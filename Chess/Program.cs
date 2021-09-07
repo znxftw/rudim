@@ -6,7 +6,8 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var Board = new Bitboard(128);
+            Board.Print();
         }
     }
 }
