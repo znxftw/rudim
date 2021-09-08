@@ -53,18 +53,13 @@ namespace Chess
 
             if (side == Side.White)
             {
-                // Only if pawn is not on A file can it attack to the left
-                if ((PawnBoard.Board & FileA) == 0)
-                    ResultBoard.Board |= PawnBoard.Board >> 9;
-                if ((PawnBoard.Board & FileH) == 0)
-                    ResultBoard.Board |= PawnBoard.Board >> 7;
+                ResultBoard.Board |= (PawnBoard.Board >> 9) & ~FileH;
+                ResultBoard.Board |= (PawnBoard.Board >> 7) & ~FileA;
             }
             else
             {
-                if ((PawnBoard.Board & FileA) == 0)
-                    ResultBoard.Board |= PawnBoard.Board << 7;
-                if ((PawnBoard.Board & FileH) == 0)
-                    ResultBoard.Board |= PawnBoard.Board << 9;
+                ResultBoard.Board |= (PawnBoard.Board << 7) & ~FileH;
+                ResultBoard.Board |= (PawnBoard.Board << 9) & ~FileA;
             }
 
             return ResultBoard;
