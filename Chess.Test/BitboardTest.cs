@@ -51,5 +51,15 @@ namespace Chess.Test
             Board.ClearBit(63);
             Assert.Equal((ulong)0, Board.Board);
         }
+        
+        [Fact]
+        public void ShouldGetGivenBits()
+        {
+            var Board = new Bitboard(9223372036854775808);
+
+            Assert.Equal(0, Board.GetBit(0));
+            Assert.Equal(0, Board.GetBit(5));
+            Assert.Equal(1, Board.GetBit(63));
+        }
     }
 }
