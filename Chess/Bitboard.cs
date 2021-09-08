@@ -8,7 +8,11 @@ namespace Chess
 
         // Precalculated Bitboards
         private static readonly ulong FileA = 72340172838076673;
+        private static readonly ulong FileB = 144680345676153346;
+        private static readonly ulong FileG = 4629771061636907072;
         private static readonly ulong FileH = 9259542123273814144;
+        private static readonly ulong FileAB = FileA | FileB;
+        private static readonly ulong FileGH = FileG | FileH;
 
         // Precalculated Attacks
         public static readonly ulong[,] PawnAttacks = new ulong[Constants.Sides, Constants.Squares];
@@ -62,6 +66,24 @@ namespace Chess
                 if ((PawnBoard.Board & FileH) == 0)
                     ResultBoard.Board |= PawnBoard.Board << 9;
             }
+
+            return ResultBoard;
+        }
+
+        public static Bitboard GetKnightAttacks(Square square)
+        {
+            var ResultBoard = new Bitboard(0);
+            var KnightBoard = new Bitboard(0);
+            KnightBoard.SetBit(square);
+
+            ResultBoard.Board |= (KnightBoard.Board << 17) & ~FileA;
+            ResultBoard.Board |= (KnightBoard.Board << 10) & ~FileAB;
+            ResultBoard.Board |= (KnightBoard.Board >> 6) & ~FileAB;
+            ResultBoard.Board |= (KnightBoard.Board >> 15) & ~FileA;
+            ResultBoard.Board |= (KnightBoard.Board << 15) & ~FileH;
+            ResultBoard.Board |= (KnightBoard.Board << 6) & ~FileGH;
+            ResultBoard.Board |= (KnightBoard.Board >> 10) & ~FileGH;
+            ResultBoard.Board |= (KnightBoard.Board >> 17) & ~FileH;
 
             return ResultBoard;
         }

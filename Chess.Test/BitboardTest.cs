@@ -114,5 +114,21 @@ namespace Chess.Test
             Assert.Equal(1, PawnAttacksBlackH8.GetBit(Square.g7));
             Assert.Equal(1, BitOperations.PopCount(PawnAttacksBlackH8.Board));
         }
+
+        [Fact]
+        public void ShouldGetEightKnightAttacksForCentralKnight()
+        {
+            var KnightAttacksE5 = Bitboard.GetKnightAttacks(Square.e5);
+
+            Assert.Equal(1, KnightAttacksE5.GetBit(Square.f3));
+            Assert.Equal(1, KnightAttacksE5.GetBit(Square.g4));
+            Assert.Equal(1, KnightAttacksE5.GetBit(Square.g6));
+            Assert.Equal(1, KnightAttacksE5.GetBit(Square.f7));
+            Assert.Equal(1, KnightAttacksE5.GetBit(Square.d7));
+            Assert.Equal(1, KnightAttacksE5.GetBit(Square.c6));
+            Assert.Equal(1, KnightAttacksE5.GetBit(Square.c4));
+            Assert.Equal(1, KnightAttacksE5.GetBit(Square.d3));
+            Assert.Equal(8, BitOperations.PopCount(KnightAttacksE5.Board));
+        }
     }
 }
