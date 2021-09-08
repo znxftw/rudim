@@ -36,5 +36,10 @@ namespace Chess
         {
             Board |= (ulong)1 << square;
         }
+
+        public void UnsetBit(int square)
+        {
+            Board &= ~((ulong)1 << square);
+        }
     }
 }
