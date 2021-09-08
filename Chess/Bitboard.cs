@@ -4,6 +4,8 @@ namespace Chess
 {
     public class Bitboard
     {
+        private static readonly ulong AFile = 72340172838076673;
+        private static readonly ulong HFile = 9259542123273814144;
         public ulong Board { get; set; }
 
         public Bitboard(ulong board)
@@ -25,6 +27,31 @@ namespace Chess
                 Console.Write(Environment.NewLine);
             }
             Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
+        }
+
+        public static Bitboard GetPawnAttacks(Square square, Side side)
+        {
+            var ResultBoard = new Bitboard(0);
+            var PawnBoard = new Bitboard(0);
+            PawnBoard.SetBit(square);
+
+            if (side == Side.White)
+            {
+                // Only if pawn is not on A file can it attack to the left
+                if ((PawnBoard.Board & AFile) == 0)
+                    ResultBoard.Board |= PawnBoard.Board >> 9;
+                if ((PawnBoard.Board & HFile) == 0)
+                    ResultBoard.Board |= PawnBoard.Board >> 7;
+            }
+            else
+            {
+                if ((PawnBoard.Board & AFile) == 0)
+                    ResultBoard.Board |= PawnBoard.Board << 9;
+                if ((PawnBoard.Board & HFile) == 0)
+                    ResultBoard.Board |= PawnBoard.Board << 7;
+            }
+
+            return ResultBoard;
         }
 
         public int GetBit(Square square)

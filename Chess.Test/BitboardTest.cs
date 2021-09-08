@@ -1,3 +1,4 @@
+using System.Numerics;
 using Xunit;
 
 namespace Chess.Test
@@ -60,6 +61,20 @@ namespace Chess.Test
             Assert.Equal(0, Board.GetBit(0));
             Assert.Equal(0, Board.GetBit(5));
             Assert.Equal(1, Board.GetBit(63));
+        }
+
+        [Fact]
+        public void ShouldGetPawnAttacksForCentralPawn()
+        {
+            var PawnAttacksWhite = Bitboard.GetPawnAttacks(Square.e5, Side.White);
+            var PawnAttacksBlack = Bitboard.GetPawnAttacks(Square.e5, Side.Black);
+
+            Assert.Equal(1, PawnAttacksWhite.GetBit(Square.f6));
+            Assert.Equal(1, PawnAttacksWhite.GetBit(Square.d6));
+            Assert.Equal(1, PawnAttacksBlack.GetBit(Square.f4));
+            Assert.Equal(1, PawnAttacksBlack.GetBit(Square.d4));
+            Assert.Equal(2, BitOperations.PopCount(PawnAttacksBlack.Board));
+            Assert.Equal(2, BitOperations.PopCount(PawnAttacksWhite.Board));
         }
     }
 }
