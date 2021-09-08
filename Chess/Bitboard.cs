@@ -8,7 +8,7 @@ namespace Chess
 
         // Precalculated Bitboards
         private static readonly ulong FileA = 72340172838076673;
-        private static readonly ulong HFile = 9259542123273814144;
+        private static readonly ulong FileH = 9259542123273814144;
 
         // Precalculated Attacks
         public static readonly ulong[,] PawnAttacks = new ulong[Constants.Sides, Constants.Squares];
@@ -52,14 +52,14 @@ namespace Chess
                 // Only if pawn is not on A file can it attack to the left
                 if ((PawnBoard.Board & FileA) == 0)
                     ResultBoard.Board |= PawnBoard.Board >> 9;
-                if ((PawnBoard.Board & HFile) == 0)
+                if ((PawnBoard.Board & FileH) == 0)
                     ResultBoard.Board |= PawnBoard.Board >> 7;
             }
             else
             {
                 if ((PawnBoard.Board & FileA) == 0)
                     ResultBoard.Board |= PawnBoard.Board << 7;
-                if ((PawnBoard.Board & HFile) == 0)
+                if ((PawnBoard.Board & FileH) == 0)
                     ResultBoard.Board |= PawnBoard.Board << 9;
             }
 
