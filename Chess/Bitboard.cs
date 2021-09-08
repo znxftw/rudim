@@ -27,8 +27,23 @@ namespace Chess
             Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
         }
 
-        private int GetBit(int square)
-        { 
+        public int GetBit(Squares square)
+        {
+            return GetBit((int)square);
+        }
+
+        public void SetBit(Squares square)
+        {
+            SetBit((int)square);
+        }
+
+        public void ClearBit(Squares square)
+        {
+            ClearBit((int)square);
+        }
+
+        public int GetBit(int square)
+        {
             return (Board & ((ulong)1 << square)) > 0 ? 1 : 0;
         }
 
