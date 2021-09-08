@@ -29,5 +29,31 @@ namespace Chess.Test
             Board.UnsetBit(5);
             Assert.Equal((ulong)0, Board.Board);
         }
+
+        [Fact]
+        public void SetBitShouldBeIdempotent()
+        {
+            var Board = new Bitboard(0);
+            Assert.Equal((ulong)0, Board.Board);
+
+            Board.SetBit(63);
+            Assert.Equal(9223372036854775808, Board.Board);
+
+            Board.SetBit(63);
+            Assert.Equal(9223372036854775808, Board.Board);
+        }
+
+        [Fact]
+        public void UnsetBitShouldBeIdempotent()
+        {
+            var Board = new Bitboard(9223372036854775808);
+            Assert.Equal(9223372036854775808, Board.Board);
+
+            Board.UnsetBit(63);
+            Assert.Equal((ulong)0, Board.Board);
+
+            Board.UnsetBit(63);
+            Assert.Equal((ulong)0, Board.Board);
+        }
     }
 }
