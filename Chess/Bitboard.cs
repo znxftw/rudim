@@ -12,22 +12,6 @@ namespace Chess
             Board = board;
         }
 
-        public void Print()
-        {
-            for (int rank = 0; rank < 8; ++rank)
-            {
-                for (int file = 0; file < 8; ++file)
-                {
-                    if (file == 0)
-                        Console.Write((8 - rank) + "\t");
-                    int square = (rank * 8) + file;
-                    Console.Write(GetBit(square) + " ");
-                }
-                Console.Write(Environment.NewLine);
-            }
-            Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
-        }
-
         public int GetBit(Square square)
         {
             return GetBit((int)square);
@@ -56,6 +40,22 @@ namespace Chess
         public void ClearBit(int square)
         {
             Board &= ~((ulong)1 << square);
+        }
+
+        public void Print()
+        {
+            for (int rank = 0; rank < 8; ++rank)
+            {
+                for (int file = 0; file < 8; ++file)
+                {
+                    if (file == 0)
+                        Console.Write((8 - rank) + "\t");
+                    int square = (rank * 8) + file;
+                    Console.Write(GetBit(square) + " ");
+                }
+                Console.Write(Environment.NewLine);
+            }
+            Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
         }
     }
 }
