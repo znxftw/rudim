@@ -20,16 +20,21 @@ namespace Chess
                     if (file == 0)
                         Console.Write((8 - rank) + "\t");
                     int square = (rank * 8) + file;
-                    Console.Write(BitAt(square) + " ");
+                    Console.Write(GetBit(square) + " ");
                 }
                 Console.Write(Environment.NewLine);
             }
             Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
         }
 
-        private int BitAt(int square)
+        private int GetBit(int square)
         { 
             return (Board & ((ulong)1 << square)) > 0 ? 1 : 0;
+        }
+
+        public void SetBit(int square)
+        {
+            Board |= (ulong)1 << square;
         }
     }
 }
