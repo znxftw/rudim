@@ -8,7 +8,6 @@ namespace Chess.Test
         public void ShouldSetSpecifiedBits()
         {
             var Board = new Bitboard(0);
-            Assert.Equal((ulong)0, Board.Board);
 
             Board.SetBit(5);
             Assert.Equal((ulong)32, Board.Board);
@@ -21,7 +20,6 @@ namespace Chess.Test
         public void ShouldUnsetSpecifiedBits()
         {
             var Board = new Bitboard(9223372036854775840);
-            Assert.Equal(9223372036854775840, Board.Board);
 
             Board.UnsetBit(63);
             Assert.Equal((ulong)32, Board.Board);
@@ -34,7 +32,6 @@ namespace Chess.Test
         public void SetBitShouldBeIdempotent()
         {
             var Board = new Bitboard(0);
-            Assert.Equal((ulong)0, Board.Board);
 
             Board.SetBit(63);
             Assert.Equal(9223372036854775808, Board.Board);
@@ -47,7 +44,6 @@ namespace Chess.Test
         public void UnsetBitShouldBeIdempotent()
         {
             var Board = new Bitboard(9223372036854775808);
-            Assert.Equal(9223372036854775808, Board.Board);
 
             Board.UnsetBit(63);
             Assert.Equal((ulong)0, Board.Board);
