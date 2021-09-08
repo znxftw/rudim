@@ -18,7 +18,7 @@ namespace Chess
                 for (int file = 0; file < 8; ++file)
                 {
                     if (file == 0)
-                        Console.Write(rank + "\t");
+                        Console.Write((8 - rank) + "\t");
                     int square = (rank * 8) + file;
                     Console.Write(BitAt(square) + " ");
                 }
