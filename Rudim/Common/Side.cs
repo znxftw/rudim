@@ -1,4 +1,4 @@
-﻿namespace Chess
+﻿namespace Rudim
 {
     public enum Side
     {

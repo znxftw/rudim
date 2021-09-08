@@ -1,6 +1,6 @@
 using System;
 
-namespace Chess
+namespace Rudim
 {
     public partial class Bitboard
     {

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess", "Chess\Chess.csproj", "{7AECCFDC-C681-49E2-B4B3-190733F62C90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudim", "Rudim\Rudim.csproj", "{7AECCFDC-C681-49E2-B4B3-190733F62C90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess.Test", "Chess.Test\Chess.Test.csproj", "{17A4B854-3894-461C-8A5D-C3177C319C09}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudim.Test", "Rudim.Test\Rudim.Test.csproj", "{17A4B854-3894-461C-8A5D-C3177C319C09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

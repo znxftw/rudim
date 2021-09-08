@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Xunit;
 
-namespace Chess.Test
+namespace Rudim.Test
 {
     public class BitboardAttacksTest
     {
