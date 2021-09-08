@@ -130,5 +130,30 @@ namespace Chess.Test
             Assert.Equal(1, KnightAttacksE5.GetBit(Square.d3));
             Assert.Equal(8, BitOperations.PopCount(KnightAttacksE5.Board));
         }
+
+        [Fact]
+        public void ShouldGetTwoKnightAttacksForCornerKnights()
+        {
+            var KnightAttacksA1 = Bitboard.GetKnightAttacks(Square.a1);
+            var KnightAttacksA8 = Bitboard.GetKnightAttacks(Square.a8);
+            var KnightAttacksH1 = Bitboard.GetKnightAttacks(Square.h1);
+            var KnightAttacksH8 = Bitboard.GetKnightAttacks(Square.h8);
+
+            Assert.Equal(1, KnightAttacksA1.GetBit(Square.b3));
+            Assert.Equal(1, KnightAttacksA1.GetBit(Square.c2));
+            Assert.Equal(2, BitOperations.PopCount(KnightAttacksA1.Board));
+
+            Assert.Equal(1, KnightAttacksA8.GetBit(Square.b6));
+            Assert.Equal(1, KnightAttacksA8.GetBit(Square.c7));
+            Assert.Equal(2, BitOperations.PopCount(KnightAttacksA8.Board));
+
+            Assert.Equal(1, KnightAttacksH1.GetBit(Square.g3));
+            Assert.Equal(1, KnightAttacksH1.GetBit(Square.f2));
+            Assert.Equal(2, BitOperations.PopCount(KnightAttacksH1.Board));
+
+            Assert.Equal(1, KnightAttacksH8.GetBit(Square.g6));
+            Assert.Equal(1, KnightAttacksH8.GetBit(Square.f7));
+            Assert.Equal(2, BitOperations.PopCount(KnightAttacksH8.Board));
+        }
     }
 }
