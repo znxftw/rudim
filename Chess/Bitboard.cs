@@ -27,17 +27,17 @@ namespace Chess
             Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
         }
 
-        public int GetBit(Squares square)
+        public int GetBit(Square square)
         {
             return GetBit((int)square);
         }
 
-        public void SetBit(Squares square)
+        public void SetBit(Square square)
         {
             SetBit((int)square);
         }
 
-        public void ClearBit(Squares square)
+        public void ClearBit(Square square)
         {
             ClearBit((int)square);
         }
