@@ -18,7 +18,7 @@ namespace Chess.Test
         }
 
         [Fact]
-        public void ShouldUnsetSpecifiedBits()
+        public void ShouldClearSpecifiedBits()
         {
             var Board = new Bitboard(9223372036854775840);
 
@@ -42,7 +42,7 @@ namespace Chess.Test
         }
 
         [Fact]
-        public void UnsetBitShouldBeIdempotent()
+        public void ClearBitShouldBeIdempotent()
         {
             var Board = new Bitboard(9223372036854775808);
 
