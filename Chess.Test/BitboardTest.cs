@@ -76,5 +76,43 @@ namespace Chess.Test
             Assert.Equal(2, BitOperations.PopCount(PawnAttacksBlack.Board));
             Assert.Equal(2, BitOperations.PopCount(PawnAttacksWhite.Board));
         }
+
+        [Fact]
+        public void ShouldGetPawnAttacksForWhiteCornerPawns()
+        {
+            var PawnAttacksWhiteA1 = Bitboard.GetPawnAttacks(Square.a1, Side.White);
+            var PawnAttacksWhiteA8 = Bitboard.GetPawnAttacks(Square.a8, Side.White);
+            var PawnAttacksWhiteH1 = Bitboard.GetPawnAttacks(Square.h1, Side.White);
+            var PawnAttacksWhiteH8 = Bitboard.GetPawnAttacks(Square.h8, Side.White);
+
+            Assert.Equal(1, PawnAttacksWhiteA1.GetBit(Square.b2));
+            Assert.Equal(1, BitOperations.PopCount(PawnAttacksWhiteA1.Board));
+
+            Assert.Equal(0, BitOperations.PopCount(PawnAttacksWhiteA8.Board));
+
+            Assert.Equal(1, PawnAttacksWhiteH1.GetBit(Square.g2));
+            Assert.Equal(1, BitOperations.PopCount(PawnAttacksWhiteA1.Board));
+
+            Assert.Equal(0, BitOperations.PopCount(PawnAttacksWhiteH8.Board));
+        }
+
+        [Fact]
+        public void ShouldGetPawnAttacksForBlackCornerPawns()
+        {
+            var PawnAttacksBlackA1 = Bitboard.GetPawnAttacks(Square.a1, Side.Black);
+            var PawnAttacksBlackA8 = Bitboard.GetPawnAttacks(Square.a8, Side.Black);
+            var PawnAttacksBlackH1 = Bitboard.GetPawnAttacks(Square.h1, Side.Black);
+            var PawnAttacksBlackH8 = Bitboard.GetPawnAttacks(Square.h8, Side.Black);
+
+            Assert.Equal(0, BitOperations.PopCount(PawnAttacksBlackA1.Board));
+
+            Assert.Equal(1, PawnAttacksBlackA8.GetBit(Square.b7));
+            Assert.Equal(1, BitOperations.PopCount(PawnAttacksBlackA8.Board));
+
+            Assert.Equal(0, BitOperations.PopCount(PawnAttacksBlackH1.Board));
+
+            Assert.Equal(1, PawnAttacksBlackH8.GetBit(Square.g7));
+            Assert.Equal(1, BitOperations.PopCount(PawnAttacksBlackH8.Board));
+        }
     }
 }
