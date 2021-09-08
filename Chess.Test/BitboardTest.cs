@@ -52,7 +52,7 @@ namespace Chess.Test
             Board.ClearBit(63);
             Assert.Equal((ulong)0, Board.Board);
         }
-        
+
         [Fact]
         public void ShouldGetGivenBits()
         {

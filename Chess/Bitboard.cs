@@ -4,10 +4,14 @@ namespace Chess
 {
     public class Bitboard
     {
-        private static readonly ulong AFile = 72340172838076673;
-        private static readonly ulong HFile = 9259542123273814144;
-        public static ulong[,] PawnAttacks = new ulong[Constants.Sides,Constants.Squares];
         public ulong Board { get; set; }
+
+        // Precalculated Bitboards
+        private static readonly ulong FileA = 72340172838076673;
+        private static readonly ulong HFile = 9259542123273814144;
+
+        // Precalculated Attacks
+        public static readonly ulong[,] PawnAttacks = new ulong[Constants.Sides, Constants.Squares];
 
         public Bitboard(ulong board)
         {
@@ -46,14 +50,14 @@ namespace Chess
             if (side == Side.White)
             {
                 // Only if pawn is not on A file can it attack to the left
-                if ((PawnBoard.Board & AFile) == 0)
+                if ((PawnBoard.Board & FileA) == 0)
                     ResultBoard.Board |= PawnBoard.Board >> 9;
                 if ((PawnBoard.Board & HFile) == 0)
                     ResultBoard.Board |= PawnBoard.Board >> 7;
             }
             else
             {
-                if ((PawnBoard.Board & AFile) == 0)
+                if ((PawnBoard.Board & FileA) == 0)
                     ResultBoard.Board |= PawnBoard.Board << 7;
                 if ((PawnBoard.Board & HFile) == 0)
                     ResultBoard.Board |= PawnBoard.Board << 9;
