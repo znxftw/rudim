@@ -8,7 +8,7 @@ namespace Chess
         {
             var Board = new Bitboard(128);
             Board.SetBit(15);
-            Board.UnsetBit(15);
+            Board.ClearBit(15);
 
             Board.Print();
         }

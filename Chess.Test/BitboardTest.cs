@@ -21,10 +21,10 @@ namespace Chess.Test
         {
             var Board = new Bitboard(9223372036854775840);
 
-            Board.UnsetBit(63);
+            Board.ClearBit(63);
             Assert.Equal((ulong)32, Board.Board);
 
-            Board.UnsetBit(5);
+            Board.ClearBit(5);
             Assert.Equal((ulong)0, Board.Board);
         }
 
@@ -45,10 +45,10 @@ namespace Chess.Test
         {
             var Board = new Bitboard(9223372036854775808);
 
-            Board.UnsetBit(63);
+            Board.ClearBit(63);
             Assert.Equal((ulong)0, Board.Board);
 
-            Board.UnsetBit(63);
+            Board.ClearBit(63);
             Assert.Equal((ulong)0, Board.Board);
         }
     }
