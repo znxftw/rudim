@@ -8,7 +8,10 @@ namespace Chess
         {
             var Board = Bitboard.GetPawnAttacks(Square.e5, Side.White);
 
-            Board.Print();
+            foreach (ulong board in Bitboard.PawnAttacks)
+            {
+                new Bitboard(board).Print();
+            }
 
             // Generate A File
             //var ABoard = new Bitboard(0);

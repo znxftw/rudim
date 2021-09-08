@@ -6,11 +6,19 @@ namespace Chess
     {
         private static readonly ulong AFile = 72340172838076673;
         private static readonly ulong HFile = 9259542123273814144;
+        public static ulong[,] PawnAttacks = new ulong[Constants.Sides,Constants.Squares];
         public ulong Board { get; set; }
 
         public Bitboard(ulong board)
         {
             Board = board;
+        }
+
+        static Bitboard()
+        {
+            for (int side = 0; side < Constants.Sides; ++side)
+                for (int square = 0; square < Constants.Squares; ++square)
+                    PawnAttacks[side, square] = Bitboard.GetPawnAttacks((Square)square, (Side)side).Board;
         }
 
         public void Print()
@@ -46,9 +54,9 @@ namespace Chess
             else
             {
                 if ((PawnBoard.Board & AFile) == 0)
-                    ResultBoard.Board |= PawnBoard.Board << 9;
-                if ((PawnBoard.Board & HFile) == 0)
                     ResultBoard.Board |= PawnBoard.Board << 7;
+                if ((PawnBoard.Board & HFile) == 0)
+                    ResultBoard.Board |= PawnBoard.Board << 9;
             }
 
             return ResultBoard;
