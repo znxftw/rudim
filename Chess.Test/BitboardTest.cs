@@ -1,4 +1,3 @@
-using System.Numerics;
 using Xunit;
 
 namespace Chess.Test
