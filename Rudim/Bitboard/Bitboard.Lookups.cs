@@ -10,12 +10,17 @@
         private static readonly ulong FileGH = FileG | FileH;
 
         public static readonly ulong[,] PawnAttacks = new ulong[Constants.Sides, Constants.Squares];
+        public static readonly ulong[] KnightAttacks = new ulong[Constants.Squares];
 
         static Bitboard()
         {
-            for (int side = 0; side < Constants.Sides; ++side)
-                for (int square = 0; square < Constants.Squares; ++square)
-                    PawnAttacks[side, square] = Bitboard.GetPawnAttacks((Square)square, (Side)side).Board;
+            for (int square = 0; square < Constants.Squares; ++square)
+            {
+                PawnAttacks[(int)Side.White, square] = Bitboard.GetPawnAttacks((Square)square, Side.White).Board;
+                PawnAttacks[(int)Side.Black, square] = Bitboard.GetPawnAttacks((Square)square, Side.Black).Board;
+
+                KnightAttacks[square] = Bitboard.GetKnightAttacks((Square)square).Board;
+            }
         }
     }
 }
