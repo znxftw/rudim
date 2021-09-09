@@ -11,6 +11,7 @@
 
         public static readonly ulong[,] PawnAttacks = new ulong[Constants.Sides, Constants.Squares];
         public static readonly ulong[] KnightAttacks = new ulong[Constants.Squares];
+        public static readonly ulong[] KingAttacks = new ulong[Constants.Squares];
 
         static Bitboard()
         {
@@ -20,6 +21,8 @@
                 PawnAttacks[(int)Side.Black, square] = Bitboard.GetPawnAttacks((Square)square, Side.Black).Board;
 
                 KnightAttacks[square] = Bitboard.GetKnightAttacks((Square)square).Board;
+
+                KingAttacks[square] = Bitboard.GetKingAttacks((Square)square).Board;
             }
         }
     }
