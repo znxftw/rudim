@@ -97,5 +97,21 @@ namespace Rudim.Test
             Assert.Equal(1, KnightAttacksH8.GetBit(Square.f7));
             Assert.Equal(2, BitOperations.PopCount(KnightAttacksH8.Board));
         }
+
+        [Fact]
+        public void ShouldGetEightKingAttacksForCentralKing()
+        {
+            var KingAttacksE5 = Bitboard.GetKingAttacks(Square.e5);
+
+            Assert.Equal(1, KingAttacksE5.GetBit(Square.e4));
+            Assert.Equal(1, KingAttacksE5.GetBit(Square.e6));
+            Assert.Equal(1, KingAttacksE5.GetBit(Square.f4));
+            Assert.Equal(1, KingAttacksE5.GetBit(Square.f5));
+            Assert.Equal(1, KingAttacksE5.GetBit(Square.f6));
+            Assert.Equal(1, KingAttacksE5.GetBit(Square.d4));
+            Assert.Equal(1, KingAttacksE5.GetBit(Square.d5));
+            Assert.Equal(1, KingAttacksE5.GetBit(Square.d6));
+            Assert.Equal(8, BitOperations.PopCount(KingAttacksE5.Board));
+        }
     }
 }

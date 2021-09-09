@@ -1,4 +1,6 @@
-﻿namespace Rudim
+﻿using System;
+
+namespace Rudim
 {
     public partial class Bitboard
     {
@@ -36,6 +38,26 @@
             ResultBoard.Board |= (KnightBoard.Board << 6) & ~FileGH;
             ResultBoard.Board |= (KnightBoard.Board >> 10) & ~FileGH;
             ResultBoard.Board |= (KnightBoard.Board >> 17) & ~FileH;
+
+            return ResultBoard;
+        }
+
+        public static Bitboard GetKingAttacks(Square square)
+        {
+            var ResultBoard = new Bitboard(0);
+            var KingBoard = new Bitboard(0);
+            KingBoard.SetBit(square);
+
+            ResultBoard.Board |= (KingBoard.Board << 1) & ~FileA;
+            ResultBoard.Board |= (KingBoard.Board << 7) & ~FileA;
+            ResultBoard.Board |= (KingBoard.Board >> 9) & ~FileA;
+
+            ResultBoard.Board |= (KingBoard.Board >> 1) & ~FileH;
+            ResultBoard.Board |= (KingBoard.Board >> 7) & ~FileH;
+            ResultBoard.Board |= (KingBoard.Board << 9) & ~FileH;
+
+            ResultBoard.Board |= (KingBoard.Board << 8);
+            ResultBoard.Board |= (KingBoard.Board >> 8);
 
             return ResultBoard;
         }
