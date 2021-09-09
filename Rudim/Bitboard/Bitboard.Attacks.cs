@@ -49,12 +49,12 @@ namespace Rudim
             KingBoard.SetBit(square);
 
             ResultBoard.Board |= (KingBoard.Board << 1) & ~FileA;
-            ResultBoard.Board |= (KingBoard.Board << 7) & ~FileA;
-            ResultBoard.Board |= (KingBoard.Board >> 9) & ~FileA;
+            ResultBoard.Board |= (KingBoard.Board >> 7) & ~FileA;
+            ResultBoard.Board |= (KingBoard.Board << 9) & ~FileA;
 
             ResultBoard.Board |= (KingBoard.Board >> 1) & ~FileH;
-            ResultBoard.Board |= (KingBoard.Board >> 7) & ~FileH;
-            ResultBoard.Board |= (KingBoard.Board << 9) & ~FileH;
+            ResultBoard.Board |= (KingBoard.Board << 7) & ~FileH;
+            ResultBoard.Board |= (KingBoard.Board >> 9) & ~FileH;
 
             ResultBoard.Board |= (KingBoard.Board << 8);
             ResultBoard.Board |= (KingBoard.Board >> 8);

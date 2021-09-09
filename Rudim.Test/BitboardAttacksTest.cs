@@ -113,5 +113,34 @@ namespace Rudim.Test
             Assert.Equal(1, KingAttacksE5.GetBit(Square.d6));
             Assert.Equal(8, BitOperations.PopCount(KingAttacksE5.Board));
         }
+
+        [Fact]
+        public void ShouldGetThreeKingAttacksForCornerKings()
+        {
+            var KingAttacksA1 = Bitboard.GetKingAttacks(Square.a1);
+            var KingAttacksA8 = Bitboard.GetKingAttacks(Square.a8);
+            var KingAttacksH1 = Bitboard.GetKingAttacks(Square.h1);
+            var KingAttacksH8 = Bitboard.GetKingAttacks(Square.h8);
+
+            Assert.Equal(1, KingAttacksA1.GetBit(Square.a2));
+            Assert.Equal(1, KingAttacksA1.GetBit(Square.b1));
+            Assert.Equal(1, KingAttacksA1.GetBit(Square.b2));
+            Assert.Equal(3, BitOperations.PopCount(KingAttacksA1.Board));
+
+            Assert.Equal(1, KingAttacksA8.GetBit(Square.a7));
+            Assert.Equal(1, KingAttacksA8.GetBit(Square.b8));
+            Assert.Equal(1, KingAttacksA8.GetBit(Square.b7));
+            Assert.Equal(3, BitOperations.PopCount(KingAttacksA8.Board));
+
+            Assert.Equal(1, KingAttacksH1.GetBit(Square.h2));
+            Assert.Equal(1, KingAttacksH1.GetBit(Square.g1));
+            Assert.Equal(1, KingAttacksH1.GetBit(Square.g2));
+            Assert.Equal(3, BitOperations.PopCount(KingAttacksH1.Board));
+
+            Assert.Equal(1, KingAttacksH8.GetBit(Square.h7));
+            Assert.Equal(1, KingAttacksH8.GetBit(Square.g8));
+            Assert.Equal(1, KingAttacksH8.GetBit(Square.g7));
+            Assert.Equal(3, BitOperations.PopCount(KingAttacksH8.Board));
+        }
     }
 }
