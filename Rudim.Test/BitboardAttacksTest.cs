@@ -285,7 +285,6 @@ namespace Rudim.Test
             var BlockerBoard = new Bitboard(0);
             var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, BlockerBoard);
 
-
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e1));
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e2));
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e3));
@@ -315,7 +314,6 @@ namespace Rudim.Test
             BlockerBoard.SetBit(Square.f5); // Should prune g5, h5
             var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, BlockerBoard);
 
-
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e3));
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e4));
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e6));
@@ -329,6 +327,31 @@ namespace Rudim.Test
             Assert.Equal(1, RookAttacksE5.GetBit(Square.f5));
 
             Assert.Equal(10, BitOperations.PopCount(RookAttacksE5.Board));
+        }
+
+        [Fact]
+        public void ShouldGetAttacksForCornerRookWithNoBlockers()
+        {
+            var BlockerBoard = new Bitboard(0);
+            var RookAttacksA1 = Bitboard.GetRookAttacks(Square.a1, BlockerBoard);
+
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.a2));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.a3));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.a4));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.a5));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.a6));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.a7));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.a8));
+
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.b1));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.c1));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.d1));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.e1));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.f1));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.g1));
+            Assert.Equal(1, RookAttacksA1.GetBit(Square.h1));
+
+            Assert.Equal(14, BitOperations.PopCount(RookAttacksA1.Board));
         }
     }
 }
