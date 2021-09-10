@@ -9,7 +9,7 @@ namespace Rudim.Test
         //        Implement an IClassFixture and initialize before running any tests to avoid any wrongly reported test runtimes
 
         [Fact]
-        public void ShouldGetPawnAttacksForCentralPawn()
+        public void ShouldGetAttacksForCentralPawn()
         {
             var PawnAttacksWhite = Bitboard.GetPawnAttacks(Square.e5, Side.White);
             var PawnAttacksBlack = Bitboard.GetPawnAttacks(Square.e5, Side.Black);
@@ -23,7 +23,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetPawnAttacksForWhiteCornerPawns()
+        public void ShouldGetAttacksForWhiteCornerPawn()
         {
             var PawnAttacksWhiteA1 = Bitboard.GetPawnAttacks(Square.a1, Side.White);
             var PawnAttacksWhiteA8 = Bitboard.GetPawnAttacks(Square.a8, Side.White);
@@ -35,7 +35,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetPawnAttacksForBlackCornerPawns()
+        public void ShouldGetAttacksForBlackCornerPawn()
         {
             var PawnAttacksBlackA1 = Bitboard.GetPawnAttacks(Square.a1, Side.Black);
             var PawnAttacksBlackA8 = Bitboard.GetPawnAttacks(Square.a8, Side.Black);
@@ -47,7 +47,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetEightKnightAttacksForCentralKnight()
+        public void ShouldGetAttacksForCentralKnight()
         {
             var KnightAttacksE5 = Bitboard.GetKnightAttacks(Square.e5);
 
@@ -63,7 +63,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetTwoKnightAttacksForCornerKnights()
+        public void ShouldGetAttacksForCornerKnight()
         {
             var KnightAttacksA1 = Bitboard.GetKnightAttacks(Square.a1);
 
@@ -73,7 +73,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetEightKingAttacksForCentralKing()
+        public void ShouldGetAttacksForCentralKing()
         {
             var KingAttacksE5 = Bitboard.GetKingAttacks(Square.e5);
 
@@ -89,7 +89,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetThreeKingAttacksForCornerKings()
+        public void ShouldGetAttacksForCornerKing()
         {
             var KingAttacksA1 = Bitboard.GetKingAttacks(Square.a1);
 
@@ -100,7 +100,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetThirteenAttacksForCentralBishopWithNoBlockers()
+        public void ShouldGetAttacksForCentralBishopWithNoBlockers()
         {
             var BlockerBoard = new Bitboard(0);
             var BishopAttacksE5 = Bitboard.GetBishopAttacks(Square.e5, BlockerBoard);
@@ -152,7 +152,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetAttacksForCornerBishopsWithNoBlockers()
+        public void ShouldGetAttacksForCornerBishopWithNoBlockers()
         {
             var BlockerBoard = new Bitboard(0);
             var BishopAttacksA1 = Bitboard.GetBishopAttacks(Square.a1, BlockerBoard);
@@ -168,7 +168,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetAttacksForCornerBishopsWithBlockers()
+        public void ShouldGetAttacksForCornerBishopWithBlockers()
         {
             var BlockerBoard = new Bitboard(0);
             BlockerBoard.SetBit(Square.e5); // Should prune f6, g7, h8
@@ -183,7 +183,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetFourteenAttacksForCentralRookWithNoBlockers()
+        public void ShouldGetAttacksForCentralRookWithNoBlockers()
         {
             var BlockerBoard = new Bitboard(0);
             var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, BlockerBoard);
