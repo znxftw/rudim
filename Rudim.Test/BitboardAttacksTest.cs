@@ -194,5 +194,51 @@ namespace Rudim.Test
 
             Assert.Equal(10, BitOperations.PopCount(BishopAttacksE5.Board));
         }
+
+        [Fact]
+        public void ShouldGetAttacksForCornerBishopsWithNoBlockers()
+        {
+            var BlockerBoard = new Bitboard(0);
+            var BishopAttacksA1 = Bitboard.GetBishopAttacks(Square.a1, BlockerBoard);
+            var BishopAttacksA8 = Bitboard.GetBishopAttacks(Square.a8, BlockerBoard);
+            var BishopAttacksH1 = Bitboard.GetBishopAttacks(Square.h1, BlockerBoard);
+            var BishopAttacksH8 = Bitboard.GetBishopAttacks(Square.h8, BlockerBoard);
+
+            Assert.Equal(1, BishopAttacksA1.GetBit(Square.b2));
+            Assert.Equal(1, BishopAttacksA1.GetBit(Square.c3));
+            Assert.Equal(1, BishopAttacksA1.GetBit(Square.d4));
+            Assert.Equal(1, BishopAttacksA1.GetBit(Square.e5));
+            Assert.Equal(1, BishopAttacksA1.GetBit(Square.f6));
+            Assert.Equal(1, BishopAttacksA1.GetBit(Square.g7));
+            Assert.Equal(1, BishopAttacksA1.GetBit(Square.h8));
+            Assert.Equal(7, BitOperations.PopCount(BishopAttacksA1.Board));
+
+            Assert.Equal(1, BishopAttacksA8.GetBit(Square.b7));
+            Assert.Equal(1, BishopAttacksA8.GetBit(Square.c6));
+            Assert.Equal(1, BishopAttacksA8.GetBit(Square.d5));
+            Assert.Equal(1, BishopAttacksA8.GetBit(Square.e4));
+            Assert.Equal(1, BishopAttacksA8.GetBit(Square.f3));
+            Assert.Equal(1, BishopAttacksA8.GetBit(Square.g2));
+            Assert.Equal(1, BishopAttacksA8.GetBit(Square.h1));
+            Assert.Equal(7, BitOperations.PopCount(BishopAttacksA8.Board));
+
+            Assert.Equal(1, BishopAttacksH1.GetBit(Square.g2));
+            Assert.Equal(1, BishopAttacksH1.GetBit(Square.f3));
+            Assert.Equal(1, BishopAttacksH1.GetBit(Square.e4));
+            Assert.Equal(1, BishopAttacksH1.GetBit(Square.d5));
+            Assert.Equal(1, BishopAttacksH1.GetBit(Square.c6));
+            Assert.Equal(1, BishopAttacksH1.GetBit(Square.b7));
+            Assert.Equal(1, BishopAttacksH1.GetBit(Square.a8));
+            Assert.Equal(7, BitOperations.PopCount(BishopAttacksH1.Board));
+
+            Assert.Equal(1, BishopAttacksH8.GetBit(Square.g7));
+            Assert.Equal(1, BishopAttacksH8.GetBit(Square.f6));
+            Assert.Equal(1, BishopAttacksH8.GetBit(Square.e5));
+            Assert.Equal(1, BishopAttacksH8.GetBit(Square.d4));
+            Assert.Equal(1, BishopAttacksH8.GetBit(Square.c3));
+            Assert.Equal(1, BishopAttacksH8.GetBit(Square.b2));
+            Assert.Equal(1, BishopAttacksH8.GetBit(Square.a1));
+            Assert.Equal(7, BitOperations.PopCount(BishopAttacksH8.Board));
+        }
     }
 }
