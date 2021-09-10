@@ -144,7 +144,7 @@ namespace Rudim.Test
         }
 
         [Fact]
-        public void ShouldGetThirteenAttacksForCentralBishopsWithNoBlockers()
+        public void ShouldGetThirteenAttacksForCentralBishopWithNoBlockers()
         {
             var BlockerBoard = new Bitboard(0);
             var BishopAttacksE5 = Bitboard.GetBishopAttacks(Square.e5, BlockerBoard);
@@ -167,6 +167,32 @@ namespace Rudim.Test
             Assert.Equal(1, BishopAttacksE5.GetBit(Square.b8));
 
             Assert.Equal(13, BitOperations.PopCount(BishopAttacksE5.Board));
+        }
+
+        [Fact]
+        public void ShouldGetAttacksForCentralBishopWithBlockers()
+        {
+            var BlockerBoard = new Bitboard(0);
+            BlockerBoard.SetBit(Square.d4); // Should prune c3,b2,a1
+            BlockerBoard.SetBit(Square.a5); // Should not cause any problems because it is not in the diagonal
+            BlockerBoard.SetBit(Square.h2); // Should not change anything as it is an edge square
+            var BishopAttacksE5 = Bitboard.GetBishopAttacks(Square.e5, BlockerBoard);
+
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.f4));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.g3));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.h2));
+
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.f6));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.g7));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.h8));
+
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.d4));
+
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.d6));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.c7));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.b8));
+
+            Assert.Equal(10, BitOperations.PopCount(BishopAttacksE5.Board));
         }
     }
 }
