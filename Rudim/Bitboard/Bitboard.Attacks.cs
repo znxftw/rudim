@@ -94,5 +94,42 @@ namespace Rudim
 
             return ResultBoard;
         }
+
+        public static Bitboard GetRookAttacks(Square square, Bitboard blockers)
+        {
+            var ResultBoard = new Bitboard(0);
+            var RookRank = (int)square / 8;
+            var RookFile = (int)square % 8;
+
+            for(int rank = RookRank + 1; rank < 8; ++rank)
+            {
+                var file = RookFile;
+                //TODO : Kept this variable to be able to refactor out these common statements occuring 8 times
+                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+            }
+
+            for (int rank = RookRank - 1; rank >= 0; --rank)
+            {
+                var file = RookFile;
+                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+            }
+
+            for(int file = RookFile + 1; file < 8; ++file)
+            {
+                var rank = RookRank;
+                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+            }
+            for (int file = RookFile - 1; file  >= 0; --file)
+            {
+                var rank = RookRank;
+                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+            }
+
+            return ResultBoard;
+        }
     }
 }

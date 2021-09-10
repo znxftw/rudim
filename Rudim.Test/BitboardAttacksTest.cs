@@ -5,6 +5,9 @@ namespace Rudim.Test
 {
     public class BitboardAttacksTest
     {
+        // TODO : Minor improvement, the first test run takes longer than the rest because of the static initializer
+        //        Implement an IClassFixture and initialize before running any tests to avoid any wrongly reported test runtimes
+
         [Fact]
         public void ShouldGetPawnAttacksForCentralPawn()
         {
@@ -274,6 +277,32 @@ namespace Rudim.Test
             Assert.Equal(1, BishopAttacksH8.GetBit(Square.f6));
             Assert.Equal(1, BishopAttacksH8.GetBit(Square.e5));
             Assert.Equal(3, BitOperations.PopCount(BishopAttacksH8.Board));
+        }
+
+        [Fact]
+        public void ShouldGetFourteenAttacksForCentralRookWithNoBlockers()
+        {
+            var BlockerBoard = new Bitboard(0);
+            var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, BlockerBoard);
+
+
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e1));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e2));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e3));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e4));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e6));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e7));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e8));
+
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.a5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.b5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.c5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.d5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.f5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.g5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.h5));
+
+            Assert.Equal(14, BitOperations.PopCount(RookAttacksE5.Board));
         }
     }
 }
