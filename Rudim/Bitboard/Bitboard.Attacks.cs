@@ -90,27 +90,16 @@ namespace Rudim
             var RookFile = (int)square % 8;
 
             for (int rank = RookRank + 1; rank < 8; ++rank)
-            {
-                var file = RookFile;
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
-            }
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, RookFile, blockers)) break;
 
             for (int rank = RookRank - 1; rank >= 0; --rank)
-            {
-                var file = RookFile;
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
-            }
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, RookFile, blockers)) break;
 
             for (int file = RookFile + 1; file < 8; ++file)
-            {
-                var rank = RookRank;
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
-            }
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, RookRank, file, blockers)) break;
+
             for (int file = RookFile - 1; file >= 0; --file)
-            {
-                var rank = RookRank;
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
-            }
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, RookRank, file, blockers)) break;
 
             return ResultBoard;
         }
