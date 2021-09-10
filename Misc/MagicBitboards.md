@@ -45,7 +45,13 @@ If we have a position of blocking pieces being (same e5 example - we don't care 
 ```
 Say we want to represent it as `100001100` (going left -> right and top -> bottom and only considering the bits on the relevant diagonal and also excluding edge bits)
 
-Let's call the first number (the big binary matrix above) as X and the second representation as P.
-A magic number is basically a unique number for a square such that X * Magic Number = P, for all one-to-one mappings for X -> P
-I didn't look too much into the mathematical proof for if and why such a number could exist, will probably expand this document if I go to look into that.
+Let's use the following terminology
+- `A` is the big binary representation you see above (the LSB is described in the previous sentence)
+- `B` is the index we represented it as in the line above
+- `Sq` is the squaare marked as `X` in the matrix.
+
+A magic number is basically a number for a square such that `A * Magic Number = B`, for all one-to-one mappings for `Sq`, `A -> B`
+
+This apparently exists for every square `Sq` in the board. I didn't look too much into (or don't even know if there is - probably why it's called magic) the mathematical proof for why such a number could exist, will probably expand this document if I go to look into that.
+
 But with this understanding of what magic numbers are and how they work - you would (hopefully) be able to better understand the wiki and the algorithms mentioned there.
