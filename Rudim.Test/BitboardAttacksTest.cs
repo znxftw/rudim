@@ -142,5 +142,31 @@ namespace Rudim.Test
             Assert.Equal(1, KingAttacksH8.GetBit(Square.g7));
             Assert.Equal(3, BitOperations.PopCount(KingAttacksH8.Board));
         }
+
+        [Fact]
+        public void ShouldGetThirteenAttacksForCentralBishopsWithNoBlockers()
+        {
+            var BlockerBoard = new Bitboard(0);
+            var BishopAttacksE5 = Bitboard.GetBishopAttacks(Square.e5, BlockerBoard);
+
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.f4));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.g3));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.h2));
+
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.f6));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.g7));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.h8));
+
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.d4));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.c3));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.b2));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.a1));
+
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.d6));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.c7));
+            Assert.Equal(1, BishopAttacksE5.GetBit(Square.b8));
+
+            Assert.Equal(13, BitOperations.PopCount(BishopAttacksE5.Board));
+        }
     }
 }

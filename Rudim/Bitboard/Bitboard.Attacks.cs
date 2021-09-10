@@ -61,5 +61,38 @@ namespace Rudim
 
             return ResultBoard;
         }
+
+        public static Bitboard GetBishopAttacks(Square square, Bitboard blockers)
+        {
+            var ResultBoard = new Bitboard(0);
+            var BishopRank = (int)square / 8;
+            var BishopFile = (int)square % 8;
+
+            for (int rank = BishopRank + 1, file = BishopFile + 1; rank < 8 && file < 8; ++rank, ++file)
+            {
+                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+            }
+
+            for (int rank = BishopRank - 1, file = BishopFile + 1; rank >= 0 && file < 8; --rank, ++file)
+            {
+                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+            }
+
+            for (int rank = BishopRank - 1, file = BishopFile - 1; rank >= 0 && file >= 0; --rank, --file)
+            {
+                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+            }
+
+            for (int rank = BishopRank + 1, file = BishopFile - 1; rank < 8 && file >= 0; ++rank, --file)
+            {
+                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+            }
+
+            return ResultBoard;
+        }
     }
 }
