@@ -304,5 +304,31 @@ namespace Rudim.Test
 
             Assert.Equal(14, BitOperations.PopCount(RookAttacksE5.Board));
         }
+
+        [Fact]
+        public void ShouldGetAttacksForCentralRookWithBlockers()
+        {
+            var BlockerBoard = new Bitboard(0);
+            BlockerBoard.SetBit(Square.e3); // Should prune e2, e1
+            BlockerBoard.SetBit(Square.g7); // Should not make a difference
+            BlockerBoard.SetBit(Square.e8); // Should not make a difference
+            BlockerBoard.SetBit(Square.f5); // Should prune g5, h5
+            var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, BlockerBoard);
+
+
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e3));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e4));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e6));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e7));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.e8));
+
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.a5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.b5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.c5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.d5));
+            Assert.Equal(1, RookAttacksE5.GetBit(Square.f5));
+
+            Assert.Equal(10, BitOperations.PopCount(RookAttacksE5.Board));
+        }
     }
 }
