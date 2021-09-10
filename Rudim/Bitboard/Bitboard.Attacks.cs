@@ -69,28 +69,16 @@ namespace Rudim
             var BishopFile = (int)square % 8;
 
             for (int rank = BishopRank + 1, file = BishopFile + 1; rank < 8 && file < 8; ++rank, ++file)
-            {
-                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
-            }
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
 
             for (int rank = BishopRank - 1, file = BishopFile + 1; rank >= 0 && file < 8; --rank, ++file)
-            {
-                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
-            }
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
 
             for (int rank = BishopRank - 1, file = BishopFile - 1; rank >= 0 && file >= 0; --rank, --file)
-            {
-                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
-            }
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
 
             for (int rank = BishopRank + 1, file = BishopFile - 1; rank < 8 && file >= 0; ++rank, --file)
-            {
-                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
-            }
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
 
             return ResultBoard;
         }
@@ -101,35 +89,38 @@ namespace Rudim
             var RookRank = (int)square / 8;
             var RookFile = (int)square % 8;
 
-            for(int rank = RookRank + 1; rank < 8; ++rank)
+            for (int rank = RookRank + 1; rank < 8; ++rank)
             {
                 var file = RookFile;
-                //TODO : Kept this variable to be able to refactor out these common statements occuring 8 times
-                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
             }
 
             for (int rank = RookRank - 1; rank >= 0; --rank)
             {
                 var file = RookFile;
-                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
             }
 
-            for(int file = RookFile + 1; file < 8; ++file)
+            for (int file = RookFile + 1; file < 8; ++file)
             {
                 var rank = RookRank;
-                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
             }
-            for (int file = RookFile - 1; file  >= 0; --file)
+            for (int file = RookFile - 1; file >= 0; --file)
             {
                 var rank = RookRank;
-                ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-                if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0) break;
+                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
             }
 
             return ResultBoard;
+        }
+
+        private static bool AddSquareToBoardAndStopAtBlockers(Bitboard ResultBoard, int rank, int file, Bitboard blockers)
+        {
+            ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
+            if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0)
+                return true;
+            return false;
         }
     }
 }
