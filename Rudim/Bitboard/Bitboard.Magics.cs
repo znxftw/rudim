@@ -50,7 +50,7 @@ namespace Rudim
             return ResultBoard;
         }
 
-        private static ulong GenerateMagicNumber()
+        private static ulong GeneratePotentialMagicNumber()
         {
             return Random.NextULong() & Random.NextULong() & Random.NextULong();
         }
