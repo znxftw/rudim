@@ -47,7 +47,7 @@ Say we want to represent it as `100001100` (going left -> right and top -> botto
 
 Let's use the following terminology
 - `A` is the big binary representation you see above (the LSB is described in the previous sentence)
-- `B` is the index we represented it as in the line above
+- `B` is the magic index we represented it as in the line above. Quick note here, this magic index doesn't have to be exactly as I described, it just has to represent all the bits uniquely and should have a different magic index for every possible combination of blocking pieces.
 - `Sq` is the square marked as `X` in the matrix.
 
 A magic number is basically a number for `Sq` such that `A * Magic Number = B`, for all one-to-one mappings for `Sq`, `A -> B`
