@@ -62,52 +62,52 @@ namespace Rudim
             return ResultBoard;
         }
 
-        public static Bitboard GetBishopAttacks(Square square, Bitboard blockers)
+        public static Bitboard GetBishopAttacks(Square square, Bitboard occupancy)
         {
             var ResultBoard = new Bitboard(0);
             var BishopRank = (int)square / 8;
             var BishopFile = (int)square % 8;
 
             for (int rank = BishopRank + 1, file = BishopFile + 1; rank < 8 && file < 8; ++rank, ++file)
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, occupancy)) break;
 
             for (int rank = BishopRank - 1, file = BishopFile + 1; rank >= 0 && file < 8; --rank, ++file)
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, occupancy)) break;
 
             for (int rank = BishopRank - 1, file = BishopFile - 1; rank >= 0 && file >= 0; --rank, --file)
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, occupancy)) break;
 
             for (int rank = BishopRank + 1, file = BishopFile - 1; rank < 8 && file >= 0; ++rank, --file)
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, file, blockers)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, occupancy)) break;
 
             return ResultBoard;
         }
 
-        public static Bitboard GetRookAttacks(Square square, Bitboard blockers)
+        public static Bitboard GetRookAttacks(Square square, Bitboard occupancy)
         {
             var ResultBoard = new Bitboard(0);
             var RookRank = (int)square / 8;
             var RookFile = (int)square % 8;
 
             for (int rank = RookRank + 1; rank < 8; ++rank)
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, RookFile, blockers)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, RookFile, occupancy)) break;
 
             for (int rank = RookRank - 1; rank >= 0; --rank)
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, rank, RookFile, blockers)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, RookFile, occupancy)) break;
 
             for (int file = RookFile + 1; file < 8; ++file)
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, RookRank, file, blockers)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, RookRank, file, occupancy)) break;
 
             for (int file = RookFile - 1; file >= 0; --file)
-                if (AddSquareToBoardAndStopAtBlockers(ResultBoard, RookRank, file, blockers)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, RookRank, file, occupancy)) break;
 
             return ResultBoard;
         }
 
-        private static bool AddSquareToBoardAndStopAtBlockers(Bitboard ResultBoard, int rank, int file, Bitboard blockers)
+        private static bool AddSquareToBoardAndStopAtOccupiedSquare(Bitboard ResultBoard, int rank, int file, Bitboard occupancy)
         {
             ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-            if (((ulong)1 << (rank * 8) + file & blockers.Board) > 0)
+            if (((ulong)1 << (rank * 8) + file & occupancy.Board) > 0)
                 return true;
             return false;
         }

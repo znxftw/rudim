@@ -102,8 +102,8 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGetAttacksForCentralBishopWithNoBlockers()
         {
-            var BlockerBoard = new Bitboard(0);
-            var BishopAttacksE5 = Bitboard.GetBishopAttacks(Square.e5, BlockerBoard);
+            var OccupancyBoard = new Bitboard(0);
+            var BishopAttacksE5 = Bitboard.GetBishopAttacks(Square.e5, OccupancyBoard);
 
             Assert.Equal(1, BishopAttacksE5.GetBit(Square.f4));
             Assert.Equal(1, BishopAttacksE5.GetBit(Square.g3));
@@ -128,11 +128,11 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGetAttacksForCentralBishopWithBlockers()
         {
-            var BlockerBoard = new Bitboard(0);
-            BlockerBoard.SetBit(Square.d4); // Should prune c3,b2,a1
-            BlockerBoard.SetBit(Square.a5); // Should not cause any problems because it is not in the diagonal
-            BlockerBoard.SetBit(Square.h2); // Should not change anything as it is an edge square
-            var BishopAttacksE5 = Bitboard.GetBishopAttacks(Square.e5, BlockerBoard);
+            var OccupancyBoard = new Bitboard(0);
+            OccupancyBoard.SetBit(Square.d4); // Should prune c3,b2,a1
+            OccupancyBoard.SetBit(Square.a5); // Should not cause any problems because it is not in the diagonal
+            OccupancyBoard.SetBit(Square.h2); // Should not change anything as it is an edge square
+            var BishopAttacksE5 = Bitboard.GetBishopAttacks(Square.e5, OccupancyBoard);
 
             Assert.Equal(1, BishopAttacksE5.GetBit(Square.f4));
             Assert.Equal(1, BishopAttacksE5.GetBit(Square.g3));
@@ -154,8 +154,8 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGetAttacksForCornerBishopWithNoBlockers()
         {
-            var BlockerBoard = new Bitboard(0);
-            var BishopAttacksA1 = Bitboard.GetBishopAttacks(Square.a1, BlockerBoard);
+            var OccupancyBoard = new Bitboard(0);
+            var BishopAttacksA1 = Bitboard.GetBishopAttacks(Square.a1, OccupancyBoard);
 
             Assert.Equal(1, BishopAttacksA1.GetBit(Square.b2));
             Assert.Equal(1, BishopAttacksA1.GetBit(Square.c3));
@@ -170,10 +170,10 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGetAttacksForCornerBishopWithBlockers()
         {
-            var BlockerBoard = new Bitboard(0);
-            BlockerBoard.SetBit(Square.e5); // Should prune f6, g7, h8
-            BlockerBoard.SetBit(Square.e4); // Should not make a difference
-            var BishopAttacksA1 = Bitboard.GetBishopAttacks(Square.a1, BlockerBoard);
+            var OccupancyBoard = new Bitboard(0);
+            OccupancyBoard.SetBit(Square.e5); // Should prune f6, g7, h8
+            OccupancyBoard.SetBit(Square.e4); // Should not make a difference
+            var BishopAttacksA1 = Bitboard.GetBishopAttacks(Square.a1, OccupancyBoard);
 
             Assert.Equal(1, BishopAttacksA1.GetBit(Square.b2));
             Assert.Equal(1, BishopAttacksA1.GetBit(Square.c3));
@@ -185,8 +185,8 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGetAttacksForCentralRookWithNoBlockers()
         {
-            var BlockerBoard = new Bitboard(0);
-            var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, BlockerBoard);
+            var OccupancyBoard = new Bitboard(0);
+            var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, OccupancyBoard);
 
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e1));
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e2));
@@ -210,12 +210,12 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGetAttacksForCentralRookWithBlockers()
         {
-            var BlockerBoard = new Bitboard(0);
-            BlockerBoard.SetBit(Square.e3); // Should prune e2, e1
-            BlockerBoard.SetBit(Square.g7); // Should not make a difference
-            BlockerBoard.SetBit(Square.e8); // Should not make a difference
-            BlockerBoard.SetBit(Square.f5); // Should prune g5, h5
-            var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, BlockerBoard);
+            var OccupancyBoard = new Bitboard(0);
+            OccupancyBoard.SetBit(Square.e3); // Should prune e2, e1
+            OccupancyBoard.SetBit(Square.g7); // Should not make a difference
+            OccupancyBoard.SetBit(Square.e8); // Should not make a difference
+            OccupancyBoard.SetBit(Square.f5); // Should prune g5, h5
+            var RookAttacksE5 = Bitboard.GetRookAttacks(Square.e5, OccupancyBoard);
 
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e3));
             Assert.Equal(1, RookAttacksE5.GetBit(Square.e4));
@@ -235,8 +235,8 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGetAttacksForCornerRookWithNoBlockers()
         {
-            var BlockerBoard = new Bitboard(0);
-            var RookAttacksA1 = Bitboard.GetRookAttacks(Square.a1, BlockerBoard);
+            var OccupancyBoard = new Bitboard(0);
+            var RookAttacksA1 = Bitboard.GetRookAttacks(Square.a1, OccupancyBoard);
 
             Assert.Equal(1, RookAttacksA1.GetBit(Square.a2));
             Assert.Equal(1, RookAttacksA1.GetBit(Square.a3));
@@ -260,12 +260,12 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGetAttacksForCornerRookWithBlockers()
         {
-            var BlockerBoard = new Bitboard(0);
-            BlockerBoard.SetBit(Square.a5); // Should prune a6, a7, a8
-            BlockerBoard.SetBit(Square.g7); // Should not make a difference
-            BlockerBoard.SetBit(Square.e8); // Should not make a difference
-            BlockerBoard.SetBit(Square.b1); // Should prune c1, d1, e1, f1, g1, h1
-            var RookAttacksA1 = Bitboard.GetRookAttacks(Square.a1, BlockerBoard);
+            var OccupancyBoard = new Bitboard(0);
+            OccupancyBoard.SetBit(Square.a5); // Should prune a6, a7, a8
+            OccupancyBoard.SetBit(Square.g7); // Should not make a difference
+            OccupancyBoard.SetBit(Square.e8); // Should not make a difference
+            OccupancyBoard.SetBit(Square.b1); // Should prune c1, d1, e1, f1, g1, h1
+            var RookAttacksA1 = Bitboard.GetRookAttacks(Square.a1, OccupancyBoard);
 
             Assert.Equal(1, RookAttacksA1.GetBit(Square.a2));
             Assert.Equal(1, RookAttacksA1.GetBit(Square.a3));
