@@ -48,9 +48,9 @@ Say we want to represent it as `100001100` (going left -> right and top -> botto
 Let's use the following terminology
 - `A` is the big binary representation you see above (the LSB is described in the previous sentence)
 - `B` is the index we represented it as in the line above
-- `Sq` is the squaare marked as `X` in the matrix.
+- `Sq` is the square marked as `X` in the matrix.
 
-A magic number is basically a number for a square such that `A * Magic Number = B`, for all one-to-one mappings for `Sq`, `A -> B`
+A magic number is basically a number for `Sq` such that `A * Magic Number = B`, for all one-to-one mappings for `Sq`, `A -> B`
 
 This apparently exists for every square `Sq` in the board. I didn't look too much into (or don't even know if there is - probably why it's called magic) the mathematical proof for why such a number could exist, will probably expand this document if I go to look into that.
 
