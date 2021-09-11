@@ -1,4 +1,6 @@
-﻿namespace Rudim
+﻿using System.Numerics;
+
+namespace Rudim
 {
     public partial class Bitboard
     {
@@ -12,6 +14,8 @@
         public static readonly ulong[,] PawnAttacks = new ulong[Constants.Sides, Constants.Squares];
         public static readonly ulong[] KnightAttacks = new ulong[Constants.Squares];
         public static readonly ulong[] KingAttacks = new ulong[Constants.Squares];
+        public static readonly int[] BishopMaskBits = new int[Constants.Squares];
+        public static readonly int[] RookMaskBits = new int[Constants.Squares];
 
         static Bitboard()
         {
@@ -23,6 +27,9 @@
                 KnightAttacks[square] = Bitboard.GetKnightAttacks((Square)square).Board;
 
                 KingAttacks[square] = Bitboard.GetKingAttacks((Square)square).Board;
+
+                BishopMaskBits[square] = BitOperations.PopCount(Bitboard.GetBishopMask((Square)square).Board);
+                RookMaskBits[square] = BitOperations.PopCount(Bitboard.GetRookMask((Square)square).Board);
             }
         }
     }
