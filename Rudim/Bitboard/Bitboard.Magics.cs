@@ -7,7 +7,7 @@ namespace Rudim
         public static Bitboard GetBishopMask(Square square)
         {
             var ResultBoard = new Bitboard(0);
-            // Masking equivalent to zero blockers and no edge square
+            // Masking equivalent to attacaks with zero blockers and no edge square
             var blockers = new Bitboard(0);
             var BishopRank = (int)square / 8;
             var BishopFile = (int)square % 8;
@@ -30,7 +30,7 @@ namespace Rudim
         public static Bitboard GetRookMask(Square square)
         {
             var ResultBoard = new Bitboard(0);
-            // Masking equivalent to zero blockers and no edge square
+            // Masking equivalent to attacks with zero blockers and no edge square 
             var blockers = new Bitboard(0);
             var RookRank = (int)square / 8;
             var RookFile = (int)square % 8;
