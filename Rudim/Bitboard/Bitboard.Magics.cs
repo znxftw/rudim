@@ -1,4 +1,6 @@
-﻿namespace Rudim
+﻿using Rudim.Common;
+
+namespace Rudim
 {
     public partial class Bitboard
     {
@@ -46,6 +48,11 @@
                 if (AddSquareToBoardAndStopAtBlockers(ResultBoard, RookRank, file, blockers)) break;
 
             return ResultBoard;
+        }
+
+        private static ulong GenerateMagicNumber()
+        {
+            return Random.NextULong() & Random.NextULong() & Random.NextULong();
         }
     }
 }
