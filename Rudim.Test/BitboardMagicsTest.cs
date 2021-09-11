@@ -111,6 +111,17 @@ namespace Rudim.Test
             Assert.Equal(1, OccupancyMapping.GetBit(Square.b5));
 
             Assert.Equal(3, BitOperations.PopCount(OccupancyMapping.Board));
+            Assert.NotNull(Mask);
+        }
+
+        [Fact]
+        public void ShouldGenerateMagicNumbersForAllSquares()
+        {
+            for(int square = 0; square < 64; ++square)
+            {
+                Bitboard.FindMagicNumber((Square)square, Bitboard.BishopMaskBits[square], true);
+                Bitboard.FindMagicNumber((Square)square, Bitboard.RookMaskBits[square], false);
+            }
         }
     }
 }

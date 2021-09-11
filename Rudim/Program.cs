@@ -1,4 +1,5 @@
 ﻿using Rudim.Common;
+using System;
 
 namespace Rudim
 {
@@ -6,25 +7,24 @@ namespace Rudim
     {
         static void Main(string[] args)
         {
-            //var Board = Bitboard.GetPawnAttacks(Square.e5, Side.White);
+            var BishopMagicNumbers = new ulong[64];
+            var RookMagicNumbers = new ulong[64];
+            for (int square = 0; square < 64; ++square)
+            {
+                BishopMagicNumbers[square] = Bitboard.FindMagicNumber((Square)square, Bitboard.BishopMaskBits[square], true);
+                RookMagicNumbers[square] = Bitboard.FindMagicNumber((Square)square, Bitboard.RookMaskBits[square], false);
+            }
+            Console.WriteLine("Bishop Magics : \n");
+            foreach(var magic in BishopMagicNumbers)
+            {
+                Console.WriteLine(magic + ",");
+            }
 
-            //foreach (ulong board in Bitboard.PawnAttacks)
-            //{
-            //    new Bitboard(board).Print();
-            //}
-
-            // Generate A File
-            //var ABoard = new Bitboard(0);
-            //for (int rank = 0; rank < 8; ++rank)
-            //{
-            //    ABoard.SetBit(rank * 8 + 6);
-            //}
-            //ABoard.Print();
-            //Console.WriteLine(ABoard.Board);
-
-            Bitboard.GetKnightAttacks(Square.e5).Print();
-
-            new Bitboard(Random.NextULong() & Random.NextULong() & Random.NextULong()).Print();
+            Console.WriteLine("Rook Magics : \n");
+            foreach (var magic in RookMagicNumbers)
+            {
+                Console.WriteLine(magic + ",");
+            }
         }
     }
 }

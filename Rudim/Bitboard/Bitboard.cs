@@ -57,5 +57,16 @@ namespace Rudim
             }
             Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Bitboard bitboard &&
+                   Board == bitboard.Board;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Board);
+        }
     }
 }
