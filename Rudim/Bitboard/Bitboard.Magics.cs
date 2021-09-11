@@ -1,4 +1,5 @@
 ﻿using Rudim.Common;
+using System.Numerics;
 
 namespace Rudim
 {
@@ -50,6 +51,20 @@ namespace Rudim
             return ResultBoard;
         }
 
+        public static Bitboard GetOccupancyMapping(int index, int nBitsInMask, Bitboard mask)
+        {
+            var OccupancyMapping = new Bitboard(0);
+            for (int count = 0; count < nBitsInMask; ++count)
+            {
+                int square = BitOperations.TrailingZeroCount(mask.Board);
+                mask.ClearBit(square);
+
+                if ((index & (1 << count)) != 0)
+                    OccupancyMapping.Board |= (ulong)1 << square;
+
+            }
+            return OccupancyMapping;
+        }
         private static ulong GeneratePotentialMagicNumber()
         {
             return Random.NextULong() & Random.NextULong() & Random.NextULong();

@@ -82,5 +82,35 @@ namespace Rudim.Test
 
             Assert.Equal(12, BitOperations.PopCount(RookMaskA1.Board));
         }
+
+        [Fact]
+        public void ShouldGetOccupancyMappingForBishop()
+        {
+            var Mask = Bitboard.GetBishopMask(Square.e5);
+            var Index = 0b100100100;
+            var BitsInMask = BitOperations.PopCount(Mask.Board);
+            var OccupancyMapping = Bitboard.GetOccupancyMapping(Index, BitsInMask, Mask);
+
+            Assert.Equal(1, OccupancyMapping.GetBit(Square.d6));
+            Assert.Equal(1, OccupancyMapping.GetBit(Square.f4));
+            Assert.Equal(1, OccupancyMapping.GetBit(Square.b2));
+
+            Assert.Equal(3, BitOperations.PopCount(OccupancyMapping.Board));
+        }
+
+        [Fact]
+        public void ShouldGetOccupancyMappingForRook()
+        {
+            var Mask = Bitboard.GetRookMask(Square.e5);
+            var Index = 0b0100100100;
+            var BitsInMask = BitOperations.PopCount(Mask.Board);
+            var OccupancyMapping = Bitboard.GetOccupancyMapping(Index, BitsInMask, Mask);
+
+            Assert.Equal(1, OccupancyMapping.GetBit(Square.e3));
+            Assert.Equal(1, OccupancyMapping.GetBit(Square.f5));
+            Assert.Equal(1, OccupancyMapping.GetBit(Square.b5));
+
+            Assert.Equal(3, BitOperations.PopCount(OccupancyMapping.Board));
+        }
     }
 }
