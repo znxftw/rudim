@@ -1,4 +1,6 @@
-﻿namespace Rudim
+﻿using Rudim.Common;
+
+namespace Rudim
 {
     class Program
     {
@@ -21,6 +23,8 @@
             //Console.WriteLine(ABoard.Board);
 
             Bitboard.GetKnightAttacks(Square.e5).Print();
+
+            new Bitboard(Random.NextULong() & Random.NextULong() & Random.NextULong()).Print();
         }
     }
 }
