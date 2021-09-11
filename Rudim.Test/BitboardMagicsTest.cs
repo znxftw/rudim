@@ -114,7 +114,7 @@ namespace Rudim.Test
             Assert.NotNull(Mask);
         }
 
-        [Fact]
+        [Fact (Skip = "Heavy test, one-time run function, to be reenabled if changing FindMagicNumber / regenerating Bishop / Rook magics")]
         public void ShouldGenerateMagicNumbersForAllSquares()
         {
             for(int square = 0; square < 64; ++square)
