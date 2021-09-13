@@ -8,10 +8,12 @@ namespace Rudim.Board
         public BoardState()
         {
             Pieces = new Bitboard[Constants.Sides, Constants.Pieces];
+            Occupancies = new Bitboard[Constants.SidesWithBoth];
+
+
             for (int side = 0; side < Constants.Sides; ++side)
                 for (int piece = 0; piece < Constants.Pieces; ++piece)
                     Pieces[side, piece] = new Bitboard(0);
-            Occupancies = new Bitboard[Constants.SidesWithBoth];
             for (int side = 0; side < Constants.SidesWithBoth; ++side)
                 Occupancies[side] = new Bitboard(0);
         }
