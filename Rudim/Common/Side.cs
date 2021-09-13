@@ -4,7 +4,6 @@
     {
         White,
         Black,
-        Both,
-        None
+        Both
     }
 }
