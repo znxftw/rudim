@@ -7,26 +7,15 @@ namespace Rudim.Board
     {
         public BoardState()
         {
-            Pawns = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0)};
-            Knights = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
-            Bishops = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
-            Rooks = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
-            Kings = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
-            Queens = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
-            WhitePieces = new Bitboard(0);
-            BlackPieces = new Bitboard(0);
-            AllPieces = new Bitboard(0);
+            Pieces = new Bitboard[Constants.Sides, Constants.Pieces];
+            for (int side = 0; side < Constants.Sides; ++side)
+                for (int piece = 0; piece < Constants.Pieces; ++piece)
+                    Pieces[side, piece] = new Bitboard(0);
+            Occupancies = new Bitboard[3] { new Bitboard(0), new Bitboard(0), new Bitboard(0) };
         }
 
-        public Bitboard[] Pawns { get; set; }
-        public Bitboard[] Knights { get; set; }
-        public Bitboard[] Bishops { get; set; }
-        public Bitboard[] Rooks { get; set; }
-        public Bitboard[] Kings { get; set; }
-        public Bitboard[] Queens { get; set; }
-        public Bitboard WhitePieces { get; set; }
-        public Bitboard BlackPieces { get; set; }
-        public Bitboard AllPieces { get; set; }
+        public Bitboard[,] Pieces { get; set; }
+        public Bitboard[] Occupancies { get; set; }
         public Side SideToMove { get; set; }
         public Square EnPassantSquare { get; set; }
         public Castle Castle { get; set; }
@@ -44,18 +33,12 @@ namespace Rudim.Board
                         Console.Write((8 - rank) + "\t");
                     int square = (rank * 8) + file;
 
-                    var piece = Piece.None;
-                    foreach (var enumSide in Enum.GetValues(typeof(Side)))
-                    {
-                        var index = (int)enumSide;
-                        if(Pawns[index].GetBit(square) == 1) { piece = Piece.Pawn; }
-                        if(Knights[index].GetBit(square) == 1) { piece = Piece.Knight;}
-                        if(Bishops[index].GetBit(square) == 1) { piece = Piece.Bishop;}
-                        if(Rooks[index].GetBit(square) == 1) { piece = Piece.Rook; }
-                        if(Queens[index].GetBit(square) == 1) { piece = Piece.Queen; }
-                        if(Kings[index].GetBit(square) == 1) { piece = Piece.King; }
-                    }
-                    char asciiValue = BlackPieces.GetBit(square) == 0 ? Char.ToLower(AsciiPieces[(int)piece]) : AsciiPieces[(int)piece];
+                    var boardPiece = Piece.None;
+                    for (int side = 0; side < Constants.Sides; ++side)
+                        for (int piece = 0; piece < Constants.Pieces; ++piece)
+                            if (Pieces[side, piece].GetBit(square) == 1)
+                                boardPiece = (Piece)piece;
+                    char asciiValue = Occupancies[0].GetBit(square) == 0 ? char.ToLower(AsciiPieces[(int)boardPiece]) : AsciiPieces[(int)boardPiece];
                     Console.Write(asciiValue + " ");
                 }
                 Console.Write(Environment.NewLine);
