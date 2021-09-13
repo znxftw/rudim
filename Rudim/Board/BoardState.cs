@@ -7,12 +7,15 @@ namespace Rudim.Board
     {
         public BoardState()
         {
-            Pawns = new Bitboard[Constants.Sides];
-            Knights = new Bitboard[Constants.Sides];
-            Bishops = new Bitboard[Constants.Sides];
-            Rooks = new Bitboard[Constants.Sides];
-            Kings = new Bitboard[Constants.Sides];
-            Queens = new Bitboard[Constants.Sides];
+            Pawns = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0)};
+            Knights = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
+            Bishops = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
+            Rooks = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
+            Kings = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
+            Queens = new Bitboard[Constants.Sides] { new Bitboard(0), new Bitboard(0) };
+            WhitePieces = new Bitboard(0);
+            BlackPieces = new Bitboard(0);
+            AllPieces = new Bitboard(0);
         }
 
         public Bitboard[] Pawns { get; set; }
