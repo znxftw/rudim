@@ -23,5 +23,6 @@
         public Bitboard AllPieces { get; set; }
         public Side SideToMove { get; set; }
         public Square EnPassantSquare { get; set; }
+        public Castle Castle { get; set; }
     }
 }
