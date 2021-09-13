@@ -21,7 +21,7 @@ namespace Rudim.Board
         public Castle Castle { get; set; }
 
 
-        private string AsciiPieces = "-PNBRQK";
+        private readonly string AsciiPieces = "-PNBRQK";
         public void Print()
         {
 
