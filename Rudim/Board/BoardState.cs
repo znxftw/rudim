@@ -44,6 +44,10 @@ namespace Rudim.Board
                 Console.Write(Environment.NewLine);
             }
             Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
+            Console.WriteLine(Environment.NewLine + "Side to move : " + SideToMove);
+            Console.WriteLine(Environment.NewLine + "En passant square : " + EnPassantSquare);
+            Console.WriteLine(Environment.NewLine + "Castling rights : " + Castle);
+
         }
     }
 }
