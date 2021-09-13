@@ -9,7 +9,9 @@ namespace Rudim.Board
         {
             Pieces = new Bitboard[Constants.Sides, Constants.Pieces];
             Occupancies = new Bitboard[Constants.SidesWithBoth];
-
+            SideToMove = Side.None;
+            EnPassantSquare = Square.NoSquare;
+            Castle = Castle.None;
 
             for (int side = 0; side < Constants.Sides; ++side)
                 for (int piece = 0; piece < Constants.Pieces; ++piece)
