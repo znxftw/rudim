@@ -11,7 +11,9 @@ namespace Rudim.Board
             for (int side = 0; side < Constants.Sides; ++side)
                 for (int piece = 0; piece < Constants.Pieces; ++piece)
                     Pieces[side, piece] = new Bitboard(0);
-            Occupancies = new Bitboard[3] { new Bitboard(0), new Bitboard(0), new Bitboard(0) };
+            Occupancies = new Bitboard[Constants.SidesWithBoth];
+            for (int side = 0; side < Constants.SidesWithBoth; ++side)
+                Occupancies[side] = new Bitboard(0);
         }
 
         public Bitboard[,] Pieces { get; set; }

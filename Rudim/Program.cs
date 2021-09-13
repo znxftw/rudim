@@ -15,6 +15,10 @@ namespace Rudim
             board.Pieces[(int)Side.White, (int)Piece.Knight].SetBit(Square.e1);
             board.Occupancies[(int)Side.White].SetBit(Square.e1);
 
+            board.Castle |= Castle.BlackLong;
+            board.Castle |= Castle.BlackShort;
+            board.Castle |= Castle.WhiteLong;
+            board.Castle |= Castle.WhiteShort;
             board.Print();
         }
     }
