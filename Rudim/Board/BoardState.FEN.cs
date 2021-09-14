@@ -16,22 +16,22 @@ namespace Rudim.Board
             return board;
         }
 
-        private static void ParseEnPassant(BoardState board, string v)
+        private static void ParseEnPassant(BoardState board, string fen)
+        {
+            board.EnPassantSquare = (Square)Enum.Parse(typeof(Square), fen);
+        }
+
+        private static void ParseCastling(BoardState board, string fen)
         {
             throw new NotImplementedException();
         }
 
-        private static void ParseCastling(BoardState board, string v)
+        private static void ParseSideToMove(BoardState board, string fen)
         {
             throw new NotImplementedException();
         }
 
-        private static void ParseSideToMove(BoardState board, string v)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParsePieces(BoardState board, string v)
+        private static void ParsePieces(BoardState board, string fen)
         {
             throw new NotImplementedException();
         }
