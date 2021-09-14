@@ -18,7 +18,8 @@ namespace Rudim.Board
 
         private static void ParseEnPassant(BoardState board, string fen)
         {
-            board.EnPassantSquare = (Square)Enum.Parse(typeof(Square), fen);
+            if (fen != "-")
+                board.EnPassantSquare = (Square)Enum.Parse(typeof(Square), fen);
         }
 
         private static void ParseCastling(BoardState board, string fen)
