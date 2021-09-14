@@ -8,18 +8,17 @@ namespace Rudim
     {
         static void Main(string[] args)
         {
-            var board = new BoardState();
-            board.Pieces[(int)Side.Black, (int)Piece.Pawn].SetBit(Square.e5);
-            board.Occupancies[(int)Side.Black].SetBit(Square.e5);
+            var fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 
-            board.Pieces[(int)Side.White, (int)Piece.Knight].SetBit(Square.e1);
-            board.Occupancies[(int)Side.White].SetBit(Square.e1);
+            var result = BoardState.ParseFEN(fen);
 
-            board.Castle |= Castle.BlackLong;
-            board.Castle |= Castle.BlackShort;
-            board.Castle |= Castle.WhiteLong;
-            board.Castle |= Castle.WhiteShort;
-            board.Print();
+            foreach(var board in result.Pieces)
+            {
+                board.Print();
+                Console.WriteLine(board.Board);
+            }
+
+            result.Print();
         }
     }
 }

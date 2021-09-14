@@ -26,8 +26,14 @@ namespace Rudim.Board
         public Square EnPassantSquare { get; set; }
         public Castle Castle { get; set; }
 
+        private void AddPiece(Square square, Side side, Piece piece)
+        {
+            Pieces[(int)side, (int)piece].SetBit(square);
+            Occupancies[(int)side].SetBit(square);
+            Occupancies[(int)Side.Both].SetBit(square);
+        }
 
-        private readonly string AsciiPieces = "-PNBRQK";
+        private readonly string AsciiPieces = "PNBRQK-";
         public void Print()
         {
 

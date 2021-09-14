@@ -1,0 +1,3 @@
+- Change usages of casting to ulong into ul literals - once compiled, both do the same thing, but looks a bit less cluttered and complicated.
+- Piece conversion logic seems to be growing a bit disconnected
+- Assertions for FENTests could possibly be improved, seems unnecessarily long? Loop over an array of expected values in the same order?

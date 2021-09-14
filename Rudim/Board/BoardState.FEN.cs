@@ -43,7 +43,36 @@ namespace Rudim.Board
 
         private static void ParsePieces(BoardState board, string fen)
         {
-            throw new NotImplementedException();
+            var ranks = fen.Split('/');
+
+            for (var rank = 0; rank < 8; rank++)
+            {
+                var index = rank * 8;
+                for (var file = 0; file < ranks[rank].Length; file++)
+                {
+                    var symbol = ranks[rank][file];
+                    if (char.IsLetter(symbol))
+                    {
+                        var piece = Piece.None;
+                        switch (char.ToLower(symbol))
+                        {
+                            case 'p': piece = Piece.Pawn; break;
+                            case 'r': piece = Piece.Rook; break;
+                            case 'n': piece = Piece.Knight; break;
+                            case 'b': piece = Piece.Bishop; break;
+                            case 'q': piece = Piece.Queen; break;
+                            case 'k': piece = Piece.King; break;
+                        }
+                        var side = char.IsUpper(symbol) ? Side.White : Side.Black;
+                        board.AddPiece((Square)index, side, piece);
+                        index++;
+                    }
+                    else if (char.IsDigit(symbol))
+                    {
+                        index += symbol - '0';
+                    }
+                }
+            }
         }
     }
 }
