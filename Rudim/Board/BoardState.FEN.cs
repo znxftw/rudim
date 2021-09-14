@@ -23,7 +23,16 @@ namespace Rudim.Board
 
         private static void ParseCastling(BoardState board, string fen)
         {
-            throw new NotImplementedException();
+            foreach (var character in fen)
+            {
+                switch (character)
+                {
+                    case 'K': board.Castle |= Castle.WhiteShort; break;
+                    case 'Q': board.Castle |= Castle.WhiteLong; break;
+                    case 'k': board.Castle |= Castle.BlackShort; break;
+                    case 'q': board.Castle |= Castle.BlackLong; break;
+                }
+            }
         }
 
         private static void ParseSideToMove(BoardState board, string fen)
