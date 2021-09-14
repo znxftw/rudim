@@ -53,18 +53,7 @@ namespace Rudim.Board
                     var symbol = ranks[rank][file];
                     if (char.IsLetter(symbol))
                     {
-                        var piece = Piece.None;
-                        switch (char.ToLower(symbol))
-                        {
-                            case 'p': piece = Piece.Pawn; break;
-                            case 'r': piece = Piece.Rook; break;
-                            case 'n': piece = Piece.Knight; break;
-                            case 'b': piece = Piece.Bishop; break;
-                            case 'q': piece = Piece.Queen; break;
-                            case 'k': piece = Piece.King; break;
-                        }
-                        var side = char.IsUpper(symbol) ? Side.White : Side.Black;
-                        board.AddPiece((Square)index, side, piece);
+                        board.AddPiece((Square)index, SymbolToSide(symbol), SymbolToPiece(symbol));
                         index++;
                     }
                     else if (char.IsDigit(symbol))
