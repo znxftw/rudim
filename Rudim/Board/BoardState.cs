@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Rudim.Board
 {
-    public class BoardState
+    public partial class BoardState
     {
         public BoardState()
         {
