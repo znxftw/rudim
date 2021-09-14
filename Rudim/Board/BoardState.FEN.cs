@@ -63,5 +63,24 @@ namespace Rudim.Board
                 }
             }
         }
+        private static Piece SymbolToPiece(char symbol)
+        {
+            switch (char.ToLower(symbol))
+            {
+                case 'p': return Piece.Pawn;
+                case 'r': return Piece.Rook;
+                case 'n': return Piece.Knight;
+                case 'b': return Piece.Bishop;
+                case 'q': return Piece.Queen;
+                case 'k': return Piece.King;
+            }
+            return Piece.None;
+        }
+
+        private static Side SymbolToSide(char symbol)
+        {
+            return char.IsUpper(symbol) ? Side.White : Side.Black;
+        }
+
     }
 }
