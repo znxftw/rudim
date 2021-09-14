@@ -106,8 +106,8 @@ namespace Rudim
 
         private static bool AddSquareToBoardAndStopAtOccupiedSquare(Bitboard ResultBoard, int rank, int file, Bitboard occupancy)
         {
-            ResultBoard.Board |= (ulong)1 << (rank * 8) + file;
-            if (((ulong)1 << (rank * 8) + file & occupancy.Board) > 0)
+            ResultBoard.Board |= 1ul << (rank * 8) + file;
+            if ((1ul << (rank * 8) + file & occupancy.Board) > 0)
                 return true;
             return false;
         }

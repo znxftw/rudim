@@ -100,7 +100,7 @@ namespace Rudim
                 TemporaryMask.ClearBit(square);
 
                 if ((index & (1 << count)) != 0)
-                    OccupancyMapping.Board |= (ulong)1 << square;
+                    OccupancyMapping.Board |= 1ul << square;
 
             }
             return OccupancyMapping;

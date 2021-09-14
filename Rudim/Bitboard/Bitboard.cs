@@ -29,17 +29,17 @@ namespace Rudim
 
         public int GetBit(int square)
         {
-            return (Board & ((ulong)1 << square)) > 0 ? 1 : 0;
+            return (Board & (1ul << square)) > 0 ? 1 : 0;
         }
 
         public void SetBit(int square)
         {
-            Board |= (ulong)1 << square;
+            Board |= 1ul << square;
         }
 
         public void ClearBit(int square)
         {
-            Board &= ~((ulong)1 << square);
+            Board &= ~(1ul << square);
         }
 
         public void Print()
