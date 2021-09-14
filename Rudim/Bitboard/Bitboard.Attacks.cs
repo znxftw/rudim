@@ -104,6 +104,13 @@ namespace Rudim
             return ResultBoard;
         }
 
+        public static Bitboard GetQueenAttacks(Square square, Bitboard occupancy)
+        {
+            var rookAttacks = GetRookAttacks(square, occupancy);
+            var bishopAttacks = GetBishopAttacks(square, occupancy);
+            return new Bitboard(rookAttacks.Board | bishopAttacks.Board);
+        }
+
         private static bool AddSquareToBoardAndStopAtOccupiedSquare(Bitboard ResultBoard, int rank, int file, Bitboard occupancy)
         {
             ResultBoard.Board |= 1ul << (rank * 8) + file;

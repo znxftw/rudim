@@ -276,5 +276,16 @@ namespace Rudim.Test
 
             Assert.Equal(5, BitOperations.PopCount(RookAttacksA1.Board));
         }
+
+        [Fact]
+        public void ShouldGetAttacksForQueen()
+        {
+            var OccupancyBoard = new Bitboard(0);
+            var expectedBoard = Bitboard.GetBishopAttacks(Square.e5, OccupancyBoard).Board | Bitboard.GetRookAttacks(Square.e5, OccupancyBoard).Board;
+
+            var QueenAttacksE5 = Bitboard.GetQueenAttacks(Square.e5, OccupancyBoard);
+
+            Assert.Equal(expectedBoard, QueenAttacksE5.Board);
+        }
     }
 }

@@ -8,15 +8,9 @@ namespace Rudim
     {
         static void Main(string[] args)
         {
-            var fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+            var fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 ";
 
             var result = BoardState.ParseFEN(fen);
-
-            foreach(var board in result.Occupancies)
-            {
-                board.Print();
-                Console.WriteLine(board.Board);
-            }
 
             result.Print();
         }
