@@ -38,7 +38,7 @@ namespace Rudim.Board
 
         private static void ParseSideToMove(BoardState board, string fen)
         {
-            throw new NotImplementedException();
+            board.SideToMove = fen == "w" ? Side.White : Side.Black;
         }
 
         private static void ParsePieces(BoardState board, string fen)
