@@ -27,6 +27,10 @@ namespace Rudim.Test
             Assert.Equal((ulong)8, result.Pieces[(int)Side.Black, (int)Piece.Queen].Board);
             Assert.Equal((ulong)16, result.Pieces[(int)Side.Black, (int)Piece.King].Board);
 
+            Assert.Equal((ulong)65535, result.Occupancies[(int)Side.Black].Board);
+            Assert.Equal((ulong)18446462598732840960, result.Occupancies[(int)Side.White].Board);
+            Assert.Equal((ulong)18446462598732906495, result.Occupancies[(int)Side.Both].Board);
+
             Assert.Equal(Side.White, result.SideToMove);
             Assert.Equal((Castle) 15, result.Castle);
             Assert.Equal(Square.NoSquare, result.EnPassantSquare);

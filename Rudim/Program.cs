@@ -12,7 +12,7 @@ namespace Rudim
 
             var result = BoardState.ParseFEN(fen);
 
-            foreach(var board in result.Pieces)
+            foreach(var board in result.Occupancies)
             {
                 board.Print();
                 Console.WriteLine(board.Board);
