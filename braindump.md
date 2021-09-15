@@ -1,2 +1,3 @@
 - Piece conversion logic seems to be growing a bit disconnected
 - Assertions for FENTests could possibly be improved, seems unnecessarily long? Loop over an array of expected values in the same order?
+- Next step : Move generation
