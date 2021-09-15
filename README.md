@@ -1,5 +1,5 @@
 # Rudim
-
+[![Pipeline](https://github.com/znxftw/rudim/actions/workflows/pipeline.yml/badge.svg)](https://github.com/znxftw/rudim/actions/workflows/pipeline.yml)
 ### ---- Work In Progress -----
 
 Rudim is a chess engine written from scratch, in C#. It uses Bitboards.
