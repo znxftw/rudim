@@ -41,14 +41,14 @@ namespace Rudim
                 RookMasks[square] = Bitboard.GetRookMask((Square)square).Board;
                 RookMaskBits[square] = BitOperations.PopCount(RookMasks[square]);
 
-                for(int index = 0; index < (1 << BishopMaskBits[square]); ++index)
+                for (int index = 0; index < (1 << BishopMaskBits[square]); ++index)
                 {
                     var occupancyMapping = GetOccupancyMapping(index, BishopMaskBits[square], new Bitboard(BishopMasks[square]));
                     var magicIndex = (occupancyMapping.Board * BishopMagics[square]) >> (64 - BishopMaskBits[square]);
                     BishopAttacks[square, magicIndex] = GetBishopAttacks((Square)index, occupancyMapping).Board;
                 }
 
-                for(int index = 0; index < (1 << RookMaskBits[square]); ++index)
+                for (int index = 0; index < (1 << RookMaskBits[square]); ++index)
                 {
                     var occupancyMapping = GetOccupancyMapping(index, RookMaskBits[square], new Bitboard(RookMasks[square]));
                     var magicIndex = (occupancyMapping.Board * RookMagics[square]) >> (64 - RookMaskBits[square]);
@@ -73,7 +73,12 @@ namespace Rudim
             index &= RookMasks[(int)square];
             index *= RookMagics[(int)square];
             index >>= 64 - RookMaskBits[(int)square];
-            return new Bitboard(RookAttacks[(int)square,index]);
+            return new Bitboard(RookAttacks[(int)square, index]);
+        }
+
+        public static Bitboard GetQueenAttacksFromTable(Square square, Bitboard occupancy)
+        {
+            return new Bitboard(GetRookAttacksFromTable(square, occupancy).Board | GetBishopAttacksFromTable(square, occupancy).Board);
         }
 
         // Precalculated - Refer Bitboard.FindMagicNumber()
