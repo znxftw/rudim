@@ -1,6 +1,6 @@
 ﻿namespace Rudim.Common
 {
-    class Move
+    public class Move
     {
         public Square Source { get; set; }
         public Square Target { get; set; }

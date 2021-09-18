@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rudim.Common;
+using System;
 using System.Collections.Generic;
 
 namespace Rudim.Board
@@ -12,6 +13,8 @@ namespace Rudim.Board
             SideToMove = Side.White;
             EnPassantSquare = Square.NoSquare;
             Castle = Castle.None;
+            // Revisit : Leave Moves uninitialized till GenerateMoves is called? Trying to access moves before generating shouldn't be allowed
+            // Moves = new List<Move>();
 
             for (int side = 0; side < Constants.Sides; ++side)
                 for (int piece = 0; piece < Constants.Pieces; ++piece)
@@ -25,6 +28,7 @@ namespace Rudim.Board
         public Side SideToMove { get; set; }
         public Square EnPassantSquare { get; set; }
         public Castle Castle { get; set; }
+        public IEnumerable<Move> Moves { get; set; }
 
         private void AddPiece(Square square, Side side, Piece piece)
         {
