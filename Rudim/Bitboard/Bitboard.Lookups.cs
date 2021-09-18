@@ -53,7 +53,7 @@ namespace Rudim
         {
             var attacks = new Bitboard(occupancy.Board);
             attacks.Board &= BishopMasks[(int)square];
-            attacks.Board *= BishopMasks[(int)square];
+            attacks.Board *= BishopMagics[(int)square];
             attacks.Board >>= 64 - BishopMaskBits[(int)square];
             return attacks;
         }
