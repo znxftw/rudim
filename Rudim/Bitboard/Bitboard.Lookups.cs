@@ -28,17 +28,17 @@ namespace Rudim
         {
             for (int square = 0; square < Constants.Squares; ++square)
             {
-                PawnAttacks[(int)Side.White, square] = Bitboard.GetPawnAttacks((Square)square, Side.White).Board;
-                PawnAttacks[(int)Side.Black, square] = Bitboard.GetPawnAttacks((Square)square, Side.Black).Board;
+                PawnAttacks[(int)Side.White, square] = GetPawnAttacks((Square)square, Side.White).Board;
+                PawnAttacks[(int)Side.Black, square] = GetPawnAttacks((Square)square, Side.Black).Board;
 
-                KnightAttacks[square] = Bitboard.GetKnightAttacks((Square)square).Board;
+                KnightAttacks[square] = GetKnightAttacks((Square)square).Board;
 
-                KingAttacks[square] = Bitboard.GetKingAttacks((Square)square).Board;
+                KingAttacks[square] = GetKingAttacks((Square)square).Board;
 
-                BishopMasks[square] = Bitboard.GetBishopMask((Square)square).Board;
+                BishopMasks[square] = GetBishopMask((Square)square).Board;
                 BishopMaskBits[square] = BitOperations.PopCount(BishopMasks[square]);
 
-                RookMasks[square] = Bitboard.GetRookMask((Square)square).Board;
+                RookMasks[square] = GetRookMask((Square)square).Board;
                 RookMaskBits[square] = BitOperations.PopCount(RookMasks[square]);
 
                 for (int index = 0; index < (1 << BishopMaskBits[square]); ++index)
