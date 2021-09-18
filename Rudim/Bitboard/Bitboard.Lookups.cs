@@ -16,6 +16,7 @@ namespace Rudim
         public static readonly ulong[] KnightAttacks = new ulong[Constants.Squares];
         public static readonly ulong[] KingAttacks = new ulong[Constants.Squares];
         public static readonly ulong[,] BishopAttacks = new ulong[Constants.Squares, 4096];
+        public static readonly ulong[,] RookAttacks = new ulong[Constants.Squares, 4096];
 
         public static readonly ulong[] BishopMasks = new ulong[Constants.Squares];
         public static readonly ulong[] RookMasks = new ulong[Constants.Squares];
@@ -46,6 +47,13 @@ namespace Rudim
                     var magicIndex = (occupancyMapping.Board * BishopMagics[square]) >> (64 - BishopMaskBits[square]);
                     BishopAttacks[square, magicIndex] = GetBishopAttacks((Square)index, occupancyMapping).Board;
                 }
+
+                for(int index = 0; index < (1 << RookMaskBits[square]); ++index)
+                {
+                    var occupancyMapping = GetOccupancyMapping(index, RookMaskBits[square], new Bitboard(RookMasks[square]));
+                    var magicIndex = (occupancyMapping.Board * RookMagics[square]) >> (64 - RookMaskBits[square]);
+                    RookAttacks[square, magicIndex] = GetRookAttacks((Square)index, occupancyMapping).Board;
+                }
             }
         }
 
@@ -56,7 +64,16 @@ namespace Rudim
             index &= BishopMasks[(int)square];
             index *= BishopMagics[(int)square];
             index >>= 64 - BishopMaskBits[(int)square];
-            return new Bitboard(BishopAttacks[((int)square), index]);
+            return new Bitboard(BishopAttacks[(int)square, index]);
+        }
+
+        public static Bitboard GetRookAttacksFromTable(Square square, Bitboard occupancy)
+        {
+            var index = occupancy.Board;
+            index &= RookMasks[(int)square];
+            index *= RookMagics[(int)square];
+            index >>= 64 - RookMaskBits[(int)square];
+            return new Bitboard(RookAttacks[(int)square,index]);
         }
 
         // Precalculated - Refer Bitboard.FindMagicNumber()
