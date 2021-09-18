@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace Rudim
 {
@@ -14,13 +15,9 @@ namespace Rudim
         public static readonly ulong[,] PawnAttacks = new ulong[Constants.Sides, Constants.Squares];
         public static readonly ulong[] KnightAttacks = new ulong[Constants.Squares];
         public static readonly ulong[] KingAttacks = new ulong[Constants.Squares];
-        
+
         public static readonly int[] BishopMaskBits = new int[Constants.Squares];
         public static readonly int[] RookMaskBits = new int[Constants.Squares];
-
-
-        public static readonly ulong[] BishopMagics = new ulong[Constants.Squares];
-        public static readonly ulong[] RookMagics = new ulong[Constants.Squares];
 
         static Bitboard()
         {
@@ -35,9 +32,11 @@ namespace Rudim
 
                 BishopMaskBits[square] = BitOperations.PopCount(Bitboard.GetBishopMask((Square)square).Board);
                 RookMaskBits[square] = BitOperations.PopCount(Bitboard.GetRookMask((Square)square).Board);
+            }
+        }
 
-                // Precalculated - Refer Bitboard.FindMagicNumber()
-                BishopMagics = new ulong[]{ 
+        // Precalculated - Refer Bitboard.FindMagicNumber()
+        public static readonly ulong[] BishopMagics = new ulong[]{
                     572335195422784,
                     9225705203045892096,
                     1155322839151150592,
@@ -102,7 +101,7 @@ namespace Rudim
                     4612284170613301505,
                     2594178955930118721,
                     9297788375727620608};
-                RookMagics = new ulong[] {
+        public static readonly ulong[] RookMagics = new ulong[] {
                     11565244117967444096,
                     594492744072699904,
                     2197769949736337536,
@@ -167,8 +166,5 @@ namespace Rudim
                     4648277834194814978,
                     8798274129924,
                     1157930883880079490};
-            }
-        }
-        
     }
 }
