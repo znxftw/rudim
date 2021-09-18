@@ -17,6 +17,8 @@ namespace Rudim
         public static readonly ulong[] KingAttacks = new ulong[Constants.Squares];
         public static readonly ulong[,] BishopAttacks = new ulong[Constants.Squares, 4096];
 
+        public static readonly ulong[] BishopMasks = new ulong[Constants.Squares];
+
         public static readonly int[] BishopMaskBits = new int[Constants.Squares];
         public static readonly int[] RookMaskBits = new int[Constants.Squares];
 
@@ -31,13 +33,13 @@ namespace Rudim
 
                 KingAttacks[square] = Bitboard.GetKingAttacks((Square)square).Board;
 
-                Bitboard bishopMask = Bitboard.GetBishopMask((Square)square);
-                BishopMaskBits[square] = BitOperations.PopCount(bishopMask.Board);
+                BishopMasks[square] = Bitboard.GetBishopMask((Square)square).Board;
+                BishopMaskBits[square] = BitOperations.PopCount(BishopMasks[square]);
                 RookMaskBits[square] = BitOperations.PopCount(Bitboard.GetRookMask((Square)square).Board);
 
                 for(int index = 0; index < (1 << BishopMaskBits[square]); ++index)
                 {
-                    var occupancyMapping = GetOccupancyMapping(index, BishopMaskBits[square], bishopMask);
+                    var occupancyMapping = GetOccupancyMapping(index, BishopMaskBits[square], new Bitboard(BishopMasks[square]));
                     var magicIndex = (occupancyMapping.Board * BishopMagics[square]) >> (64 - BishopMaskBits[square]);
                     BishopAttacks[square, magicIndex] = GetBishopAttacks((Square)index, occupancyMapping).Board;
                 }
