@@ -49,6 +49,15 @@ namespace Rudim
             }
         }
 
+        public static Bitboard GetBishopAttacksFromTable(Square square, Bitboard occupancy)
+        {
+            var attacks = new Bitboard(occupancy.Board);
+            attacks.Board &= BishopMasks[(int)square];
+            attacks.Board *= BishopMasks[(int)square];
+            attacks.Board >>= 64 - BishopMaskBits[(int)square];
+            return attacks;
+        }
+
         // Precalculated - Refer Bitboard.FindMagicNumber()
         public static readonly ulong[] BishopMagics = new ulong[]{
                     572335195422784,
