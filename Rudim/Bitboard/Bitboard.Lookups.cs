@@ -15,8 +15,8 @@ namespace Rudim
         public static readonly ulong[,] PawnAttacks = new ulong[Constants.Sides, Constants.Squares];
         public static readonly ulong[] KnightAttacks = new ulong[Constants.Squares];
         public static readonly ulong[] KingAttacks = new ulong[Constants.Squares];
-        public static readonly ulong[,] BishopAttacks = new ulong[Constants.Squares, 4096];
-        public static readonly ulong[,] RookAttacks = new ulong[Constants.Squares, 4096];
+        public static readonly ulong[,] BishopAttacks = new ulong[Constants.Squares, Constants.MaxBishopMask];
+        public static readonly ulong[,] RookAttacks = new ulong[Constants.Squares, Constants.MaxRookMask];
 
         public static readonly ulong[] BishopMasks = new ulong[Constants.Squares];
         public static readonly ulong[] RookMasks = new ulong[Constants.Squares];
