@@ -51,11 +51,12 @@ namespace Rudim
 
         public static Bitboard GetBishopAttacksFromTable(Square square, Bitboard occupancy)
         {
-            var attacks = new Bitboard(occupancy.Board);
-            attacks.Board &= BishopMasks[(int)square];
-            attacks.Board *= BishopMagics[(int)square];
-            attacks.Board >>= 64 - BishopMaskBits[(int)square];
-            return attacks;
+            // TODO : Test this
+            var index = occupancy.Board;
+            index &= BishopMasks[(int)square];
+            index *= BishopMagics[(int)square];
+            index >>= 64 - BishopMaskBits[(int)square];
+            return new Bitboard(BishopAttacks[((int)square), index]);
         }
 
         // Precalculated - Refer Bitboard.FindMagicNumber()
