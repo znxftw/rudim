@@ -45,14 +45,14 @@ namespace Rudim
                 {
                     var occupancyMapping = GetOccupancyMapping(index, BishopMaskBits[square], new Bitboard(BishopMasks[square]));
                     var magicIndex = (occupancyMapping.Board * BishopMagics[square]) >> (64 - BishopMaskBits[square]);
-                    BishopAttacks[square, magicIndex] = GetBishopAttacks((Square)index, occupancyMapping).Board;
+                    BishopAttacks[square, magicIndex] = GetBishopAttacks((Square)square, occupancyMapping).Board;
                 }
 
                 for (int index = 0; index < (1 << RookMaskBits[square]); ++index)
                 {
                     var occupancyMapping = GetOccupancyMapping(index, RookMaskBits[square], new Bitboard(RookMasks[square]));
                     var magicIndex = (occupancyMapping.Board * RookMagics[square]) >> (64 - RookMaskBits[square]);
-                    RookAttacks[square, magicIndex] = GetRookAttacks((Square)index, occupancyMapping).Board;
+                    RookAttacks[square, magicIndex] = GetRookAttacks((Square)square, occupancyMapping).Board;
                 }
             }
         }
