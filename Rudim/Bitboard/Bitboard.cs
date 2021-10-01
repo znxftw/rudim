@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 
 namespace Rudim
 {
@@ -10,6 +11,11 @@ namespace Rudim
         public Bitboard(ulong board)
         {
             Board = board;
+        }
+
+        public Bitboard CreateCopy()
+        {
+            return new Bitboard(Board);
         }
 
         public int GetBit(Square square)
@@ -42,6 +48,10 @@ namespace Rudim
             Board &= ~(1ul << square);
         }
 
+        public int GetLsb()
+        {
+            return BitOperations.TrailingZeroCount(Board);
+        }
         public void Print()
         {
             for (int rank = 0; rank < 8; ++rank)

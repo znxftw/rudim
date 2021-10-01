@@ -28,7 +28,7 @@ namespace Rudim.Board
         public Side SideToMove { get; set; }
         public Square EnPassantSquare { get; set; }
         public Castle Castle { get; set; }
-        public IEnumerable<Move> Moves { get; set; }
+        public IList<Move> Moves { get; set; }
 
         private void AddPiece(Square square, Side side, Piece piece)
         {
