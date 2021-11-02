@@ -23,8 +23,8 @@ namespace Rudim.Board
             var bitboard = Pieces[(int)SideToMove, (int)Piece.King].CreateCopy();
             while (bitboard.Board > 0)
             {
-                var position = bitboard.GetLsb();
-                var attacks = new Bitboard(Bitboard.KingAttacks[position]);
+                var source = bitboard.GetLsb();
+                var attacks = new Bitboard(Bitboard.KingAttacks[source]);
 
                 while (attacks.Board > 0)
                 {
@@ -36,24 +36,23 @@ namespace Rudim.Board
                         continue;
                     }
 
-                    var moveType = Occupancies[1 - (int)SideToMove].GetBit(target) == 1 ? MoveType.Capture : MoveType.Quiet;
-                    var move = new Move(source: (Square)position, target: (Square)target, type: moveType);
-                    Moves.Add(move);
+                    AddMoveToMovesList(source, target);
 
                     attacks.ClearBit(target);
                 }
 
-                bitboard.ClearBit(position);
+                bitboard.ClearBit(source);
             }
         }
+
 
         private void GenerateQueenMoves()
         {
             var bitboard = Pieces[(int)SideToMove,(int)Piece.Queen].CreateCopy();
             while(bitboard.Board > 0)
             {
-                var position = bitboard.GetLsb();
-                var attacks = Bitboard.GetQueenAttacksFromTable((Square)position, Occupancies[(int)Side.Both]);
+                var source = bitboard.GetLsb();
+                var attacks = Bitboard.GetQueenAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
                 
                 while(attacks.Board > 0)
                 {
@@ -65,14 +64,12 @@ namespace Rudim.Board
                         continue;
                     }
 
-                    var moveType = Occupancies[1 - (int)SideToMove].GetBit(target) == 1 ? MoveType.Capture : MoveType.Quiet;
-                    var move = new Move(source: (Square)position, target: (Square)target, type: moveType);
-                    Moves.Add(move);
+                    AddMoveToMovesList(source, target);
 
                     attacks.ClearBit(target);
                 }
 
-                bitboard.ClearBit(position);
+                bitboard.ClearBit(source);
             }
         }
 
@@ -94,6 +91,14 @@ namespace Rudim.Board
         private void GeneratePawnMoves()
         {
             throw new NotImplementedException();
+        }
+
+
+        private void AddMoveToMovesList(int source, int target)
+        {
+            var moveType = Occupancies[1 - (int)SideToMove].GetBit(target) == 1 ? MoveType.Capture : MoveType.Quiet;
+            var move = new Move(source: (Square)source, target: (Square)target, type: moveType);
+            Moves.Add(move);
         }
     }
 }
