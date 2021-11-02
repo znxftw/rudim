@@ -158,9 +158,17 @@ namespace Rudim.Board
 
         private void GeneratePawnMoves()
         {
-            GeneratePawnAttacks();
-            GeneratePawnPushes();
-            GenerateEnPassants();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.King].CreateCopy();
+            while (bitboard.Board > 0)
+            {
+                var source = bitboard.GetLsb();
+
+                GeneratePawnPushes();
+                GenerateEnPassants();
+                GeneratePawnAttacks(source);
+
+                bitboard.ClearBit(source);
+            }
         }
 
         private void GenerateEnPassants()
@@ -173,30 +181,23 @@ namespace Rudim.Board
             throw new NotImplementedException();
         }
 
-        private void GeneratePawnAttacks()
+        private void GeneratePawnAttacks(int source)
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.King].CreateCopy();
-            while (bitboard.Board > 0)
+            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source]);
+
+            while (attacks.Board > 0)
             {
-                var source = bitboard.GetLsb();
-                var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove,source]);
+                var target = attacks.GetLsb();
 
-                while (attacks.Board > 0)
+                if (Occupancies[(int)SideToMove].GetBit(target) == 1)
                 {
-                    var target = attacks.GetLsb();
-
-                    if (Occupancies[(int)SideToMove].GetBit(target) == 1)
-                    {
-                        attacks.ClearBit(target);
-                        continue;
-                    }
-
-                    AddMoveToMovesList(source, target);
-
                     attacks.ClearBit(target);
+                    continue;
                 }
 
-                bitboard.ClearBit(source);
+                AddMoveToMovesList(source, target);
+
+                attacks.ClearBit(target);
             }
         }
         private void GenerateCastleMoves()
