@@ -175,7 +175,29 @@ namespace Rudim.Board
 
         private void GeneratePawnAttacks()
         {
-            throw new NotImplementedException();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.King].CreateCopy();
+            while (bitboard.Board > 0)
+            {
+                var source = bitboard.GetLsb();
+                var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove,source]);
+
+                while (attacks.Board > 0)
+                {
+                    var target = attacks.GetLsb();
+
+                    if (Occupancies[(int)SideToMove].GetBit(target) == 1)
+                    {
+                        attacks.ClearBit(target);
+                        continue;
+                    }
+
+                    AddMoveToMovesList(source, target);
+
+                    attacks.ClearBit(target);
+                }
+
+                bitboard.ClearBit(source);
+            }
         }
         private void GenerateCastleMoves()
         {
