@@ -41,8 +41,10 @@ namespace Rudim.Board
                     attacks.ClearBit(target);
                 }
 
+                GenerateCastleMoves();
                 bitboard.ClearBit(source);
             }
+
         }
 
 
@@ -156,9 +158,29 @@ namespace Rudim.Board
 
         private void GeneratePawnMoves()
         {
+            GeneratePawnAttacks();
+            GeneratePawnPushes();
+            GenerateEnPassants();
+        }
+
+        private void GenerateEnPassants()
+        {
             throw new NotImplementedException();
         }
 
+        private void GeneratePawnPushes()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void GeneratePawnAttacks()
+        {
+            throw new NotImplementedException();
+        }
+        private void GenerateCastleMoves()
+        {
+            throw new NotImplementedException();
+        }
 
         private void AddMoveToMovesList(int source, int target)
         {
