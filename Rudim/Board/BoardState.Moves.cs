@@ -164,16 +164,25 @@ namespace Rudim.Board
                 var source = bitboard.GetLsb();
 
                 GeneratePawnPushes();
-                GenerateEnPassants();
+                GenerateEnPassants(source);
                 GeneratePawnAttacks(source);
 
                 bitboard.ClearBit(source);
             }
         }
 
-        private void GenerateEnPassants()
+        private void GenerateEnPassants(int source)
         {
-            throw new NotImplementedException();
+            if (EnPassantSquare == Square.NoSquare)
+                return;
+
+            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & (1ul << (int)EnPassantSquare));
+            if(attacks.Board > 0)
+            {
+                var target = attacks.GetLsb();
+                AddMoveToMovesList(source, target);
+            }
+
         }
 
         private void GeneratePawnPushes()
