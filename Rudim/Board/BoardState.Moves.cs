@@ -48,13 +48,13 @@ namespace Rudim.Board
 
         private void GenerateQueenMoves()
         {
-            var bitboard = Pieces[(int)SideToMove,(int)Piece.Queen].CreateCopy();
-            while(bitboard.Board > 0)
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Queen].CreateCopy();
+            while (bitboard.Board > 0)
             {
                 var source = bitboard.GetLsb();
                 var attacks = Bitboard.GetQueenAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
-                
-                while(attacks.Board > 0)
+
+                while (attacks.Board > 0)
                 {
                     var target = attacks.GetLsb();
 
@@ -75,17 +75,83 @@ namespace Rudim.Board
 
         private void GenerateRookMoves()
         {
-            throw new NotImplementedException();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Rook].CreateCopy();
+            while (bitboard.Board > 0)
+            {
+                var source = bitboard.GetLsb();
+                var attacks = Bitboard.GetRookAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
+
+                while (attacks.Board > 0)
+                {
+                    var target = attacks.GetLsb();
+
+                    if (Occupancies[(int)SideToMove].GetBit(target) == 1)
+                    {
+                        attacks.ClearBit(target);
+                        continue;
+                    }
+
+                    AddMoveToMovesList(source, target);
+
+                    attacks.ClearBit(target);
+                }
+
+                bitboard.ClearBit(source);
+            }
         }
 
         private void GenerateKnightMoves()
         {
-            throw new NotImplementedException();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Knight].CreateCopy();
+            while (bitboard.Board > 0)
+            {
+                var source = bitboard.GetLsb();
+                var attacks = new Bitboard(Bitboard.KnightAttacks[source]);
+
+                while (attacks.Board > 0)
+                {
+                    var target = attacks.GetLsb();
+
+                    if (Occupancies[(int)SideToMove].GetBit(target) == 1)
+                    {
+                        attacks.ClearBit(target);
+                        continue;
+                    }
+
+                    AddMoveToMovesList(source, target);
+
+                    attacks.ClearBit(target);
+                }
+
+                bitboard.ClearBit(source);
+            }
         }
 
         private void GenerateBishopMoves()
         {
-            throw new NotImplementedException();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Bishop].CreateCopy();
+            while (bitboard.Board > 0)
+            {
+                var source = bitboard.GetLsb();
+                var attacks = Bitboard.GetBishopAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
+
+                while (attacks.Board > 0)
+                {
+                    var target = attacks.GetLsb();
+
+                    if (Occupancies[(int)SideToMove].GetBit(target) == 1)
+                    {
+                        attacks.ClearBit(target);
+                        continue;
+                    }
+
+                    AddMoveToMovesList(source, target);
+
+                    attacks.ClearBit(target);
+                }
+
+                bitboard.ClearBit(source);
+            }
         }
 
         private void GeneratePawnMoves()
