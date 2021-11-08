@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Rudim.Board
 {
+    // TODO : Castling , Pawn Promotions, Pawn Pushes
     public partial class BoardState
     {
         public void GenerateMoves()
@@ -163,7 +164,7 @@ namespace Rudim.Board
             {
                 var source = bitboard.GetLsb();
 
-                GeneratePawnPushes();
+                GeneratePawnPushes(source);
                 GenerateEnPassants(source);
                 GeneratePawnAttacks(source);
 
@@ -177,7 +178,7 @@ namespace Rudim.Board
                 return;
 
             var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & (1ul << (int)EnPassantSquare));
-            if(attacks.Board > 0)
+            if (attacks.Board > 0)
             {
                 var target = attacks.GetLsb();
                 AddMoveToMovesList(source, target);
@@ -185,9 +186,28 @@ namespace Rudim.Board
 
         }
 
-        private void GeneratePawnPushes()
+        private void GeneratePawnPushes(int source)
         {
-            throw new NotImplementedException();
+            if (SideToMove == Side.Black)
+            {
+                var oneSquarePush = source + 8;
+                AddMoveToMovesList(source, oneSquarePush);
+                if (source <= (int)Square.h7 && source >= (int)Square.a7)
+                {
+                    var twoSquarePush = oneSquarePush + 8;
+                    AddMoveToMovesList(source, twoSquarePush);
+                }
+            }
+            else
+            {
+                var oneSquarePush = source - 8;
+                AddMoveToMovesList(source, oneSquarePush);
+                if (source <= (int)Square.h2 && source >= (int)Square.a2)
+                {
+                    var twoSquarePush = oneSquarePush - 8;
+                    AddMoveToMovesList(source, twoSquarePush);
+                }
+            }
         }
 
         private void GeneratePawnAttacks(int source)
@@ -216,6 +236,7 @@ namespace Rudim.Board
 
         private void AddMoveToMovesList(int source, int target)
         {
+            // Makes more sense for source and target to come in as Square instead of int, refactor later
             var moveType = Occupancies[1 - (int)SideToMove].GetBit(target) == 1 ? MoveType.Capture : MoveType.Quiet;
             var move = new Move(source: (Square)source, target: (Square)target, type: moveType);
             Moves.Add(move);
