@@ -181,31 +181,32 @@ namespace Rudim.Board
             if (attacks.Board > 0)
             {
                 var target = attacks.GetLsb();
-                AddMoveToMovesList(source, target);
+                AddPawnMove(source, target, true, false);
             }
 
         }
+
 
         private void GeneratePawnPushes(int source)
         {
             if (SideToMove == Side.Black)
             {
                 var oneSquarePush = source + 8;
-                AddMoveToMovesList(source, oneSquarePush);
+                AddPawnMove(source, oneSquarePush, false, false);
                 if (source <= (int)Square.h7 && source >= (int)Square.a7)
                 {
                     var twoSquarePush = oneSquarePush + 8;
-                    AddMoveToMovesList(source, twoSquarePush);
+                    AddPawnMove(source, twoSquarePush, false, true);
                 }
             }
             else
             {
                 var oneSquarePush = source - 8;
-                AddMoveToMovesList(source, oneSquarePush);
+                AddPawnMove(source, oneSquarePush, false, false);
                 if (source <= (int)Square.h2 && source >= (int)Square.a2)
                 {
                     var twoSquarePush = oneSquarePush - 8;
-                    AddMoveToMovesList(source, twoSquarePush);
+                    AddPawnMove(source, twoSquarePush, false, true);
                 }
             }
         }
@@ -224,7 +225,7 @@ namespace Rudim.Board
                     continue;
                 }
 
-                AddMoveToMovesList(source, target);
+                AddPawnMove(source, target, false, false);
 
                 attacks.ClearBit(target);
             }
@@ -234,12 +235,40 @@ namespace Rudim.Board
             throw new NotImplementedException();
         }
 
+
+        private void AddPawnMove(int source, int target, bool enpassant, bool doublePush)
+        {
+            // This assumes all incoming pawn moves are valid
+            if ((target >= (int)Square.a1 && target <= (int)Square.h1) || (target >= (int)Square.h8 && target <= (int)Square.a8))
+            {
+                var capture = IsSquareCapture(target);
+
+                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveType.KnightPromotionCapture : MoveType.KnightPromotion));
+                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveType.BishopPromotionCapture : MoveType.BishopPromotion));
+                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveType.RookPromotionCapture : MoveType.RookPromotion));
+                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveType.QueenPromotionCapture : MoveType.QueenPromotion));
+            }
+            else if (enpassant || doublePush)
+            {
+                Moves.Add(new Move((Square)source, (Square)target, enpassant ? MoveType.EnPassant : MoveType.DoublePush));
+            }
+            else
+            {
+                AddMoveToMovesList(source, target);
+            }
+        }
+
+
         private void AddMoveToMovesList(int source, int target)
         {
             // Makes more sense for source and target to come in as Square instead of int, refactor later
-            var moveType = Occupancies[1 - (int)SideToMove].GetBit(target) == 1 ? MoveType.Capture : MoveType.Quiet;
+            var moveType = IsSquareCapture(target) ? MoveType.Capture : MoveType.Quiet;
             var move = new Move(source: (Square)source, target: (Square)target, type: moveType);
             Moves.Add(move);
+        }
+        private bool IsSquareCapture(int target)
+        {
+            return Occupancies[1 - (int)SideToMove].GetBit(target) == 1;
         }
     }
 }

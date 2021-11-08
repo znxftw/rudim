@@ -3,6 +3,16 @@
     public enum MoveType
     {
         Quiet,
-        Capture
+        Capture,
+        EnPassant,
+        DoublePush,
+        KnightPromotion,
+        BishopPromotion,
+        RookPromotion,
+        QueenPromotion,
+        KnightPromotionCapture,
+        BishopPromotionCapture,
+        RookPromotionCapture,
+        QueenPromotionCapture
     }
 }
