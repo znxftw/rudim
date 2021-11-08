@@ -13,6 +13,7 @@
         KnightPromotionCapture,
         BishopPromotionCapture,
         RookPromotionCapture,
-        QueenPromotionCapture
+        QueenPromotionCapture,
+        Castle
     }
 }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace Rudim.Board
 {
-    // TODO : Castling , Pawn Promotions, Pawn Pushes
     public partial class BoardState
     {
         public void GenerateMoves()
@@ -24,6 +23,7 @@ namespace Rudim.Board
             var bitboard = Pieces[(int)SideToMove, (int)Piece.King].CreateCopy();
             while (bitboard.Board > 0)
             {
+                // Ideally this loop should only run once
                 var source = bitboard.GetLsb();
                 var attacks = new Bitboard(Bitboard.KingAttacks[source]);
 
@@ -232,9 +232,53 @@ namespace Rudim.Board
         }
         private void GenerateCastleMoves()
         {
-            throw new NotImplementedException();
+            // Squares should be empty and shouldn't castle through check, can avoid checking if landing position is check to do legal move check in make move function
+
+            var occ = Occupancies[(int)Side.Both];
+            if (SideToMove == Side.White)
+            {
+                if (Castle.HasFlag(Castle.WhiteShort))
+                {
+                    if (occ.GetBit(Square.f1) == 0 && occ.GetBit(Square.g1) == 0 && !IsSquareAttacked(Square.e1, Side.Black) && !IsSquareAttacked(Square.f1, Side.Black))
+                        Moves.Add(new Move(Square.e1, Square.g1, MoveType.Castle));
+                }
+                if (Castle.HasFlag(Castle.WhiteLong))
+                {
+                    if (occ.GetBit(Square.d1) == 0 && occ.GetBit(Square.c1) == 0 && occ.GetBit(Square.b1) == 0 && !IsSquareAttacked(Square.e1, Side.Black) && !IsSquareAttacked(Square.d1, Side.Black))
+                        Moves.Add(new Move(Square.e1, Square.c1, MoveType.Castle));
+                }
+            }
+            else
+            {
+                if (Castle.HasFlag(Castle.BlackShort))
+                {
+                    if (occ.GetBit(Square.f8) == 0 && occ.GetBit(Square.g8) == 0 && !IsSquareAttacked(Square.e8, Side.White) && !IsSquareAttacked(Square.f8, Side.White))
+                        Moves.Add(new Move(Square.e8, Square.g8, MoveType.Castle));
+                }
+                if (Castle.HasFlag(Castle.BlackLong))
+                {
+                    if (occ.GetBit(Square.d8) == 0 && occ.GetBit(Square.c8) == 0 && occ.GetBit(Square.b8) == 0 && !IsSquareAttacked(Square.e8, Side.White) && !IsSquareAttacked(Square.d8, Side.White))
+                        Moves.Add(new Move(Square.e8, Square.c8, MoveType.Castle));
+                }
+            }
         }
 
+        private bool IsSquareAttacked(Square square, Side attackingSide)
+        {
+            if ((Bitboard.PawnAttacks[1 - (int)attackingSide, (int)square] & Pieces[(int)attackingSide, (int)Piece.Pawn].Board) != 0)
+                return true;
+            if ((Bitboard.KnightAttacks[(int)square] & Pieces[(int)attackingSide, (int)Piece.Knight].Board) != 0)
+                return true;
+            if ((Bitboard.GetBishopAttacksFromTable(square, Occupancies[(int)Side.Both]).Board & Pieces[(int)attackingSide, (int)Piece.Bishop].Board) != 0)
+                return true;
+            if ((Bitboard.GetRookAttacksFromTable(square, Occupancies[(int)Side.Both]).Board & Pieces[(int)attackingSide, (int)Piece.Rook].Board) != 0)
+                return true;
+            if ((Bitboard.GetQueenAttacksFromTable(square, Occupancies[(int)Side.Both]).Board & Pieces[(int)attackingSide, (int)Piece.Queen].Board) != 0)
+                return true;
+            if ((Bitboard.KingAttacks[(int)square] & Pieces[(int)attackingSide, (int)Piece.King].Board) != 0)
+                return true;
+            return false;
+        }
 
         private void AddPawnMove(int source, int target, bool enpassant, bool doublePush)
         {
