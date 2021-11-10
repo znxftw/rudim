@@ -159,11 +159,10 @@ namespace Rudim.Board
 
         private void GeneratePawnMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.King].CreateCopy();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Pawn].CreateCopy();
             while (bitboard.Board > 0)
             {
                 var source = bitboard.GetLsb();
-
                 GeneratePawnPushes(source);
                 GenerateEnPassants(source);
                 GeneratePawnAttacks(source);
@@ -192,20 +191,24 @@ namespace Rudim.Board
             if (SideToMove == Side.Black)
             {
                 var oneSquarePush = source + 8;
+                if (Occupancies[(int)Side.Both].GetBit(oneSquarePush) != 0) return;
                 AddPawnMove(source, oneSquarePush, false, false);
                 if (source <= (int)Square.h7 && source >= (int)Square.a7)
                 {
                     var twoSquarePush = oneSquarePush + 8;
+                    if (Occupancies[(int)Side.Both].GetBit(twoSquarePush) != 0) return;
                     AddPawnMove(source, twoSquarePush, false, true);
                 }
             }
             else
             {
                 var oneSquarePush = source - 8;
+                if (Occupancies[(int)Side.Both].GetBit(oneSquarePush) != 0) return;
                 AddPawnMove(source, oneSquarePush, false, false);
                 if (source <= (int)Square.h2 && source >= (int)Square.a2)
                 {
                     var twoSquarePush = oneSquarePush - 8;
+                    if (Occupancies[(int)Side.Both].GetBit(twoSquarePush) != 0) return;
                     AddPawnMove(source, twoSquarePush, false, true);
                 }
             }
@@ -213,7 +216,7 @@ namespace Rudim.Board
 
         private void GeneratePawnAttacks(int source)
         {
-            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source]);
+            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & Occupancies[1 - (int)SideToMove].Board);
 
             while (attacks.Board > 0)
             {
@@ -283,7 +286,7 @@ namespace Rudim.Board
         private void AddPawnMove(int source, int target, bool enpassant, bool doublePush)
         {
             // This assumes all incoming pawn moves are valid
-            if ((target >= (int)Square.a1 && target <= (int)Square.h1) || (target >= (int)Square.h8 && target <= (int)Square.a8))
+            if ((target >= (int)Square.a1 && target <= (int)Square.h1) || (target <= (int)Square.h8 && target >= (int)Square.a8))
             {
                 var capture = IsSquareCapture(target);
 

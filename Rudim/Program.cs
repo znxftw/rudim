@@ -8,13 +8,14 @@ namespace Rudim
     {
         static void Main(string[] args)
         {
-            //var boardState = BoardState.ParseFEN("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 ");
-            //boardState.Print();
-            //boardState.GenerateQueenMoves();
-            //boardState.Print();
-            //foreach(var v in boardState.Moves){
-            //    Console.WriteLine(v.Source.ToString() +  v.Target.ToString()+ v.Type);
-            //}
+            var boardState = BoardState.ParseFEN("rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1");
+            boardState.Print();
+            boardState.GenerateMoves();
+            foreach(var move in boardState.Moves)
+            {
+                Console.WriteLine(move.Source.ToString() + move.Target.ToString() + move.Type.ToString());
+            }
+            Console.WriteLine(boardState.Moves.Count);
         }
     }
 }
