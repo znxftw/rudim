@@ -38,3 +38,6 @@ msbuild.wrn
 .vs/
 /UpgradeLog.htm
 /Backup
+
+# Rider
+Rudim.csproj.DotSettings
