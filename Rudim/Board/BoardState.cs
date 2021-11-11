@@ -16,10 +16,10 @@ namespace Rudim.Board
             // Revisit : Leave Moves uninitialized till GenerateMoves is called? Trying to access moves before generating shouldn't be allowed
             // Moves = new List<Move>();
 
-            for (int side = 0; side < Constants.Sides; ++side)
-                for (int piece = 0; piece < Constants.Pieces; ++piece)
+            for (var side = 0; side < Constants.Sides; ++side)
+                for (var piece = 0; piece < Constants.Pieces; ++piece)
                     Pieces[side, piece] = new Bitboard(0);
-            for (int side = 0; side < Constants.SidesWithBoth; ++side)
+            for (var side = 0; side < Constants.SidesWithBoth; ++side)
                 Occupancies[side] = new Bitboard(0);
         }
 
@@ -51,8 +51,8 @@ namespace Rudim.Board
                     int square = (rank * 8) + file;
 
                     var boardPiece = Piece.None;
-                    for (int side = 0; side < Constants.Sides; ++side)
-                        for (int piece = 0; piece < Constants.Pieces; ++piece)
+                    for (var side = 0; side < Constants.Sides; ++side)
+                        for (var piece = 0; piece < Constants.Pieces; ++piece)
                             if (Pieces[side, piece].GetBit(square) == 1)
                                 boardPiece = (Piece)piece;
                     char asciiValue = Occupancies[0].GetBit(square) == 0 ? char.ToLower(AsciiPieces[(int)boardPiece]) : AsciiPieces[(int)boardPiece];

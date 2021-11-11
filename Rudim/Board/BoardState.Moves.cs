@@ -1,5 +1,4 @@
 ﻿using Rudim.Common;
-using System;
 using System.Collections.Generic;
 
 namespace Rudim.Board
@@ -193,7 +192,7 @@ namespace Rudim.Board
                 var oneSquarePush = source + 8;
                 if (Occupancies[(int)Side.Both].GetBit(oneSquarePush) != 0) return;
                 AddPawnMove(source, oneSquarePush, false, false);
-                if (source <= (int)Square.h7 && source >= (int)Square.a7)
+                if (source is <= (int)Square.h7 and >= (int)Square.a7)
                 {
                     var twoSquarePush = oneSquarePush + 8;
                     if (Occupancies[(int)Side.Both].GetBit(twoSquarePush) != 0) return;
@@ -205,7 +204,7 @@ namespace Rudim.Board
                 var oneSquarePush = source - 8;
                 if (Occupancies[(int)Side.Both].GetBit(oneSquarePush) != 0) return;
                 AddPawnMove(source, oneSquarePush, false, false);
-                if (source <= (int)Square.h2 && source >= (int)Square.a2)
+                if (source is <= (int)Square.h2 and >= (int)Square.a2)
                 {
                     var twoSquarePush = oneSquarePush - 8;
                     if (Occupancies[(int)Side.Both].GetBit(twoSquarePush) != 0) return;
@@ -286,7 +285,7 @@ namespace Rudim.Board
         private void AddPawnMove(int source, int target, bool enpassant, bool doublePush)
         {
             // This assumes all incoming pawn moves are valid
-            if ((target >= (int)Square.a1 && target <= (int)Square.h1) || (target <= (int)Square.h8 && target >= (int)Square.a8))
+            if (target is >= (int)Square.a1 and <= (int)Square.h1 || target is <= (int)Square.h8 and >= (int)Square.a8)
             {
                 var capture = IsSquareCapture(target);
 
@@ -310,7 +309,7 @@ namespace Rudim.Board
         {
             // Makes more sense for source and target to come in as Square instead of int, refactor later
             var moveType = IsSquareCapture(target) ? MoveType.Capture : MoveType.Quiet;
-            var move = new Move(source: (Square)source, target: (Square)target, type: moveType);
+            var move = new Move((Square)source, (Square)target, moveType);
             Moves.Add(move);
         }
         private bool IsSquareCapture(int target)

@@ -4,18 +4,18 @@
      * This class is to generate fast random numbers using 
      * https://en.wikipedia.org/wiki/Xorshift
      */
-    class Random
+    internal static class Random
     {
         // Arbitrary starting seed
-        private static ulong State = 1804289383;
+        private static ulong _state = 1804289383;
 
         public static ulong NextULong()
         {
-            ulong RandomNumber = State;
+            ulong RandomNumber = _state;
             RandomNumber ^= RandomNumber << 13;
             RandomNumber ^= RandomNumber >> 7;
             RandomNumber ^= RandomNumber << 17;
-            return State = RandomNumber;
+            return _state = RandomNumber;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Rudim.Common;
 
 namespace Rudim
 {
@@ -111,12 +111,10 @@ namespace Rudim
             return new Bitboard(rookAttacks.Board | bishopAttacks.Board);
         }
 
-        private static bool AddSquareToBoardAndStopAtOccupiedSquare(Bitboard ResultBoard, int rank, int file, Bitboard occupancy)
+        private static bool AddSquareToBoardAndStopAtOccupiedSquare(Bitboard resultBoard, int rank, int file, Bitboard occupancy)
         {
-            ResultBoard.Board |= 1ul << (rank * 8) + file;
-            if ((1ul << (rank * 8) + file & occupancy.Board) > 0)
-                return true;
-            return false;
+            resultBoard.Board |= 1ul << (rank * 8) + file;
+            return (1ul << (rank * 8) + file & occupancy.Board) > 0;
         }
     }
 }

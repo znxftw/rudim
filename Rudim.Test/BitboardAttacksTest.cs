@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Rudim.Common;
 using Xunit;
 
 namespace Rudim.Test

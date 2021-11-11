@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Rudim.Common;
 
 namespace Rudim
 {
@@ -41,14 +42,14 @@ namespace Rudim
                 RookMasks[square] = GetRookMask((Square)square).Board;
                 RookMaskBits[square] = BitOperations.PopCount(RookMasks[square]);
 
-                for (int index = 0; index < (1 << BishopMaskBits[square]); ++index)
+                for (var index = 0; index < (1 << BishopMaskBits[square]); ++index)
                 {
                     var occupancyMapping = GetOccupancyMapping(index, BishopMaskBits[square], new Bitboard(BishopMasks[square]));
                     var magicIndex = (occupancyMapping.Board * BishopMagics[square]) >> (64 - BishopMaskBits[square]);
                     BishopAttacks[square, magicIndex] = GetBishopAttacks((Square)square, occupancyMapping).Board;
                 }
 
-                for (int index = 0; index < (1 << RookMaskBits[square]); ++index)
+                for (var index = 0; index < (1 << RookMaskBits[square]); ++index)
                 {
                     var occupancyMapping = GetOccupancyMapping(index, RookMaskBits[square], new Bitboard(RookMasks[square]));
                     var magicIndex = (occupancyMapping.Board * RookMagics[square]) >> (64 - RookMaskBits[square]);
@@ -82,7 +83,7 @@ namespace Rudim
         }
 
         // Precalculated - Refer Bitboard.FindMagicNumber()
-        public static readonly ulong[] BishopMagics = new ulong[]{
+        private static readonly ulong[] BishopMagics = new ulong[]{
                     572335195422784,
                     9225705203045892096,
                     1155322839151150592,
@@ -147,7 +148,8 @@ namespace Rudim
                     4612284170613301505,
                     2594178955930118721,
                     9297788375727620608};
-        public static readonly ulong[] RookMagics = new ulong[] {
+
+        private static readonly ulong[] RookMagics = new ulong[] {
                     11565244117967444096,
                     594492744072699904,
                     2197769949736337536,

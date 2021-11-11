@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Rudim
+namespace Rudim.Common
 {
     [Serializable]
     internal class ExceededMaximumRetryException : Exception

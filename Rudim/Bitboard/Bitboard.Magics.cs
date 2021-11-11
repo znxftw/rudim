@@ -11,7 +11,6 @@ namespace Rudim
             var MaxIndex = 1 << bitsInMask;
             var OccupancyMappings = new Bitboard[Constants.MaxMaskIndex];
             var Attacks = new Bitboard[Constants.MaxMaskIndex];
-            var MagicAttacks = new Bitboard[Constants.MaxMaskIndex];
             var Mask = isBishop ? GetBishopMask(square) : GetRookMask(square);
 
             for (int index = 0; index < MaxIndex; ++index)
@@ -28,14 +27,14 @@ namespace Rudim
                 if (BitOperations.PopCount((Mask.Board * PotentialMagicNumber) & 0xFF00000000000000) < 6) 
                     continue;
 
-                MagicAttacks = new Bitboard[Constants.MaxMaskIndex];
+                var MagicAttacks = new Bitboard[Constants.MaxMaskIndex];
                 var FailureFlag = false;
-                for(int Index = 0; Index < MaxIndex; ++Index)
+                for(var Index = 0; Index < MaxIndex; ++Index)
                 {
-                    int MagicIndex = (int)((OccupancyMappings[Index].Board * PotentialMagicNumber) >> (64 - bitsInMask));
+                    var MagicIndex = (int)((OccupancyMappings[Index].Board * PotentialMagicNumber) >> (64 - bitsInMask));
                     if (MagicAttacks[MagicIndex] == null)
                         MagicAttacks[MagicIndex] = Attacks[Index];
-                    else if (MagicAttacks[MagicIndex] != Attacks[Index])
+                    else if (!Equals(MagicAttacks[MagicIndex], Attacks[Index]))
                         FailureFlag = true;
                 }
                 // PotentialMagicNumber is actually the magic number
@@ -47,7 +46,7 @@ namespace Rudim
         public static Bitboard GetBishopMask(Square square)
         {
             var ResultBoard = new Bitboard(0);
-            // Masking equivalent to attacaks with zero blockers and no edge square
+            // Masking equivalent to attacks with zero blockers and no edge square
             var OccupancyBoard = new Bitboard(0);
             var BishopRank = (int)square / 8;
             var BishopFile = (int)square % 8;

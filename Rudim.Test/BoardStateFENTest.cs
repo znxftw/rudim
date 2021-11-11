@@ -1,5 +1,5 @@
 ﻿using Rudim.Board;
-using System;
+using Rudim.Common;
 using Xunit;
 
 namespace Rudim.Test

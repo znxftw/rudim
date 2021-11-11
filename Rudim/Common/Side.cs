@@ -1,4 +1,4 @@
-﻿namespace Rudim
+﻿namespace Rudim.Common
 {
     public enum Side
     {

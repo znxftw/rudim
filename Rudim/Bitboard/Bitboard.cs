@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Rudim.Common;
 
 namespace Rudim
 {
@@ -54,13 +55,13 @@ namespace Rudim
         }
         public void Print()
         {
-            for (int rank = 0; rank < 8; ++rank)
+            for (var rank = 0; rank < 8; ++rank)
             {
-                for (int file = 0; file < 8; ++file)
+                for (var file = 0; file < 8; ++file)
                 {
                     if (file == 0)
                         Console.Write((8 - rank) + "\t");
-                    int square = (rank * 8) + file;
+                    var square = (rank * 8) + file;
                     Console.Write(GetBit(square) + " ");
                 }
                 Console.Write(Environment.NewLine);

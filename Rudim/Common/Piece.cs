@@ -1,4 +1,4 @@
-﻿namespace Rudim.Board
+﻿namespace Rudim.Common
 {
     public enum Piece
     {

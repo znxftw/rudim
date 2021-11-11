@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rudim.Board
+namespace Rudim.Common
 {
     [Flags]
     public enum Castle
