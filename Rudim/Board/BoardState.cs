@@ -37,8 +37,9 @@ namespace Rudim.Board
             Occupancies[(int)Side.Both].SetBit(square);
         }
 
-        
-        private readonly string AsciiPieces = "PNBRQK-";
+
+        private const string AsciiPieces = "PNBRQK-";
+
         public void Print()
         {
 
