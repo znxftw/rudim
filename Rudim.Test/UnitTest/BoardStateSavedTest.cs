@@ -1,4 +1,5 @@
 using Rudim.Board;
+using Rudim.Test.Common;
 using Xunit;
 
 namespace Rudim.Test
@@ -8,9 +9,8 @@ namespace Rudim.Test
         [Fact (Skip = "TODO : Write equality members for BoardState, the code is working")]
         public void ShouldSaveAndRestoreBoardState()
         {
-            // TODO : Extract common FENs
-            var originalState = BoardState.ParseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-            var boardState = BoardState.ParseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            var originalState = BoardState.ParseFEN(Helpers.StartingFEN);
+            var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
             
             boardState.SaveState();
             boardState.GenerateMoves();

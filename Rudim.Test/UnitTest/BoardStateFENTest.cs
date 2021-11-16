@@ -1,5 +1,6 @@
 ﻿using Rudim.Board;
 using Rudim.Common;
+using Rudim.Test.Common;
 using Xunit;
 
 namespace Rudim.Test
@@ -9,7 +10,7 @@ namespace Rudim.Test
         [Fact]
         public void ShouldParseStartingFENCorrectly()
         {
-            var fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+            var fen = Helpers.StartingFEN;
 
             var result = BoardState.ParseFEN(fen);
 
