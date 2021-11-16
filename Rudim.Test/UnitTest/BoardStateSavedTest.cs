@@ -6,7 +6,7 @@ namespace Rudim.Test
 {
     public class BoardStateSavedTest
     {
-        [Fact (Skip = "TODO : Write equality members for BoardState, the code is working")]
+        [Fact]
         public void ShouldSaveAndRestoreBoardState()
         {
             var originalState = BoardState.ParseFEN(Helpers.StartingFEN);
