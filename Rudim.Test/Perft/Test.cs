@@ -8,6 +8,7 @@ using Xunit.Abstractions;
 
 namespace Rudim.Test.Perft
 {
+    [Collection("StateRace")]
     public class Test
     {
         private readonly ITestOutputHelper output;
@@ -26,18 +27,22 @@ namespace Rudim.Test.Perft
         [InlineData(5, 4_865_609)]
         public void PerftStartingPosition(int depth, ulong nodes)
         {
+            BoardState.ClearStates();
+
             var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
             PerftDriver.ResetNodeCount();
             PerftDriver.Traverse(boardState, depth);
             Assert.Equal(nodes, PerftDriver.nodes);
+
+            BoardState.ClearStates();
         }
 
-        [Fact]
+        [Fact (Skip = "Debugging test")]
         public void PerftDebug()
         {
             var depth = 2;
 
-            var boardState = BoardState.ParseFEN("rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1");
+            var boardState = BoardState.ParseFEN("rnbqkbnr/p1pppppp/8/1p6/P7/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 2");
             ulong total = 0;
             boardState.GenerateMoves();
             foreach(var move in boardState.Moves)
@@ -50,7 +55,7 @@ namespace Rudim.Test.Perft
                    PerftDriver.Traverse(boardState, depth - 1);
 
                 total += PerftDriver.nodes;
-                output.WriteLine(move.Source.ToString() + move.Target.ToString() + " " + PerftDriver.nodes);
+                output.WriteLine(move.Source.ToString() + move.Target.ToString() + " " + PerftDriver.nodes + " " + move.Type.ToString());
                 boardState.RestoreState();
             }
             output.WriteLine(total.ToString());

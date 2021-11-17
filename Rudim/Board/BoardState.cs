@@ -40,19 +40,21 @@ namespace Rudim.Board
 
         private Piece RemovePiece(Square square)
         {
-            for (var pieceType = 0; pieceType < Constants.Pieces; ++pieceType)
+            for (var side = 0; side < Constants.Sides; ++side)
             {
-                if (Pieces[(int) SideToMove, pieceType].GetBit(square) == 1)
+                for (var pieceType = 0; pieceType < Constants.Pieces; ++pieceType)
                 {
-                    Pieces[(int) SideToMove, pieceType].ClearBit(square);
-                    Occupancies[(int) SideToMove].ClearBit(square);
-                    Occupancies[(int) Side.Both].ClearBit(square);
-                    return (Piece) pieceType;
+                    if (Pieces[side, pieceType].GetBit(square) == 1)
+                    {
+                        Pieces[side, pieceType].ClearBit(square);
+                        Occupancies[side].ClearBit(square);
+                        Occupancies[(int)Side.Both].ClearBit(square);
+                        return (Piece)pieceType;
+                    }
                 }
             }
-
             return Piece.None;
-        }
+        } 
 
         public bool IsInCheck(Side side)
         {

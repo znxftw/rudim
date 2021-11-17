@@ -12,6 +12,10 @@ namespace Rudim
 
             var move = new Move(Square.a2, Square.a4, MoveType.DoublePush);
             boardState.MakeMove(move);
+            move = new Move(Square.b7, Square.b5, MoveType.DoublePush);
+            boardState.MakeMove(move);
+            move = new Move(Square.a4, Square.b5, MoveType.Capture);
+            boardState.MakeMove(move);
             boardState.Print();
 
             boardState.GenerateMoves();

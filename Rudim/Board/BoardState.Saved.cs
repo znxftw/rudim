@@ -54,5 +54,10 @@ namespace Rudim.Board
             Castle = savedState.SavedCastle;
             Moves = savedState.SavedMoves is null ? null : new List<Move>(savedState.SavedMoves);
         }
+
+        public static void ClearStates()
+        {
+            savedStates.Clear();
+        }
     }
 }
