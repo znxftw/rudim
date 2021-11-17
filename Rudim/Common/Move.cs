@@ -23,5 +23,10 @@
         {
             return Type is >= MoveType.KnightPromotion and <= MoveType.QueenPromotionCapture;
         }
+
+        public bool IsCastle()
+        {
+            return Type == MoveType.Castle;
+        }
     }
 }

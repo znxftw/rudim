@@ -56,7 +56,7 @@ namespace Rudim.Board
         public void MakeMove(Move move)
         {
             // WIP function - have to handle a few more cases before it is usable
-            // TODO - Castle rook movement, Update castling rights
+            // TODO - Update castling rights
             var movedPiece = RemovePiece(move.Source);
 
             if (move.IsCapture())
@@ -78,6 +78,30 @@ namespace Rudim.Board
                     MoveType.QueenPromotionCapture => Piece.Queen,
                     _ => throw new ArgumentOutOfRangeException(nameof(move.Type))
                 };
+            }
+
+            if (move.IsCastle())
+            {
+                switch (move.Target)
+                {
+                    case Square.c1:
+                        RemovePiece(Square.a1);
+                        AddPiece(Square.d1, SideToMove, Piece.Rook);
+                        break;
+                    case Square.g1:
+                        RemovePiece(Square.h1);
+                        AddPiece(Square.f1, SideToMove, Piece.Rook);
+                        break;
+                    case Square.c8:
+                        RemovePiece(Square.a8);
+                        AddPiece(Square.d8, SideToMove, Piece.Rook);
+                        break;
+                    case Square.g8:
+                        RemovePiece(Square.h8);
+                        AddPiece(Square.f8, SideToMove, Piece.Rook);
+                        break;
+                    default: throw new ArgumentOutOfRangeException(nameof(move.Target));
+                }
             }
 
             AddPiece(move.Target, SideToMove, movedPiece);
