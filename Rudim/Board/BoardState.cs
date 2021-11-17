@@ -46,6 +46,7 @@ namespace Rudim.Board
                 {
                     Pieces[(int) SideToMove, pieceType].ClearBit(square);
                     Occupancies[(int) SideToMove].ClearBit(square);
+                    Occupancies[(int) Side.Both].ClearBit(square);
                     return (Piece) pieceType;
                 }
             }
@@ -60,7 +61,6 @@ namespace Rudim.Board
         public void MakeMove(Move move)
         {
             // WIP function - have to handle a few more cases before it is usable
-            // TODO - Update castling rights
             var movedPiece = RemovePiece(move.Source);
 
             if (move.IsCapture())
@@ -112,8 +112,10 @@ namespace Rudim.Board
 
             Castle &= (Castle) CastlingRights[(int) move.Source];
             Castle &= (Castle) CastlingRights[(int) move.Target];
-            SideToMove = SideToMove.Other();
             EnPassantSquare = move.Type == MoveType.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
+            SideToMove = SideToMove.Other();
+
+            Moves = new List<Move>();
         }
 
         private Square EnPassantSquareFor(Move move)

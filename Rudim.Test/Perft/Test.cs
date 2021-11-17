@@ -32,12 +32,12 @@ namespace Rudim.Test.Perft
             Assert.Equal(nodes, PerftDriver.nodes);
         }
 
-        [Fact (Skip= "Unskip when debugging")]
+        [Fact]
         public void PerftDebug()
         {
-            var depth = 3;
+            var depth = 2;
 
-            var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
+            var boardState = BoardState.ParseFEN("rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1");
             ulong total = 0;
             boardState.GenerateMoves();
             foreach(var move in boardState.Moves)
