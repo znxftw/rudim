@@ -13,7 +13,13 @@ namespace Rudim
             boardState.GenerateMoves();
             foreach(var move in boardState.Moves)
             {
+                boardState.SaveState();
+                boardState.MakeMove(move);
+
                 Console.WriteLine(move.Source.ToString() + move.Target.ToString() + move.Type.ToString());
+                boardState.Print();
+                boardState.RestoreState();
+                Console.Read();
             }
             Console.WriteLine(boardState.Moves.Count);
         }

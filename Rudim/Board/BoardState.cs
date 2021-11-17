@@ -53,6 +53,10 @@ namespace Rudim.Board
             return Piece.None;
         }
 
+        public bool IsInCheck(Side side)
+        {
+            return IsSquareAttacked((Square)Pieces[(int)side,(int)Piece.King].GetLsb(), side.Other());
+        }
         public void MakeMove(Move move)
         {
             // WIP function - have to handle a few more cases before it is usable
