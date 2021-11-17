@@ -47,7 +47,7 @@ namespace Rudim.Board
             if (move.IsCapture())
             {
                 if (move.Type == MoveType.EnPassant)
-                    RemovePieceFromSquare(move.Target + 8 * (SideToMove == Side.Black ? -1 : 1));
+                    RemovePieceFromSquare(EnPassantSquareFor(move));
                 else
                     RemovePieceFromSquare(move.Target);
             }
@@ -67,10 +67,16 @@ namespace Rudim.Board
                     _ => throw new ArgumentOutOfRangeException(nameof(move.Type))
                 };
             }
-            
+
             AddPiece(move.Target, SideToMove, movedPiece);
 
             SideToMove = SideToMove.Other();
+            EnPassantSquare = move.Type == MoveType.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
+        }
+
+        private Square EnPassantSquareFor(Move move)
+        {
+            return move.Target + 8 * (SideToMove == Side.Black ? -1 : 1);
         }
 
         private Piece RemovePieceFromSquare(Square square)
