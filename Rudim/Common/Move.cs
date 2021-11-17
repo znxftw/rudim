@@ -12,5 +12,16 @@
             Target = target;
             Type = type;
         }
+
+        public bool IsCapture()
+        {
+            return Type is MoveType.Capture or MoveType.EnPassant or MoveType.BishopPromotionCapture or
+                MoveType.KnightPromotionCapture or MoveType.QueenPromotionCapture or MoveType.RookPromotionCapture;
+        }
+
+        public bool IsPromotion()
+        {
+            return Type is >= MoveType.KnightPromotion and <= MoveType.QueenPromotionCapture;
+        }
     }
 }
