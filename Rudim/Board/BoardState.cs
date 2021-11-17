@@ -38,18 +38,30 @@ namespace Rudim.Board
             Occupancies[(int) Side.Both].SetBit(square);
         }
 
+        private Piece RemovePiece(Square square)
+        {
+            for (var pieceType = 0; pieceType < Constants.Pieces; ++pieceType)
+            {
+                if (Pieces[(int) SideToMove, pieceType].GetBit(square) == 1)
+                {
+                    Pieces[(int) SideToMove, pieceType].ClearBit(square);
+                    Occupancies[(int) SideToMove].ClearBit(square);
+                    return (Piece) pieceType;
+                }
+            }
+
+            return Piece.None;
+        }
+
         public void MakeMove(Move move)
         {
             // WIP function - have to handle a few more cases before it is usable
-            // TODO - Castle rook movement, enpassant reset, enpassant set for double push, Update castling rights
-            var movedPiece = RemovePieceFromSquare(move.Source);
+            // TODO - Castle rook movement, Update castling rights
+            var movedPiece = RemovePiece(move.Source);
 
             if (move.IsCapture())
             {
-                if (move.Type == MoveType.EnPassant)
-                    RemovePieceFromSquare(EnPassantSquareFor(move));
-                else
-                    RemovePieceFromSquare(move.Target);
+                RemovePiece(move.Type == MoveType.EnPassant ? EnPassantSquareFor(move) : move.Target);
             }
 
             if (move.IsPromotion())
@@ -79,20 +91,6 @@ namespace Rudim.Board
             return move.Target + 8 * (SideToMove == Side.Black ? -1 : 1);
         }
 
-        private Piece RemovePieceFromSquare(Square square)
-        {
-            for (var pieceType = 0; pieceType < Constants.Pieces; ++pieceType)
-            {
-                if (Pieces[(int) SideToMove, pieceType].GetBit(square) == 1)
-                {
-                    Pieces[(int) SideToMove, pieceType].ClearBit(square);
-                    Occupancies[(int) SideToMove].ClearBit(square);
-                    return (Piece) pieceType;
-                }
-            }
-
-            return Piece.None;
-        }
 
         private const string AsciiPieces = "PNBRQK-";
 
