@@ -215,7 +215,7 @@ namespace Rudim.Board
 
         private void GeneratePawnAttacks(int source)
         {
-            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & Occupancies[1 - (int)SideToMove].Board);
+            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & Occupancies[(int) SideToMove.Other()].Board);
 
             while (attacks.Board > 0)
             {
@@ -267,7 +267,7 @@ namespace Rudim.Board
 
         private bool IsSquareAttacked(Square square, Side attackingSide)
         {
-            if ((Bitboard.PawnAttacks[1 - (int)attackingSide, (int)square] & Pieces[(int)attackingSide, (int)Piece.Pawn].Board) != 0)
+            if ((Bitboard.PawnAttacks[(int)attackingSide.Other(), (int)square] & Pieces[(int)attackingSide, (int)Piece.Pawn].Board) != 0)
                 return true;
             if ((Bitboard.KnightAttacks[(int)square] & Pieces[(int)attackingSide, (int)Piece.Knight].Board) != 0)
                 return true;
@@ -314,7 +314,7 @@ namespace Rudim.Board
         }
         private bool IsSquareCapture(int target)
         {
-            return Occupancies[1 - (int)SideToMove].GetBit(target) == 1;
+            return Occupancies[(int)SideToMove.Other()].GetBit(target) == 1;
         }
     }
 }

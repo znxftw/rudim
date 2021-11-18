@@ -27,14 +27,21 @@ namespace Rudim.Test.Perft
         [InlineData(5, 4_865_609)]
         public void PerftStartingPosition(int depth, ulong nodes)
         {
+            var timer = new Stopwatch();
+            
             BoardState.ClearStates();
-
+            
+            timer.Start();
+            
             var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
             PerftDriver.ResetNodeCount();
             PerftDriver.Traverse(boardState, depth);
+
+            timer.Stop();
             Assert.Equal(nodes, PerftDriver.nodes);
 
             BoardState.ClearStates();
+            output.WriteLine($"Execution Time: {timer.ElapsedMilliseconds} ms");
         }
 
         [Fact (Skip = "Debugging test")]

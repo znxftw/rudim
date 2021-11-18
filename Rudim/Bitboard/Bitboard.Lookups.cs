@@ -79,11 +79,11 @@ namespace Rudim
 
         public static Bitboard GetQueenAttacksFromTable(Square square, Bitboard occupancy)
         {
-            return new Bitboard(GetRookAttacksFromTable(square, occupancy).Board | GetBishopAttacksFromTable(square, occupancy).Board);
+            return new(GetRookAttacksFromTable(square, occupancy).Board | GetBishopAttacksFromTable(square, occupancy).Board);
         }
 
         // Precalculated - Refer Bitboard.FindMagicNumber()
-        private static readonly ulong[] BishopMagics = new ulong[]{
+        private static readonly ulong[] BishopMagics = {
                     572335195422784,
                     9225705203045892096,
                     1155322839151150592,
@@ -149,7 +149,7 @@ namespace Rudim
                     2594178955930118721,
                     9297788375727620608};
 
-        private static readonly ulong[] RookMagics = new ulong[] {
+        private static readonly ulong[] RookMagics = {
                     11565244117967444096,
                     594492744072699904,
                     2197769949736337536,

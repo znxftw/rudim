@@ -7,7 +7,7 @@ namespace Rudim.Board
 {
     public partial class BoardState : IEquatable<BoardState>
     {
-        public BoardState()
+        private BoardState()
         {
             Pieces = new Bitboard[Constants.Sides, Constants.Pieces];
             Occupancies = new Bitboard[Constants.SidesWithBoth];
@@ -44,13 +44,11 @@ namespace Rudim.Board
             {
                 for (var pieceType = 0; pieceType < Constants.Pieces; ++pieceType)
                 {
-                    if (Pieces[side, pieceType].GetBit(square) == 1)
-                    {
-                        Pieces[side, pieceType].ClearBit(square);
-                        Occupancies[side].ClearBit(square);
-                        Occupancies[(int)Side.Both].ClearBit(square);
-                        return (Piece)pieceType;
-                    }
+                    if (Pieces[side, pieceType].GetBit(square) != 1) continue;
+                    Pieces[side, pieceType].ClearBit(square);
+                    Occupancies[side].ClearBit(square);
+                    Occupancies[(int)Side.Both].ClearBit(square);
+                    return (Piece)pieceType;
                 }
             }
             return Piece.None;
