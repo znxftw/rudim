@@ -14,8 +14,7 @@ namespace Rudim.Board
             SideToMove = Side.White;
             EnPassantSquare = Square.NoSquare;
             Castle = Castle.None;
-            // Revisit : Leave Moves uninitialized till GenerateMoves is called? Trying to access moves before generating shouldn't be allowed
-            // Moves = new List<Move>();
+            Moves = new List<Move>();
 
             for (var side = 0; side < Constants.Sides; ++side)
             for (var piece = 0; piece < Constants.Pieces; ++piece)

@@ -7,7 +7,7 @@ namespace Rudim.Board
     {
         public void GenerateMoves()
         {
-            Moves = new List<Move>();
+            Moves.Clear();
 
             GeneratePawnMoves();
             GenerateBishopMoves();
