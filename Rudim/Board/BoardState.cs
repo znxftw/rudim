@@ -62,7 +62,6 @@ namespace Rudim.Board
         }
         public void MakeMove(Move move)
         {
-            // WIP function - have to handle a few more cases before it is usable
             var movedPiece = RemovePiece(move.Source);
 
             if (move.IsCapture())
