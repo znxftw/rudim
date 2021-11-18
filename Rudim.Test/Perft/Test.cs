@@ -38,7 +38,7 @@ namespace Rudim.Test.Perft
             PerftDriver.Traverse(boardState, depth);
 
             timer.Stop();
-            Assert.Equal(nodes, PerftDriver.nodes);
+            Assert.Equal(nodes, PerftDriver.Nodes);
 
             BoardState.ClearStates();
             output.WriteLine($"Execution Time: {timer.ElapsedMilliseconds} ms");
@@ -61,8 +61,8 @@ namespace Rudim.Test.Perft
                 if(!boardState.IsInCheck(boardState.SideToMove.Other()))
                    PerftDriver.Traverse(boardState, depth - 1);
 
-                total += PerftDriver.nodes;
-                output.WriteLine(move.Source.ToString() + move.Target.ToString() + " " + PerftDriver.nodes + " " + move.Type.ToString());
+                total += PerftDriver.Nodes;
+                output.WriteLine(move.Source.ToString() + move.Target.ToString() + " " + PerftDriver.Nodes + " " + move.Type.ToString());
                 boardState.RestoreState();
             }
             output.WriteLine(total.ToString());

@@ -5,20 +5,21 @@ namespace Rudim.Test.Perft
 {
     static class PerftDriver
     {
-        public static ulong nodes { get; set; }
+        // Not thread safe
+        public static ulong Nodes { get; set; }
 
         static PerftDriver()
         {
-            nodes = 0;
+            Nodes = 0;
         }
 
         public static void ResetNodeCount()
         {
-            nodes = 0;
+            Nodes = 0;
         }
         public static void Traverse(BoardState boardState, int depth)
         {
-            if (depth == 0) { nodes++; return; }
+            if (depth == 0) { Nodes++; return; }
             boardState.GenerateMoves();
             foreach (var move in boardState.Moves)
             {
