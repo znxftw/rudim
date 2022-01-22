@@ -5,3 +5,6 @@
 - Test out bishop, rook tables manually
 
 - Currently implementing : Move generation
+
+
+Perft results seem unbelievably slow - need to fix the move generation speed (or maybe a problem in my test run?) before going to implementing UCI
