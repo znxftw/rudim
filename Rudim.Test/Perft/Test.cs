@@ -1,7 +1,5 @@
 ﻿using Rudim.Board;
 using Rudim.Common;
-using Rudim.Test.Common;
-using System;
 using System.Diagnostics;
 using Xunit;
 using Xunit.Abstractions;

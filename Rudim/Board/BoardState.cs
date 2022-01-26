@@ -22,6 +22,11 @@ namespace Rudim.Board
             for (var side = 0; side < Constants.SidesWithBoth; ++side)
                 Occupancies[side] = new Bitboard(0);
         }
+        
+        public static BoardState Default()
+        {
+            return BoardState.ParseFEN(Helpers.StartingFEN);
+        } 
 
         public Bitboard[,] Pieces { get; set; }
         public Bitboard[] Occupancies { get; set; }

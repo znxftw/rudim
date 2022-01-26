@@ -1,4 +1,4 @@
-namespace Rudim.Test.Common
+namespace Rudim.Common
 {
     public class Helpers
     {

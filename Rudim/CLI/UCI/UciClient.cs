@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rudim.Board;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,11 +7,15 @@ namespace Rudim.CLI
 {
     internal class UciClient : ICliCommand
     {
-        private Dictionary<string, IUciCommand> Commands;
-
+        private readonly Dictionary<string, IUciCommand> Commands;
+        public BoardState board;
         public UciClient()
         {
-            Commands = new Dictionary<string, IUciCommand>();
+            Commands = new Dictionary<string, IUciCommand>
+            {
+                ["isready"] = new IsReadyCommand(this)
+            };
+            board = BoardState.Default();
         }
 
         public void Run(string[] parameters)
