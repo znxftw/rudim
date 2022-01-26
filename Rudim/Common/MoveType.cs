@@ -6,14 +6,14 @@
         Capture,
         EnPassant,
         DoublePush,
-        KnightPromotion,
-        BishopPromotion,
-        RookPromotion,
-        QueenPromotion,
-        KnightPromotionCapture,
-        BishopPromotionCapture,
-        RookPromotionCapture,
-        QueenPromotionCapture,
-        Castle
+        KnightPromotion = 4,
+        BishopPromotion = 5,
+        RookPromotion = 6,
+        QueenPromotion = 7,
+        KnightPromotionCapture = 12,
+        BishopPromotionCapture = 13,
+        RookPromotionCapture = 14,
+        QueenPromotionCapture = 15,
+        Castle = 16
     }
 }
