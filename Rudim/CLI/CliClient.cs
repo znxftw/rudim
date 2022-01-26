@@ -12,7 +12,8 @@ namespace Rudim.CLI
         {
             Commands = new Dictionary<string, ICliCommand>
             {
-                ["info"] = new InfoCommand()
+                ["info"] = new InfoCommand(),
+                ["uci"] = new UciClient()
             };
         }
         public static void Run()
