@@ -34,6 +34,7 @@ namespace Rudim.CLI
 
                 if (command == "quit")
                 {
+                    // Should quit be exiting the entire application as well?
                     break;
                 }
 
