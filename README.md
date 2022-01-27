@@ -12,6 +12,10 @@ What's next for Rudim?
 - Once the UCI Protocol is in place and Rudim can 'play' (albeit bad) chess, the next step would be to write an actual search + evaluation algorithm to find the best of all the generated moves.
 - Implement a GUI for interactive gameplay on top of UCI CLI.
 
+## How does Rudim work?
+
+I've written a blog post on my journey through creating Rudim - you can read up on it [here](https://vishnubhagyanath.dev/blog/2022-01-28-rudim-1/).
+
 ## Running Rudim
 
 Tests - `dotnet test`
