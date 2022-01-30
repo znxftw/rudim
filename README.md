@@ -7,10 +7,11 @@ Rudim is currently a work in progress. The aim is for Rudim to be able to play a
 
 Rudim currently has a working implementation of [Bitboards](https://en.wikipedia.org/wiki/Bitboard) and Move Generation. It uses simple straightforward bitboard logic for generating legal moves of a given position and can currently calculate roughy 1000 KN/s according to simple perft on my local.
 
+Rudim has a basic implementation for the [UCI Protocol](https://www.shredderchess.com/chess-features/uci-universal-chess-interface.html) - i.e. if you try loading the engine into a GUI like Arena and generate moves - it would be able to play a game of chess. It currently does not evaluate the best move in the position, just picks any of the available moves arbitrarily.
 What's next for Rudim?
-- I'm currently implementing the [UCI Protocol](https://www.shredderchess.com/chess-features/uci-universal-chess-interface.html) for the work so far to be interactable with chess interfaces. It would use a random move picker in place of an actual implementation for 'find best move'.
-- Once the UCI Protocol is in place and Rudim can 'play' (albeit bad) chess, the next step would be to write an actual search + evaluation algorithm to find the best of all the generated moves.
-- Implement a GUI for interactive gameplay on top of UCI CLI.
+- Write a simple evaluation algorithm to give each position a score of how advantageous it is.
+- Write a search algorithm to scan through the tree, prune unnecessary nodes, and evaluate leaf positions.
+- Update the UCI code to include the extra options for the `go` command. (These are mostly timers & infinite search until an async stop is called - which would need the above two steps in place first)
 
 ## How does Rudim work?
 
