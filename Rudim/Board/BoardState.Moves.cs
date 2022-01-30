@@ -53,13 +53,24 @@ namespace Rudim.Board
 
             depth.ToString(); // Placeholder for actual depth usage later
 
-            return PickRandomMove();
+            return PickNextLegalMove();
         }
 
-        private Move PickRandomMove()
+        private Move PickNextLegalMove()
         {
-            var randomIndex = System.Math.Abs(Random.NextInt()) % Moves.Count;
-            return Moves[randomIndex];
+            for (var i = 0; i < Moves.Count; ++i)
+            {
+                var move = Moves[i];
+                SaveState();
+                MakeMove(move);
+                if (!IsInCheck(SideToMove.Other()))
+                {
+                    RestoreState();
+                    return move;
+                }
+                RestoreState();
+            }
+            return new Move(Square.NoSquare, Square.NoSquare, MoveType.Quiet);
         }
 
         private void GenerateQueenMoves()
