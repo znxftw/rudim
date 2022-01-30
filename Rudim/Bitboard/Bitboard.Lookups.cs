@@ -59,7 +59,6 @@ namespace Rudim
 
         public static Bitboard GetBishopAttacksFromTable(Square square, Bitboard occupancy)
         {
-            // TODO : Test this
             var index = occupancy.Board;
             index &= BishopMasks[(int)square];
             index *= BishopMagics[(int)square];
