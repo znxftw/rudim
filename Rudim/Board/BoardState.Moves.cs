@@ -47,6 +47,20 @@ namespace Rudim.Board
 
         }
 
+        public Move FindBestMove(int depth)
+        {
+            GenerateMoves();
+
+            depth.ToString(); // Placeholder for actual depth usage later
+
+            return PickRandomMove();
+        }
+
+        private Move PickRandomMove()
+        {
+            var randomIndex = System.Math.Abs(Random.NextInt()) % Moves.Count;
+            return Moves[randomIndex];
+        }
 
         private void GenerateQueenMoves()
         {
@@ -215,7 +229,7 @@ namespace Rudim.Board
 
         private void GeneratePawnAttacks(int source)
         {
-            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & Occupancies[(int) SideToMove.Other()].Board);
+            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & Occupancies[(int)SideToMove.Other()].Board);
 
             while (attacks.Board > 0)
             {

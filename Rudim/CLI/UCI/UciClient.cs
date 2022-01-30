@@ -14,7 +14,9 @@ namespace Rudim.CLI
             Commands = new Dictionary<string, IUciCommand>
             {
                 ["isready"] = new IsReadyCommand(this),
-                ["position"] = new PositionCommand(this)
+                ["position"] = new PositionCommand(this),
+                ["go"] = new GoCommand(this)
+
             };
             board = BoardState.Default();
         }
