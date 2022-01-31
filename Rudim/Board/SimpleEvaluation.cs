@@ -26,6 +26,8 @@ namespace Rudim.Board
         private static int ScorePosition(BoardState boardState)
         {
             var positionalScore = 0;
+            var midgamePhase = GamePhase.Calculate(boardState);
+            var endgamePhase = GamePhase.TotalPhase - midgamePhase;
             for (var piece = Piece.Pawn; piece <= Piece.King; ++piece)
             {
                 var whiteBoard = new Bitboard(boardState.Pieces[(int)Side.White, (int)piece].Board);
@@ -33,9 +35,15 @@ namespace Rudim.Board
 
                 if (piece == Piece.King)
                 {
-                    // TODO : Introduce Tapered Eval 
-                    positionalScore += MidgameKingValues[whiteBoard.GetLsb()];
-                    positionalScore -= MidgameKingValues[MirrorSquare(blackBoard.GetLsb())];
+                    var whiteKing = whiteBoard.GetLsb();
+                    var blackKing = blackBoard.GetLsb();
+                    whiteBoard.ClearBit(whiteKing);
+                    blackBoard.ClearBit(blackKing);
+
+                    blackKing = MirrorSquare(blackKing);
+                    positionalScore += ((MidgameKingValues[whiteKing] * midgamePhase) + (EndgameKingValues[whiteKing] * endgamePhase)) / GamePhase.TotalPhase;
+                    positionalScore -= ((MidgameKingValues[blackKing] * midgamePhase) + (EndgameKingValues[blackKing] * endgamePhase)) / GamePhase.TotalPhase;
+                    continue;
                 }
 
                 while (whiteBoard.Board > 0)
