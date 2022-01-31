@@ -26,7 +26,7 @@ namespace Rudim.Board
         private static int ScorePosition(BoardState boardState)
         {
             var positionalScore = 0;
-            for (var piece = Piece.Pawn; piece < Piece.King; ++piece)
+            for (var piece = Piece.Pawn; piece <= Piece.King; ++piece)
             {
                 var whiteBoard = new Bitboard(boardState.Pieces[(int)Side.White, (int)piece].Board);
                 var blackBoard = new Bitboard(boardState.Pieces[(int)Side.Black, (int)piece].Board);
