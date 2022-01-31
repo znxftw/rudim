@@ -34,7 +34,6 @@ namespace Rudim.Common
                 phase += PieceConstants[piece] * BitOperations.PopCount(whiteBoard);
                 phase += PieceConstants[piece] * BitOperations.PopCount(blackBoard);
             }
-            phase = Math.Min(phase, 24); // If early promotion, consider it midgame
             return Math.Min(phase, TotalPhase);
         }
     }
