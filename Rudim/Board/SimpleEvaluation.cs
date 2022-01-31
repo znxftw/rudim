@@ -36,11 +36,8 @@ namespace Rudim.Board
                 if (piece == Piece.King)
                 {
                     var whiteKing = whiteBoard.GetLsb();
-                    var blackKing = blackBoard.GetLsb();
-                    whiteBoard.ClearBit(whiteKing);
-                    blackBoard.ClearBit(blackKing);
+                    var blackKing = MirrorSquare(blackBoard.GetLsb());
 
-                    blackKing = MirrorSquare(blackKing);
                     positionalScore += ((MidgameKingValues[whiteKing] * midgamePhase) + (EndgameKingValues[whiteKing] * endgamePhase)) / GamePhase.TotalPhase;
                     positionalScore -= ((MidgameKingValues[blackKing] * midgamePhase) + (EndgameKingValues[blackKing] * endgamePhase)) / GamePhase.TotalPhase;
                     continue;
