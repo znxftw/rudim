@@ -63,8 +63,7 @@ namespace Rudim.Board
 
         private static int MirrorSquare(int square)
         {
-            Square originalSquare = (Square)square;
-            return (int)Enum.Parse(typeof(MirroredSquare), originalSquare.ToString());
+            return (int)SquareExtensions.MirroredSquare[(Square)square];
         }
 
         private static int ScoreMaterial(BoardState boardState)
