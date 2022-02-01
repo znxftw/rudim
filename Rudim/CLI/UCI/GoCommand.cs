@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq;
 
-namespace Rudim.CLI
+namespace Rudim.CLI.UCI
 {
     internal class GoCommand : IUciCommand
     {
-        private UciClient uciClient;
+        private readonly UciClient _uciClient;
 
         public GoCommand(UciClient uciClient)
         {
-            this.uciClient = uciClient;
+            _uciClient = uciClient;
         }
 
         public void Run(string[] parameters)
@@ -20,7 +20,7 @@ namespace Rudim.CLI
 
             if (!infinite)
             {
-                var move = uciClient.board.FindBestMove(depth);
+                var move = _uciClient.Board.FindBestMove(depth);
 
                 CliClient.WriteLine("bestmove " + move.Source + move.Target);
             }

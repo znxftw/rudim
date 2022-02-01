@@ -6,7 +6,7 @@ namespace Rudim
 {
     public partial class Bitboard
     {
-        public ulong Board { get; set; }
+        public ulong Board { get; private set; }
 
 
         public Bitboard(ulong board)
@@ -16,7 +16,7 @@ namespace Rudim
 
         public Bitboard CreateCopy()
         {
-            return new Bitboard(Board);
+            return new(Board);
         }
 
         public int GetBit(Square square)

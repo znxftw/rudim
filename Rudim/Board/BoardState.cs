@@ -25,15 +25,15 @@ namespace Rudim.Board
         
         public static BoardState Default()
         {
-            return BoardState.ParseFEN(Helpers.StartingFEN);
+            return ParseFEN(Helpers.StartingFEN);
         } 
 
-        public Bitboard[,] Pieces { get; set; }
-        public Bitboard[] Occupancies { get; set; }
-        public Side SideToMove { get; set; }
-        public Square EnPassantSquare { get; set; }
-        public Castle Castle { get; set; }
-        public IList<Move> Moves { get; set; }
+        public Bitboard[,] Pieces { get; }
+        public Bitboard[] Occupancies { get; }
+        public Side SideToMove { get; private set; }
+        public Square EnPassantSquare { get; private set; }
+        public Castle Castle { get; private set; }
+        public IList<Move> Moves { get; private set; }
 
         private void AddPiece(Square square, Side side, Piece piece)
         {
@@ -142,13 +142,13 @@ namespace Rudim.Board
 
         public void Print()
         {
-            for (int rank = 0; rank < 8; ++rank)
+            for (var rank = 0; rank < 8; ++rank)
             {
-                for (int file = 0; file < 8; ++file)
+                for (var file = 0; file < 8; ++file)
                 {
                     if (file == 0)
                         Console.Write((8 - rank) + "\t");
-                    int square = (rank * 8) + file;
+                    var square = (rank * 8) + file;
 
                     var boardPiece = Piece.None;
                     for (var side = 0; side < Constants.Sides; ++side)

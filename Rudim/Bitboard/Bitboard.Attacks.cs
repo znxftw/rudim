@@ -31,12 +31,12 @@ namespace Rudim
             KnightBoard.SetBit(square);
 
             ResultBoard.Board |= (KnightBoard.Board << 17) & ~FileA;
-            ResultBoard.Board |= (KnightBoard.Board << 10) & ~FileAB;
-            ResultBoard.Board |= (KnightBoard.Board >> 6) & ~FileAB;
+            ResultBoard.Board |= (KnightBoard.Board << 10) & ~FileAb;
+            ResultBoard.Board |= (KnightBoard.Board >> 6) & ~FileAb;
             ResultBoard.Board |= (KnightBoard.Board >> 15) & ~FileA;
             ResultBoard.Board |= (KnightBoard.Board << 15) & ~FileH;
-            ResultBoard.Board |= (KnightBoard.Board << 6) & ~FileGH;
-            ResultBoard.Board |= (KnightBoard.Board >> 10) & ~FileGH;
+            ResultBoard.Board |= (KnightBoard.Board << 6) & ~FileGh;
+            ResultBoard.Board |= (KnightBoard.Board >> 10) & ~FileGh;
             ResultBoard.Board |= (KnightBoard.Board >> 17) & ~FileH;
 
             return ResultBoard;
@@ -89,16 +89,16 @@ namespace Rudim
             var RookRank = (int)square / 8;
             var RookFile = (int)square % 8;
 
-            for (int rank = RookRank + 1; rank < 8; ++rank)
+            for (var rank = RookRank + 1; rank < 8; ++rank)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, RookFile, occupancy)) break;
 
-            for (int rank = RookRank - 1; rank >= 0; --rank)
+            for (var rank = RookRank - 1; rank >= 0; --rank)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, RookFile, occupancy)) break;
 
-            for (int file = RookFile + 1; file < 8; ++file)
+            for (var file = RookFile + 1; file < 8; ++file)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, RookRank, file, occupancy)) break;
 
-            for (int file = RookFile - 1; file >= 0; --file)
+            for (var file = RookFile - 1; file >= 0; --file)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, RookRank, file, occupancy)) break;
 
             return ResultBoard;

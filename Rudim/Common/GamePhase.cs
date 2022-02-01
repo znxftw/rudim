@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace Rudim.Common
 {
-    class GamePhase
+    static class GamePhase
     {
         private static readonly IDictionary<Piece, int> PieceConstants;
         public static readonly int TotalPhase;

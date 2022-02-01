@@ -1,4 +1,4 @@
-﻿namespace Rudim.CLI
+﻿namespace Rudim.CLI.UCI
 {
     internal interface IUciCommand
     {
