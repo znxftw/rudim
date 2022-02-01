@@ -14,7 +14,7 @@ namespace Rudim.CLI.UCI
 
         public void Run(string[] parameters)
         {
-            var depth = GetParameter("depth", parameters, (int)6);
+            var depth = GetParameter("depth", parameters, 5);
             // TODO : ponder, wtime, btime, winc, binc, movestogo, searchmoves, nodes, mate, movetime
             var infinite = GetOptionlessParameter("infinite", parameters);
 

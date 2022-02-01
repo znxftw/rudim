@@ -1,4 +1,5 @@
 ﻿using Rudim.Common;
+using Rudim.Search;
 using System.Collections.Generic;
 
 namespace Rudim.Board
@@ -51,26 +52,8 @@ namespace Rudim.Board
         {
             GenerateMoves();
 
-            depth.ToString(); // Placeholder for actual depth usage later
-
-            return PickNextLegalMove();
-        }
-
-        private Move PickNextLegalMove()
-        {
-            for (var i = 0; i < Moves.Count; ++i)
-            {
-                var move = Moves[i];
-                SaveState();
-                MakeMove(move);
-                if (!IsInCheck(SideToMove.Other()))
-                {
-                    RestoreState();
-                    return move;
-                }
-                RestoreState();
-            }
-            return new Move(Square.NoSquare, Square.NoSquare, MoveType.Quiet);
+            AlphaBeta.Search(this, depth);
+            return AlphaBeta.BestMove;
         }
 
         private void GenerateQueenMoves()
