@@ -1,14 +1,12 @@
 ﻿using Rudim.Common;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace Rudim.Board
 {
     internal class SimpleEvaluation
     {
-        private static readonly IDictionary<Piece, int> PieceValues;
-        private static readonly IDictionary<Piece, int[]> PositionValues;
+        private static readonly int[] PieceValues;
+        private static readonly int[,] PositionValues;
         private static readonly int[] MidgameKingValues;
         private static readonly int[] EndgameKingValues;
 
@@ -28,12 +26,12 @@ namespace Rudim.Board
             var positionalScore = 0;
             var midgamePhase = GamePhase.Calculate(boardState);
             var endgamePhase = GamePhase.TotalPhase - midgamePhase;
-            for (var piece = Piece.Pawn; piece <= Piece.King; ++piece)
+            for (var piece = 0; piece < Constants.Pieces; ++piece)
             {
-                var whiteBoard = new Bitboard(boardState.Pieces[(int)Side.White, (int)piece].Board);
-                var blackBoard = new Bitboard(boardState.Pieces[(int)Side.Black, (int)piece].Board);
+                var whiteBoard = new Bitboard(boardState.Pieces[(int)Side.White, piece].Board);
+                var blackBoard = new Bitboard(boardState.Pieces[(int)Side.Black, piece].Board);
 
-                if (piece == Piece.King)
+                if (piece == Constants.Pieces - 1)
                 {
                     var whiteKing = whiteBoard.GetLsb();
                     var blackKing = MirrorSquare(blackBoard.GetLsb());
@@ -47,7 +45,7 @@ namespace Rudim.Board
                 {
                     var square = whiteBoard.GetLsb();
                     whiteBoard.ClearBit(square);
-                    positionalScore += PositionValues[piece][square];
+                    positionalScore += PositionValues[piece,square];
                 }
 
                 while (blackBoard.Board > 0)
@@ -55,7 +53,7 @@ namespace Rudim.Board
                     var square = blackBoard.GetLsb();
                     blackBoard.ClearBit(square);
                     square = MirrorSquare(square);
-                    positionalScore -= PositionValues[piece][square];
+                    positionalScore -= PositionValues[piece,square];
                 }
             }
             return positionalScore;
@@ -63,74 +61,68 @@ namespace Rudim.Board
 
         private static int MirrorSquare(int square)
         {
-            return (int)SquareExtensions.MirroredSquare[(Square)square];
+            int row = square / 8;
+            int col = square % 8;
+
+            return (7 - row) * 8 + col;
         }
 
         private static int ScoreMaterial(BoardState boardState)
         {
             var materialScore = 0;
-            for (var piece = Piece.Pawn; piece < Piece.King; ++piece)
+            for (var piece = 0; piece < Constants.Pieces; ++piece)
             {
-                materialScore += PieceValues[piece] * BitOperations.PopCount(boardState.Pieces[(int)Side.White, (int)piece].Board);
-                materialScore -= PieceValues[piece] * BitOperations.PopCount(boardState.Pieces[(int)Side.Black, (int)piece].Board);
+                materialScore += PieceValues[piece] * BitOperations.PopCount(boardState.Pieces[(int)Side.White, piece].Board);
+                materialScore -= PieceValues[piece] * BitOperations.PopCount(boardState.Pieces[(int)Side.Black, piece].Board);
             }
             return materialScore;
         }
 
         static SimpleEvaluation()
         {
-            PieceValues = new Dictionary<Piece, int>()
-            {
-                [Piece.Pawn] = 100,
-                [Piece.Knight] = 320,
-                [Piece.Bishop] = 330,
-                [Piece.Rook] = 500,
-                [Piece.Queen] = 900,
-                [Piece.King] = 20000
-            };
-            PositionValues = new Dictionary<Piece, int[]>()
-            {
-
-                [Piece.Pawn] = new[]{  0,  0,  0,  0,  0,  0,  0,  0,
-                                                            50, 50, 50, 50, 50, 50, 50, 50,
-                                                            10, 10, 20, 30, 30, 20, 10, 10,
-                                                            5,  5, 10, 25, 25, 10,  5,  5,
-                                                            0,  0,  0, 20, 20,  0,  0,  0,
-                                                            5, -5,-10,  0,  0,-10, -5,  5,
-                                                            5, 10, 10,-20,-20, 10, 10,  5,
-                                                            0,  0,  0,  0,  0,  0,  0,  0},
-                [Piece.Knight] = new[]{-50,-40,-30,-30,-30,-30,-40,-50,
-                                                            -40,-20,  0,  0,  0,  0,-20,-40,
-                                                            -30,  0, 10, 15, 15, 10,  0,-30,
-                                                            -30,  5, 15, 20, 20, 15,  5,-30,
-                                                            -30,  0, 15, 20, 20, 15,  0,-30,
-                                                            -30,  5, 10, 15, 15, 10,  5,-30,
-                                                            -40,-20,  0,  5,  5,  0,-20,-40,
-                                                            -50,-40,-30,-30,-30,-30,-40,-50},
-                [Piece.Bishop] = new[]{-20,-10,-10,-10,-10,-10,-10,-20,
-                                                            -10,  0,  0,  0,  0,  0,  0,-10,
-                                                            -10,  0,  5, 10, 10,  5,  0,-10,
-                                                            -10,  5,  5, 10, 10,  5,  5,-10,
-                                                            -10,  0, 10, 10, 10, 10,  0,-10,
-                                                            -10, 10, 10, 10, 10, 10, 10,-10,
-                                                            -10,  5,  0,  0,  0,  0,  5,-10,
-                                                            -20,-10,-10,-10,-10,-10,-10,-20},
-                [Piece.Rook] = new[]{   0,  0,  0,  0,  0,  0,  0,  0,
-                                                             5, 10, 10, 10, 10, 10, 10,  5,
-                                                            -5,  0,  0,  0,  0,  0,  0, -5,
-                                                            -5,  0,  0,  0,  0,  0,  0, -5,
-                                                            -5,  0,  0,  0,  0,  0,  0, -5,
-                                                            -5,  0,  0,  0,  0,  0,  0, -5,
-                                                            -5,  0,  0,  0,  0,  0,  0, -5,
-                                                             0,  0,  0,  5,  5,  0,  0,  0},
-                [Piece.Queen] = new[]{ -20,-10,-10, -5, -5,-10,-10,-20,
-                                                            -10,  0,  0,  0,  0,  0,  0,-10,
-                                                            -10,  0,  5,  5,  5,  5,  0,-10,
-                                                             -5,  0,  5,  5,  5,  5,  0, -5,
-                                                              0,  0,  5,  5,  5,  5,  0, -5,
-                                                            -10,  5,  5,  5,  5,  5,  0,-10,
-                                                            -10,  0,  5,  0,  0,  0,  0,-10,
-                                                            -20,-10,-10, -5, -5,-10,-10,-20}
+            PieceValues = new int[]
+            { 100, 320, 330, 500,900, 20000 };
+            PositionValues = new int[,]
+            { { 0,  0,  0,  0,  0,  0,  0,  0,
+                50, 50, 50, 50, 50, 50, 50, 50,
+                10, 10, 20, 30, 30, 20, 10, 10,
+                5,  5, 10, 25, 25, 10,  5,  5,
+                0,  0,  0, 20, 20,  0,  0,  0,
+                5, -5,-10,  0,  0,-10, -5,  5,
+                5, 10, 10,-20,-20, 10, 10,  5,
+                0,  0,  0,  0,  0,  0,  0,  0},
+               { -50,-40,-30,-30,-30,-30,-40,-50,
+                 -40,-20,  0,  0,  0,  0,-20,-40,
+                 -30,  0, 10, 15, 15, 10,  0,-30,
+                 -30,  5, 15, 20, 20, 15,  5,-30,
+                 -30,  0, 15, 20, 20, 15,  0,-30,
+                 -30,  5, 10, 15, 15, 10,  5,-30,
+                 -40,-20,  0,  5,  5,  0,-20,-40,
+                 -50,-40,-30,-30,-30,-30,-40,-50},
+               { -20,-10,-10,-10,-10,-10,-10,-20,
+                 -10,  0,  0,  0,  0,  0,  0,-10,
+                 -10,  0,  5, 10, 10,  5,  0,-10,
+                 -10,  5,  5, 10, 10,  5,  5,-10,
+                 -10,  0, 10, 10, 10, 10,  0,-10,
+                 -10, 10, 10, 10, 10, 10, 10,-10,
+                 -10,  5,  0,  0,  0,  0,  5,-10,
+                 -20,-10,-10,-10,-10,-10,-10,-20},
+               { 0,  0,  0,  0,  0,  0,  0,  0,
+                 5, 10, 10, 10, 10, 10, 10,  5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 0,  0,  0,  5,  5,  0,  0,  0},
+               { -20,-10,-10, -5, -5,-10,-10,-20,
+                 -10,  0,  0,  0,  0,  0,  0,-10,
+                 -10,  0,  5,  5,  5,  5,  0,-10,
+                 -5,  0,  5,  5,  5,  5,  0, -5,
+                 0,  0,  5,  5,  5,  5,  0, -5,
+                 -10,  5,  5,  5,  5,  5,  0,-10,
+                 -10,  0,  5,  0,  0,  0,  0,-10,
+                 -20,-10,-10, -5, -5,-10,-10,-20}
             };
             MidgameKingValues = new[]
             {

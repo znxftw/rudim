@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Rudim.Common
+﻿namespace Rudim.Common
 {
     public enum Square
     {
@@ -13,25 +11,4 @@ namespace Rudim.Common
         a2, b2, c2, d2, e2, f2, g2, h2,
         a1, b1, c1, d1, e1, f1, g1, h1, NoSquare
     };
-
-    public static class SquareExtensions
-    {
-
-        public static Dictionary<Square, Square> MirroredSquare;
-        static SquareExtensions()
-        {
-            MirroredSquare = new Dictionary<Square, Square>();
-            for (var i = 0; i < 8; ++i)
-            {
-                for (var j = 0; j < 8; ++j)
-                {
-                    var square = (Square)(i * 8 + j);
-                    var mirror = (Square)((7 - i) * 8 + j);
-                    MirroredSquare[square] = mirror;
-                }
-            }
-            MirroredSquare[Square.NoSquare] = Square.NoSquare;
-        }
-    }
-
 }

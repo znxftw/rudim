@@ -7,29 +7,21 @@ namespace Rudim.Common
 {
     static class GamePhase
     {
-        private static readonly IDictionary<Piece, int> PieceConstants;
+        private static readonly int[] PieceConstants;
         public static readonly int TotalPhase;
 
         static GamePhase()
         {
-            PieceConstants = new Dictionary<Piece, int>()
-            {
-                [Piece.Pawn] = 0,
-                [Piece.Knight] = 1,
-                [Piece.Bishop] = 1,
-                [Piece.Rook] = 2,
-                [Piece.Queen] = 4,
-                [Piece.King] = 0
-            };
-            TotalPhase = PieceConstants[Piece.Pawn] * 16 + PieceConstants[Piece.Knight] * 4 + PieceConstants[Piece.Bishop] * 4 + PieceConstants[Piece.Rook] * 4 + PieceConstants[Piece.Queen] * 2;
+            PieceConstants = new[] {0, 1, 1, 2, 4, 0};
+            TotalPhase = PieceConstants[(int)Piece.Pawn] * 16 + PieceConstants[(int)Piece.Knight] * 4 + PieceConstants[(int)Piece.Bishop] * 4 + PieceConstants[(int)Piece.Rook] * 4 + PieceConstants[(int)Piece.Queen] * 2;
         }
         public static int Calculate(BoardState boardState)
         {
             int phase = 0;
-            for (var piece = Piece.Pawn; piece < Piece.King; ++piece)
+            for (var piece = 0; piece < Constants.Pieces - 1; ++piece)
             {
-                var whiteBoard = boardState.Pieces[(int)Side.White, (int)piece].Board;
-                var blackBoard = boardState.Pieces[(int)Side.Black, (int)piece].Board;
+                var whiteBoard = boardState.Pieces[(int)Side.White, piece].Board;
+                var blackBoard = boardState.Pieces[(int)Side.Black, piece].Board;
 
                 phase += PieceConstants[piece] * BitOperations.PopCount(whiteBoard);
                 phase += PieceConstants[piece] * BitOperations.PopCount(blackBoard);
