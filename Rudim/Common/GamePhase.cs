@@ -12,7 +12,7 @@ namespace Rudim.Common
 
         static GamePhase()
         {
-            PieceConstants = new[] {0, 1, 1, 2, 4, 0};
+            PieceConstants = new[] { 0, 1, 1, 2, 4, 0 };
             TotalPhase = PieceConstants[(int)Piece.Pawn] * 16 + PieceConstants[(int)Piece.Knight] * 4 + PieceConstants[(int)Piece.Bishop] * 4 + PieceConstants[(int)Piece.Rook] * 4 + PieceConstants[(int)Piece.Queen] * 2;
         }
         public static int Calculate(BoardState boardState)

@@ -9,7 +9,7 @@ namespace Rudim.Test
         [Fact]
         public void ShouldGenerateMoves()
         {
-            
+
             var advancedMovesPosition = BoardState.ParseFEN(Helpers.AdvancedMoveFEN);
             var randomPosition = BoardState.ParseFEN(Helpers.RandomFEN);
             var startingPosition = BoardState.ParseFEN(Helpers.StartingFEN);

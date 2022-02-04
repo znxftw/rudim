@@ -13,14 +13,14 @@ namespace Rudim.Test
             BoardState.ClearStates();
             var originalState = BoardState.ParseFEN(Helpers.StartingFEN);
             var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
-            
+
             boardState.SaveState();
             boardState.GenerateMoves();
-            
+
             Assert.NotEqual(boardState, originalState);
-            
+
             boardState.RestoreState();
-            
+
             Assert.Equal(boardState, originalState);
             BoardState.ClearStates();
         }

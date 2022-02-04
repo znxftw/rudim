@@ -45,7 +45,7 @@ namespace Rudim.Board
                 {
                     var square = whiteBoard.GetLsb();
                     whiteBoard.ClearBit(square);
-                    positionalScore += PositionValues[piece,square];
+                    positionalScore += PositionValues[piece, square];
                 }
 
                 while (blackBoard.Board > 0)
@@ -53,7 +53,7 @@ namespace Rudim.Board
                     var square = blackBoard.GetLsb();
                     blackBoard.ClearBit(square);
                     square = MirrorSquare(square);
-                    positionalScore -= PositionValues[piece,square];
+                    positionalScore -= PositionValues[piece, square];
                 }
             }
             return positionalScore;
@@ -80,7 +80,7 @@ namespace Rudim.Board
 
         static SimpleEvaluation()
         {
-            PieceValues = new int[] { 100, 320, 330, 500,900, 20000 };
+            PieceValues = new int[] { 100, 320, 330, 500, 900, 20000 };
             PositionValues = new int[,]
             { { 0,  0,  0,  0,  0,  0,  0,  0,
                 50, 50, 50, 50, 50, 50, 50, 50,

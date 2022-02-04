@@ -42,7 +42,7 @@ namespace Rudim.Search
                 }
             }
 
-            if(numberOfLegalMoves == 0)
+            if (numberOfLegalMoves == 0)
             {
                 if (boardState.IsInCheck(boardState.SideToMove))
                     return -Constants.MaxCentipawnEval + (SearchDepth - depth);

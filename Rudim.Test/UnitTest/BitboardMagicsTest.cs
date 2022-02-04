@@ -115,10 +115,10 @@ namespace Rudim.Test
             Assert.NotNull(Mask);
         }
 
-        [Fact (Skip = "Heavy test, one-time run function, to be re-enabled if changing FindMagicNumber / regenerating magics")]
+        [Fact(Skip = "Heavy test, one-time run function, to be re-enabled if changing FindMagicNumber / regenerating magics")]
         public void ShouldGenerateMagicNumbersForAllSquares()
         {
-            for(int square = 0; square < 64; ++square)
+            for (int square = 0; square < 64; ++square)
             {
                 Bitboard.FindMagicNumber((Square)square, Bitboard.BishopMaskBits[square], true);
                 Bitboard.FindMagicNumber((Square)square, Bitboard.RookMaskBits[square], false);

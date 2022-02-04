@@ -24,12 +24,12 @@ namespace Rudim
                 ulong PotentialMagicNumber = GeneratePotentialMagicNumber();
 
                 // Early exit impossible magics
-                if (BitOperations.PopCount((Mask.Board * PotentialMagicNumber) & 0xFF00000000000000) < 6) 
+                if (BitOperations.PopCount((Mask.Board * PotentialMagicNumber) & 0xFF00000000000000) < 6)
                     continue;
 
                 var MagicAttacks = new Bitboard[Constants.MaxMaskIndex];
                 var FailureFlag = false;
-                for(var Index = 0; Index < MaxIndex; ++Index)
+                for (var Index = 0; Index < MaxIndex; ++Index)
                 {
                     var MagicIndex = (int)((OccupancyMappings[Index].Board * PotentialMagicNumber) >> (64 - bitsInMask));
                     if (MagicAttacks[MagicIndex] == null)
