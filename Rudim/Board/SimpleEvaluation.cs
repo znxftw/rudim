@@ -80,8 +80,7 @@ namespace Rudim.Board
 
         static SimpleEvaluation()
         {
-            PieceValues = new int[]
-            { 100, 320, 330, 500,900, 20000 };
+            PieceValues = new int[] { 100, 320, 330, 500,900, 20000 };
             PositionValues = new int[,]
             { { 0,  0,  0,  0,  0,  0,  0,  0,
                 50, 50, 50, 50, 50, 50, 50, 50,
