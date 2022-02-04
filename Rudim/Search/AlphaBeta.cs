@@ -12,7 +12,7 @@ namespace Rudim.Search
         public static int Search(BoardState boardState, int depth, int alpha, int beta)
         {
             if (depth == 0)
-                return SimpleEvaluation.Evaluate(boardState);
+                return Quiescent.Search(boardState, alpha, beta);
 
             Nodes++;
             var originalAlpha = alpha;
