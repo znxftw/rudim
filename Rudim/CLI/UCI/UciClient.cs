@@ -30,15 +30,9 @@ namespace Rudim.CLI.UCI
                 var command = input[0];
                 var commandParameters = input.Skip(1).ToArray();
 
-                if (command == "exit")
-                {
-                    Environment.Exit(0);
-                }
-
                 if (command == "quit")
                 {
-                    // Should quit be exiting the entire application as well?
-                    break;
+                    Environment.Exit(0);
                 }
 
                 if (_commands.ContainsKey(command))
