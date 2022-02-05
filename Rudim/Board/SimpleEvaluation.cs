@@ -18,7 +18,7 @@ namespace Rudim.Board
             score += ScoreMaterial(boardState);
             score += ScorePosition(boardState);
 
-            return score;
+            return boardState.SideToMove == Side.White ? score : -score;
         }
 
         private static int ScorePosition(BoardState boardState)
