@@ -20,7 +20,7 @@ namespace Rudim.Search
 
             boardState.GenerateMoves();
             // TODO : Flag in GenerateMoves to avoid extra iteration?
-            foreach(var move in boardState.Moves)
+            foreach (var move in boardState.Moves)
             {
                 MoveOrdering.PopulateMoveScore(move, boardState);
             }

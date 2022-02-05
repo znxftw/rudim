@@ -1,10 +1,5 @@
 ﻿using Rudim.Board;
 using Rudim.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rudim.Search
 {
@@ -29,7 +24,7 @@ namespace Rudim.Search
                 MoveOrdering.PopulateMoveScore(move, boardState);
             }
             MoveOrdering.SortMoves(boardState);
-            
+
 
             for (var i = 0; i < boardState.Moves.Count; ++i)
             {

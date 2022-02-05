@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Rudim.Common;
 
 namespace Rudim.Board
-{   
+{
     // TODO : Remove this class completely, instead do UnmakeMove(), should be faster.
     public partial class BoardState
     {

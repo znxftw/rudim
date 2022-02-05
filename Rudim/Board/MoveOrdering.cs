@@ -1,15 +1,10 @@
 ﻿using Rudim.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rudim.Board
 {
     static class MoveOrdering
     {
-        private static int[,] MVVLVA;
+        private static readonly int[,] MVVLVA;
 
         static MoveOrdering()
         {
@@ -34,7 +29,7 @@ namespace Rudim.Board
                 targetPiece = (int)Piece.Pawn;
             else
                 targetPiece = boardState.GetPieceOn(move.Target, boardState.SideToMove.Other());
-            move.Score = MVVLVA[targetPiece,sourcePiece];
+            move.Score = MVVLVA[targetPiece, sourcePiece];
         }
 
         public static void SortMoves(BoardState boardState)
