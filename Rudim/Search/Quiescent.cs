@@ -23,11 +23,18 @@ namespace Rudim.Search
                 alpha = eval;
 
             boardState.GenerateMoves();
+            // TODO : Flag in GenerateMoves to avoid extra iteration?
+            foreach (var move in boardState.Moves)
+            {
+                MoveOrdering.PopulateMoveScore(move, boardState);
+            }
+            MoveOrdering.SortMoves(boardState);
+            
 
             for (var i = 0; i < boardState.Moves.Count; ++i)
             {
                 if (!boardState.Moves[i].IsCapture())
-                    continue;
+                    break; // If sorted, once a quiet move is reached we won't need to visit the remaining nodes
 
                 boardState.SaveState();
                 boardState.MakeMove(boardState.Moves[i]);

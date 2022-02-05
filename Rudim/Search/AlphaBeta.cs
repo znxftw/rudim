@@ -19,6 +19,14 @@ namespace Rudim.Search
             Move bestEvaluation = null;
 
             boardState.GenerateMoves();
+            // TODO : Flag in GenerateMoves to avoid extra iteration?
+            foreach(var move in boardState.Moves)
+            {
+                MoveOrdering.PopulateMoveScore(move, boardState);
+            }
+
+            MoveOrdering.SortMoves(boardState);
+
             var numberOfLegalMoves = 0;
             for (var i = 0; i < boardState.Moves.Count; ++i)
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rudim.Board;
+using System;
 
 namespace Rudim.Common
 {
@@ -7,6 +8,7 @@ namespace Rudim.Common
         public Square Source { get; set; }
         public Square Target { get; set; }
         public MoveType Type { get; set; }
+        public int Score { get; set; }
 
         public static readonly Move NoMove = new(Square.NoSquare, Square.NoSquare, MoveType.Quiet);
 

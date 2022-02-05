@@ -33,7 +33,7 @@ namespace Rudim.Board
         public Side SideToMove { get; private set; }
         public Square EnPassantSquare { get; private set; }
         public Castle Castle { get; private set; }
-        public IList<Move> Moves { get; private set; }
+        public List<Move> Moves { get; set; }
 
         private void AddPiece(Square square, Side side, Piece piece)
         {
@@ -56,6 +56,18 @@ namespace Rudim.Board
                 }
             }
             return Piece.None;
+        }
+
+        public int GetPieceOn(Square square, Side side)
+        {
+            int sideInt = (int)side;
+            // TODO : This is taking up a lot of CPU (~15% of an AlphaBeta run), keeping a PieceMapping might improve perf at the cost of a heavier BoardState?
+            for (var pieceType = 0; pieceType < Constants.Pieces; ++pieceType)
+            {
+                if (Pieces[sideInt, pieceType].GetBit(square) == 1)
+                    return pieceType;
+            }
+            return (int)Piece.None;
         }
 
         public bool IsInCheck(Side side)
