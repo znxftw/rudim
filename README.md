@@ -3,7 +3,7 @@
 
 ## What does Rudim do?
 
-Rudim is currently a work in progress but is in an MVP phase - you can [play with Rudim on Lichess](https://lichess.org/YaGBp2Cw).  
+Rudim is currently a work in progress but is in an MVP phase - you can [play with Rudim on Lichess](https://lichess.org/@/rudim-bot).  
 
 If you see Rudim as offline - the server might be down. If Rudim is online but not accepting your challenge, Rudim might either be playing someone else (currently can play only one person at a time) or the server might be restarting - try again later.
 
