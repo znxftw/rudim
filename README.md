@@ -3,11 +3,9 @@
 
 ## What does Rudim do?
 
-Rudim is currently a work in progress. The aim is for Rudim to be able to play above average chess.
+Rudim is currently a work in progress but is in an MVP phase - you can [play with Rudim on Lichess](https://lichess.org/YaGBp2Cw).  
 
-Rudim currently has a working implementation of [Bitboards](https://en.wikipedia.org/wiki/Bitboard) and Move Generation. It uses simple straightforward bitboard logic for generating legal moves of a given position and can currently calculate roughy 1000 KN/s according to simple perft on my local.
-
-Rudim has a basic implementation for the [UCI Protocol](https://www.shredderchess.com/chess-features/uci-universal-chess-interface.html) - i.e. if you try loading the engine into a GUI like Arena and generate moves - it would be able to play a game of chess. It currently does not evaluate the best move in the position, just picks any of the available moves arbitrarily.
+If you see Rudim as offline - the server might be down. If Rudim is online but not accepting your challenge, Rudim might either be playing someone else (currently can play only one person at a time) or the server might be restarting - try again later.
 
 ### What all does Rudim implement?
 
@@ -15,16 +13,18 @@ Rudim has a basic implementation for the [UCI Protocol](https://www.shredderches
 - UCI Protocol
 - Simplified Evaluation (Piece Square Tables)
 - Tapered Evaluation
+- Negamax with Alpha Beta Pruning
+- Quiescent Search
+- Move Ordering - MVV LVA
 
 ### What's next for Rudim?
 
-- Write a search algorithm to scan through the tree, prune unnecessary nodes, and evaluate leaf positions.
-- Update the UCI code to include the extra options for the `go` command. (These are mostly timers & infinite search until an async stop is called - which would need the above two steps in place first)
-- Improve the Search, Move Generation, and Evaluation algorithms.
+- Finish the implementation for the UCI commands (and any changes in the implementation for Rudim that might be a result of it)
+- Improve the Search, Move Generation, and Evaluation algorithms to make Rudim stronger.
 
 ## How does Rudim work?
 
-I've written a blog post on my journey through creating Rudim - you can read up on it [here](https://vishnubhagyanath.dev/blog/2022-01-28-rudim-1/).
+I've written a series of blog posts on my journey through creating Rudim - you can read up on it [here](https://vishnubhagyanath.dev/tags/rudim/).
 
 ## Running Rudim
 
