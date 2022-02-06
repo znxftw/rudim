@@ -8,9 +8,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rudim.Test", "Rudim.Test\Rudim.Test.csproj", "{17A4B854-3894-461C-8A5D-C3177C319C09}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{86B910AA-4C12-4B99-860E-7F03F942E368}"
-	ProjectSection(SolutionItems) = preProject
-		todo.md = todo.md
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
