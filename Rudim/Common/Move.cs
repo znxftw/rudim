@@ -33,6 +33,10 @@ namespace Rudim.Common
                 MoveType.BishopPromotion => "b",
                 MoveType.KnightPromotion => "n",
                 MoveType.RookPromotion => "r",
+                MoveType.QueenPromotionCapture => "q",
+                MoveType.BishopPromotionCapture => "b",
+                MoveType.KnightPromotionCapture => "n",
+                MoveType.RookPromotionCapture => "r",
                 _ => "",
             };
         }
