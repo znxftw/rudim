@@ -21,8 +21,14 @@ namespace Rudim.CLI.UCI
             if (!infinite)
             {
                 var move = _uciClient.Board.FindBestMove(depth);
-
-                CliClient.WriteLine("bestmove " + move.Source + move.Target);
+                if (move.IsPromotion())
+                {
+                    CliClient.WriteLine("bestmove " + move.Source + move.Target + move.GetPromotionChar());
+                }
+                else
+                {
+                    CliClient.WriteLine("bestmove " + move.Source + move.Target);
+                }
             }
         }
 

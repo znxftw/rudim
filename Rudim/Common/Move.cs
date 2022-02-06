@@ -25,6 +25,18 @@ namespace Rudim.Common
                 MoveType.KnightPromotionCapture or MoveType.QueenPromotionCapture or MoveType.RookPromotionCapture;
         }
 
+        public string GetPromotionChar()
+        {
+            return Type switch
+            {
+                MoveType.QueenPromotion => "q",
+                MoveType.BishopPromotion => "b",
+                MoveType.KnightPromotion => "n",
+                MoveType.RookPromotion => "r",
+                _ => "",
+            };
+        }
+
         public bool IsPromotion()
         {
             return Type is >= MoveType.KnightPromotion and <= MoveType.QueenPromotionCapture;
