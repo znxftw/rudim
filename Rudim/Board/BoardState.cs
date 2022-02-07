@@ -164,19 +164,19 @@ namespace Rudim.Board
                 {
                     case Square.c1:
                         RemovePiece(Square.d1);
-                        AddPiece(Square.a1, SideToMove.Other(), Piece.Rook);
+                        AddPiece(Square.a1, SideToMove, Piece.Rook);
                         break;
                     case Square.g1:
                         RemovePiece(Square.f1);
-                        AddPiece(Square.h1, SideToMove.Other(), Piece.Rook);
+                        AddPiece(Square.h1, SideToMove, Piece.Rook);
                         break;
                     case Square.c8:
                         RemovePiece(Square.d8);
-                        AddPiece(Square.a8, SideToMove.Other(), Piece.Rook);
+                        AddPiece(Square.a8, SideToMove, Piece.Rook);
                         break;
                     case Square.g8:
                         RemovePiece(Square.f8);
-                        AddPiece(Square.h8, SideToMove.Other(), Piece.Rook);
+                        AddPiece(Square.h8, SideToMove, Piece.Rook);
                         break;
                     default: throw new ArgumentOutOfRangeException(nameof(move.Target));
                 }
