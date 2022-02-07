@@ -33,7 +33,7 @@ namespace Rudim.Test.Perft
         [InlineData(4, 43_238, Helpers.EndgameFEN)]
         [InlineData(5, 674_624, Helpers.EndgameFEN)]
         [InlineData(6, 11_030_083, Helpers.EndgameFEN)]
-        public void PerftStartingPosition(int depth, ulong nodes, string position)
+        public void Perft(int depth, ulong nodes, string position)
         {
             var timer = new Stopwatch();
 
