@@ -15,7 +15,7 @@ namespace Rudim.Test
             var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
 
             boardState.SaveState();
-            boardState.GenerateMoves();
+            boardState.MakeMove(new Move(Square.e2, Square.e4, MoveType.Quiet));
 
             Assert.NotEqual(boardState, originalState);
 

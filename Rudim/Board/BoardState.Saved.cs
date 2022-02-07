@@ -13,7 +13,7 @@ namespace Rudim.Board
             public Side SavedSideToMove { get; set; }
             public Square SavedEnPassantSquare { get; set; }
             public Castle SavedCastle { get; set; }
-            public IList<Move> SavedMoves { get; set; }
+            public List<Move> SavedMoves { get; set; }
         }
 
         private static Stack<SavedState> savedStates { get; set; }
@@ -37,7 +37,7 @@ namespace Rudim.Board
             savedState.SavedSideToMove = SideToMove;
             savedState.SavedEnPassantSquare = EnPassantSquare;
             savedState.SavedCastle = Castle;
-            savedState.SavedMoves = Moves is null ? null : new List<Move>(Moves);
+            savedState.SavedMoves = Moves;
 
             savedStates.Push(savedState);
         }
@@ -53,7 +53,7 @@ namespace Rudim.Board
             SideToMove = savedState.SavedSideToMove;
             EnPassantSquare = savedState.SavedEnPassantSquare;
             Castle = savedState.SavedCastle;
-            Moves = savedState.SavedMoves is null ? null : new List<Move>(savedState.SavedMoves);
+            Moves = savedState.SavedMoves;
         }
 
         public static void ClearStates()
