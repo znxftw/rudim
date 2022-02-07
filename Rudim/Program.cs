@@ -19,7 +19,7 @@ namespace Rudim
 
             timer.Start();
             var board = BoardState.Default();
-            AlphaBeta.Search(board, 7);
+            AlphaBeta.Search(board, 8);
             Console.WriteLine(AlphaBeta.Nodes);
             Console.WriteLine(Quiescent.Nodes);
             board.MakeMove(AlphaBeta.BestMove);

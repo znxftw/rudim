@@ -11,6 +11,7 @@ namespace Rudim.Board
         {
             Pieces = new Bitboard[Constants.Sides, Constants.Pieces];
             Occupancies = new Bitboard[Constants.SidesWithBoth];
+            PieceMapping = new Piece[Constants.Squares];
             SideToMove = Side.White;
             EnPassantSquare = Square.NoSquare;
             Castle = Castle.None;
@@ -21,6 +22,8 @@ namespace Rudim.Board
                     Pieces[side, piece] = new Bitboard(0);
             for (var side = 0; side < Constants.SidesWithBoth; ++side)
                 Occupancies[side] = new Bitboard(0);
+            for (var square = 0; square < Constants.Squares; ++square)
+                PieceMapping[square] = Piece.None;
         }
 
         public static BoardState Default()
@@ -30,6 +33,7 @@ namespace Rudim.Board
 
         public Bitboard[,] Pieces { get; }
         public Bitboard[] Occupancies { get; }
+        public Piece[] PieceMapping { get; set; }
         public Side SideToMove { get; private set; }
         public Square EnPassantSquare { get; private set; }
         public Castle Castle { get; private set; }
@@ -40,6 +44,7 @@ namespace Rudim.Board
             Pieces[(int)side, (int)piece].SetBit(square);
             Occupancies[(int)side].SetBit(square);
             Occupancies[(int)Side.Both].SetBit(square);
+            PieceMapping[(int)square] = piece;
         }
 
         private Piece RemovePiece(Square square)
@@ -52,6 +57,7 @@ namespace Rudim.Board
                     Pieces[side, pieceType].ClearBit(square);
                     Occupancies[side].ClearBit(square);
                     Occupancies[(int)Side.Both].ClearBit(square);
+                    PieceMapping[(int)square] = Piece.None;
                     return (Piece)pieceType;
                 }
             }
@@ -60,14 +66,8 @@ namespace Rudim.Board
 
         public int GetPieceOn(Square square, Side side)
         {
-            int sideInt = (int)side;
-            // TODO : This is taking up a lot of CPU (~15% of an AlphaBeta run), keeping a PieceMapping might improve perf at the cost of a heavier BoardState?
-            for (var pieceType = 0; pieceType < Constants.Pieces; ++pieceType)
-            {
-                if (Pieces[sideInt, pieceType].GetBit(square) == 1)
-                    return pieceType;
-            }
-            return (int)Piece.None;
+            var piece = PieceMapping[(int)square];
+            return Occupancies[(int)side].GetBit(square) == 1 ? (int)piece : (int)Piece.None;
         }
 
         public bool IsInCheck(Side side)
@@ -148,7 +148,7 @@ namespace Rudim.Board
 
             if (state.CapturedPiece != Piece.None)
             {
-                if(move.Type == MoveType.EnPassant)
+                if (move.Type == MoveType.EnPassant)
                 {
                     AddPiece(EnPassantSquareFor(move), SideToMove.Other(), Piece.Pawn);
                 }
@@ -158,7 +158,7 @@ namespace Rudim.Board
                 }
             }
 
-            if(move.IsCastle())
+            if (move.IsCastle())
             {
                 switch (move.Target)
                 {
@@ -185,7 +185,7 @@ namespace Rudim.Board
             if (move.IsPromotion())
             {
                 AddPiece(move.Source, SideToMove, Piece.Pawn);
-            } 
+            }
             else
             {
                 AddPiece(move.Source, SideToMove, movedPiece);
