@@ -17,13 +17,23 @@ namespace Rudim.Test.Perft
         }
 
         [Theory]
-        [InlineData(0, 1)]
-        [InlineData(1, 20)]
-        [InlineData(2, 400)]
-        [InlineData(3, 8_902)]
-        [InlineData(4, 197_281)]
-        [InlineData(5, 4_865_609)]
-        public void PerftStartingPosition(int depth, ulong nodes)
+        [InlineData(0, 1, Helpers.StartingFEN)]
+        [InlineData(1, 20, Helpers.StartingFEN)]
+        [InlineData(2, 400, Helpers.StartingFEN)]
+        [InlineData(3, 8_902, Helpers.StartingFEN)]
+        [InlineData(4, 197_281, Helpers.StartingFEN)]
+        [InlineData(5, 4_865_609, Helpers.StartingFEN)]
+        [InlineData(1, 48, Helpers.KiwiPeteFEN)]
+        [InlineData(2, 2_039, Helpers.KiwiPeteFEN)]
+        [InlineData(3, 97_862, Helpers.KiwiPeteFEN)]
+        [InlineData(4, 4_085_603, Helpers.KiwiPeteFEN)]
+        [InlineData(1, 14, Helpers.EndgameFEN)]
+        [InlineData(2, 191, Helpers.EndgameFEN)]
+        [InlineData(3, 2_812, Helpers.EndgameFEN)]
+        [InlineData(4, 43_238, Helpers.EndgameFEN)]
+        [InlineData(5, 674_624, Helpers.EndgameFEN)]
+        [InlineData(6, 11_030_083, Helpers.EndgameFEN)]
+        public void PerftStartingPosition(int depth, ulong nodes, string position)
         {
             var timer = new Stopwatch();
 
@@ -31,7 +41,7 @@ namespace Rudim.Test.Perft
 
             timer.Start();
 
-            var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
+            var boardState = BoardState.ParseFEN(position);
             PerftDriver.ResetNodeCount();
             PerftDriver.Traverse(boardState, depth);
 
@@ -47,7 +57,7 @@ namespace Rudim.Test.Perft
         {
             var depth = 2;
 
-            var boardState = BoardState.ParseFEN("rnbqkbnr/p1pppppp/8/1p6/P7/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 2");
+            var boardState = BoardState.ParseFEN(Helpers.KiwiPeteFEN);
             ulong total = 0;
             boardState.GenerateMoves();
             foreach (var move in boardState.Moves)
