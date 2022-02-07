@@ -77,10 +77,13 @@ namespace Rudim.Board
         public void MakeMove(Move move)
         {
             var movedPiece = RemovePiece(move.Source);
+            var capturedPiece = Piece.None;
+            var originalEnPassantSquare = EnPassantSquare;
+            var originalCastlingRights = Castle;
 
             if (move.IsCapture())
             {
-                RemovePiece(move.Type == MoveType.EnPassant ? EnPassantSquareFor(move) : move.Target);
+                capturedPiece = RemovePiece(move.Type == MoveType.EnPassant ? EnPassantSquareFor(move) : move.Target);
             }
 
             if (move.IsPromotion())
@@ -130,9 +133,67 @@ namespace Rudim.Board
             EnPassantSquare = move.Type == MoveType.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
             SideToMove = SideToMove.Other();
 
+            SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights);
+
             Moves = new List<Move>();
         }
 
+
+        public void UnmakeMove(Move move)
+        {
+            SavedState state = RestoreState();
+
+            var movedPiece = RemovePiece(move.Target);
+            SideToMove = SideToMove.Other();
+
+            if (state.CapturedPiece != Piece.None)
+            {
+                if(move.Type == MoveType.EnPassant)
+                {
+                    AddPiece(EnPassantSquareFor(move), SideToMove.Other(), Piece.Pawn);
+                }
+                else
+                {
+                    AddPiece(move.Target, SideToMove.Other(), state.CapturedPiece);
+                }
+            }
+
+            if(move.IsCastle())
+            {
+                switch (move.Target)
+                {
+                    case Square.c1:
+                        RemovePiece(Square.d1);
+                        AddPiece(Square.a1, SideToMove.Other(), Piece.Rook);
+                        break;
+                    case Square.g1:
+                        RemovePiece(Square.f1);
+                        AddPiece(Square.h1, SideToMove.Other(), Piece.Rook);
+                        break;
+                    case Square.c8:
+                        RemovePiece(Square.d8);
+                        AddPiece(Square.a8, SideToMove.Other(), Piece.Rook);
+                        break;
+                    case Square.g8:
+                        RemovePiece(Square.f8);
+                        AddPiece(Square.h8, SideToMove.Other(), Piece.Rook);
+                        break;
+                    default: throw new ArgumentOutOfRangeException(nameof(move.Target));
+                }
+            }
+
+            if (move.IsPromotion())
+            {
+                AddPiece(move.Source, SideToMove, Piece.Pawn);
+            } 
+            else
+            {
+                AddPiece(move.Source, SideToMove, movedPiece);
+            }
+
+            Castle = state.CastlingRights;
+            EnPassantSquare = state.EnPassantSquare;
+        }
         private Square EnPassantSquareFor(Move move)
         {
             return move.Target + 8 * (SideToMove == Side.Black ? -1 : 1);

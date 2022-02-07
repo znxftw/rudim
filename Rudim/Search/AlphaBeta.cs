@@ -30,16 +30,16 @@ namespace Rudim.Search
             var numberOfLegalMoves = 0;
             for (var i = 0; i < boardState.Moves.Count; ++i)
             {
-                boardState.SaveState();
-                boardState.MakeMove(boardState.Moves[i]);
+                var move = boardState.Moves[i];
+                boardState.MakeMove(move);
                 if (boardState.IsInCheck(boardState.SideToMove.Other()))
                 {
-                    boardState.RestoreState();
+                    boardState.UnmakeMove(move);
                     continue;
                 }
 
                 int score = -Search(boardState, depth - 1, -beta, -alpha);
-                boardState.RestoreState();
+                boardState.UnmakeMove(move);
                 numberOfLegalMoves++;
                 if (score >= beta)
                     return beta;

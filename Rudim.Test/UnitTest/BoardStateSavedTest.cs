@@ -10,19 +10,19 @@ namespace Rudim.Test
         [Fact]
         public void ShouldSaveAndRestoreBoardState()
         {
-            BoardState.ClearStates();
+            BoardState.ClearSavedStates();
             var originalState = BoardState.ParseFEN(Helpers.StartingFEN);
             var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
+            var move = new Move(Square.e2, Square.e4, MoveType.Quiet);
 
-            boardState.SaveState();
-            boardState.MakeMove(new Move(Square.e2, Square.e4, MoveType.Quiet));
+            boardState.MakeMove(move);
 
             Assert.NotEqual(boardState, originalState);
 
-            boardState.RestoreState();
+            boardState.UnmakeMove(move);
 
             Assert.Equal(boardState, originalState);
-            BoardState.ClearStates();
+            BoardState.ClearSavedStates();
         }
     }
 }

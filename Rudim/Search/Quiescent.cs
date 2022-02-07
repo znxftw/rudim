@@ -28,18 +28,18 @@ namespace Rudim.Search
 
             for (var i = 0; i < boardState.Moves.Count; ++i)
             {
-                if (!boardState.Moves[i].IsCapture())
+                var move = boardState.Moves[i];
+                if (!move.IsCapture())
                     break; // If sorted, once a quiet move is reached we won't need to visit the remaining nodes
 
-                boardState.SaveState();
-                boardState.MakeMove(boardState.Moves[i]);
+                boardState.MakeMove(move);
                 if (boardState.IsInCheck(boardState.SideToMove.Other()))
                 {
-                    boardState.RestoreState();
+                    boardState.UnmakeMove(move);
                     continue;
                 }
                 var score = -Search(boardState, -beta, -alpha);
-                boardState.RestoreState();
+                boardState.UnmakeMove(move);
 
                 if (score >= beta)
                     return beta;

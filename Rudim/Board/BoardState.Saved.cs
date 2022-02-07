@@ -8,57 +8,39 @@ namespace Rudim.Board
     {
         private class SavedState
         {
-            public Bitboard[,] SavedPieces { get; set; }
-            public Bitboard[] SavedOccupancies { get; set; }
-            public Side SavedSideToMove { get; set; }
-            public Square SavedEnPassantSquare { get; set; }
-            public Castle SavedCastle { get; set; }
+            public Piece CapturedPiece { get; set; }
             public List<Move> SavedMoves { get; set; }
+            public Square EnPassantSquare { get; set; }
+            public Castle CastlingRights { get; internal set; }
         }
 
-        private static Stack<SavedState> savedStates { get; set; }
+        private static Stack<SavedState> SavedStates { get; set; }
 
         static BoardState()
         {
-            savedStates = new Stack<SavedState>();
+            SavedStates = new Stack<SavedState>();
         }
 
-        public void SaveState()
+        private void SaveState(Piece capturedPiece, Square enPassant, Castle originalCastlingRights)
         {
             var savedState = new SavedState();
-            savedState.SavedPieces = new Bitboard[Constants.Sides, Constants.Pieces];
-            savedState.SavedOccupancies = new Bitboard[Constants.SidesWithBoth];
-            // TODO : Copy constructors ?
-            for (var side = 0; side < Constants.Sides; ++side)
-                for (var piece = 0; piece < Constants.Pieces; ++piece)
-                    savedState.SavedPieces[side, piece] = Pieces[side, piece].CreateCopy();
-            for (var side = 0; side < Constants.SidesWithBoth; ++side)
-                savedState.SavedOccupancies[side] = Occupancies[side].CreateCopy();
-            savedState.SavedSideToMove = SideToMove;
-            savedState.SavedEnPassantSquare = EnPassantSquare;
-            savedState.SavedCastle = Castle;
             savedState.SavedMoves = Moves;
-
-            savedStates.Push(savedState);
+            savedState.CapturedPiece = capturedPiece;
+            savedState.EnPassantSquare = enPassant;
+            savedState.CastlingRights = originalCastlingRights;
+            SavedStates.Push(savedState);
         }
 
-        public void RestoreState()
+        private SavedState RestoreState()
         {
-            var savedState = savedStates.Pop();
-            for (var side = 0; side < Constants.Sides; ++side)
-                for (var piece = 0; piece < Constants.Pieces; ++piece)
-                    Pieces[side, piece] = savedState.SavedPieces[side, piece].CreateCopy();
-            for (var side = 0; side < Constants.SidesWithBoth; ++side)
-                Occupancies[side] = savedState.SavedOccupancies[side].CreateCopy();
-            SideToMove = savedState.SavedSideToMove;
-            EnPassantSquare = savedState.SavedEnPassantSquare;
-            Castle = savedState.SavedCastle;
+            var savedState = SavedStates.Pop();
             Moves = savedState.SavedMoves;
+            return savedState;
         }
 
-        public static void ClearStates()
+        public static void ClearSavedStates()
         {
-            savedStates.Clear();
+            SavedStates.Clear();
         }
     }
 }

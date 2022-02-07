@@ -27,7 +27,7 @@ namespace Rudim.Test.Perft
         {
             var timer = new Stopwatch();
 
-            BoardState.ClearStates();
+            BoardState.ClearSavedStates();
 
             timer.Start();
 
@@ -38,7 +38,7 @@ namespace Rudim.Test.Perft
             timer.Stop();
             Assert.Equal(nodes, PerftDriver.Nodes);
 
-            BoardState.ClearStates();
+            BoardState.ClearSavedStates();
             output.WriteLine($"Execution Time: {timer.ElapsedMilliseconds} ms");
         }
 
@@ -53,7 +53,6 @@ namespace Rudim.Test.Perft
             foreach (var move in boardState.Moves)
             {
                 PerftDriver.ResetNodeCount();
-                boardState.SaveState();
                 boardState.MakeMove(move);
 
                 if (!boardState.IsInCheck(boardState.SideToMove.Other()))
@@ -61,7 +60,7 @@ namespace Rudim.Test.Perft
 
                 total += PerftDriver.Nodes;
                 output.WriteLine(move.Source.ToString() + move.Target.ToString() + " " + PerftDriver.Nodes + " " + move.Type.ToString());
-                boardState.RestoreState();
+                boardState.UnmakeMove(move);
             }
             output.WriteLine(total.ToString());
         }
