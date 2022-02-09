@@ -52,8 +52,8 @@ namespace Rudim.Board
         {
             GenerateMoves();
 
-            AlphaBeta.Search(this, depth);
-            return AlphaBeta.BestMove;
+            Negamax.Search(this, depth);
+            return Negamax.BestMove;
         }
 
         private void GenerateQueenMoves()

@@ -19,10 +19,10 @@ namespace Rudim
 
             timer.Start();
             var board = BoardState.Default();
-            AlphaBeta.Search(board, 8);
-            Console.WriteLine(AlphaBeta.Nodes);
+            Negamax.Search(board, 8);
+            Console.WriteLine(Negamax.Nodes);
             Console.WriteLine(Quiescent.Nodes);
-            board.MakeMove(AlphaBeta.BestMove);
+            board.MakeMove(Negamax.BestMove);
             board.Print();
             timer.Stop();
 

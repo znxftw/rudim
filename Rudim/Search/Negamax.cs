@@ -3,7 +3,7 @@ using Rudim.Common;
 
 namespace Rudim.Search
 {
-    static class AlphaBeta
+    static class Negamax
     {
         public static Move BestMove;
         public static int Nodes = 0;
