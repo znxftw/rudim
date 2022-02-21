@@ -1,6 +1,11 @@
-﻿namespace Rudim.Common
+﻿using System;
+namespace Rudim.Common
 {
-    public record MoveType(int Value, Piece Piece = Piece.None, string PromotionChar = "", bool IsCapture = false);
+    public record MoveType(int Value, Piece Piece = Piece.None, string PromotionChar = "", bool IsCapture = false) : IEquatable<MoveType>
+    {
+        public virtual bool Equals(MoveType other) => other?.Value == Value;
+        public override int GetHashCode() => HashCode.Combine(Value);
+    }
 
     public static class MoveTypes
     {
