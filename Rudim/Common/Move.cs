@@ -7,12 +7,12 @@ namespace Rudim.Common
     {
         public Square Source { get; set; }
         public Square Target { get; set; }
-        public MoveType Type { get; set; }
+        public MoveTypeRecord Type { get; set; }
         public int Score { get; set; }
 
         public static readonly Move NoMove = new(Square.NoSquare, Square.NoSquare, MoveType.Quiet);
 
-        public Move(Square source, Square target, MoveType type)
+        public Move(Square source, Square target, MoveTypeRecord type)
         {
             Source = source;
             Target = target;
@@ -21,29 +21,17 @@ namespace Rudim.Common
 
         public bool IsCapture()
         {
-            return Type is MoveType.Capture or MoveType.EnPassant or MoveType.BishopPromotionCapture or
-                MoveType.KnightPromotionCapture or MoveType.QueenPromotionCapture or MoveType.RookPromotionCapture;
+            return Type.IsCapture;
         }
 
         public string GetPromotionChar()
         {
-            return Type switch
-            {
-                MoveType.QueenPromotion => "q",
-                MoveType.BishopPromotion => "b",
-                MoveType.KnightPromotion => "n",
-                MoveType.RookPromotion => "r",
-                MoveType.QueenPromotionCapture => "q",
-                MoveType.BishopPromotionCapture => "b",
-                MoveType.KnightPromotionCapture => "n",
-                MoveType.RookPromotionCapture => "r",
-                _ => "",
-            };
+            return Type.PromotionChar;
         }
 
         public bool IsPromotion()
         {
-            return Type is >= MoveType.KnightPromotion and <= MoveType.QueenPromotionCapture;
+            return Type.Value >= MoveType.KnightPromotion.Value && Type.Value <= MoveType.QueenPromotionCapture.Value;
         }
 
         public bool IsCastle()
@@ -60,7 +48,7 @@ namespace Rudim.Common
             return new Move(from, to, moveType);
         }
 
-        private static MoveType ParsePromotionType(char piece)
+        private static MoveTypeRecord ParsePromotionType(char piece)
         {
             return piece switch
             {

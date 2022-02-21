@@ -72,7 +72,7 @@ namespace Rudim.CLI.UCI
                     // Cool little trick I saw on Cosette - requires keeping enums on certain numbers
                     // So that the we they differ by only one bit
                     // Refactor  this concept better maybe - hardcoded in the enum and here for now
-                    if (move.Type == MoveType.Quiet || ((byte)moves[i].Type & ~8) == (byte)move.Type)
+                    if (move.Type == MoveType.Quiet || ((byte) moves[i].Type.Value & ~8) == (byte) move.Type.Value)
                     {
                         return moves[i];
                     }
