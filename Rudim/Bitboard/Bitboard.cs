@@ -4,10 +4,9 @@ using Rudim.Common;
 
 namespace Rudim
 {
-    public partial class Bitboard
+    public partial struct Bitboard
     {
         public ulong Board { get; private set; }
-
 
         public Bitboard(ulong board)
         {
@@ -21,17 +20,19 @@ namespace Rudim
 
         public int GetBit(Square square)
         {
-            return GetBit((int)square);
+            return GetBit((int) square);
         }
 
-        public void SetBit(Square square)
+        public Bitboard SetBit(Square square)
         {
-            SetBit((int)square);
+            SetBit((int) square);
+            return this;
         }
 
-        public void ClearBit(Square square)
+        public Bitboard ClearBit(Square square)
         {
-            ClearBit((int)square);
+            ClearBit((int) square);
+            return this;
         }
 
         public int GetBit(int square)

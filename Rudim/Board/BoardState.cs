@@ -41,9 +41,9 @@ namespace Rudim.Board
 
         private void AddPiece(Square square, Side side, Piece piece)
         {
-            Pieces[(int) side, (int) piece].SetBit(square);
-            Occupancies[(int) side].SetBit(square);
-            Occupancies[(int) Side.Both].SetBit(square);
+            Pieces[(int) side, (int) piece] = Pieces[(int) side, (int) piece].SetBit(square);
+            Occupancies[(int) side] = Occupancies[(int) side].SetBit(square);
+            Occupancies[(int) Side.Both] = Occupancies[(int) Side.Both].SetBit(square);
             PieceMapping[(int) square] = piece;
         }
 
@@ -54,9 +54,9 @@ namespace Rudim.Board
                 for (var pieceType = 0; pieceType < Constants.Pieces; ++pieceType)
                 {
                     if (Pieces[side, pieceType].GetBit(square) != 1) continue;
-                    Pieces[side, pieceType].ClearBit(square);
-                    Occupancies[side].ClearBit(square);
-                    Occupancies[(int) Side.Both].ClearBit(square);
+                    Pieces[side, pieceType] = Pieces[side, pieceType].ClearBit(square);
+                    Occupancies[side] = Occupancies[side].ClearBit(square);
+                    Occupancies[(int) Side.Both] = Occupancies[(int) Side.Both].ClearBit(square);
                     PieceMapping[(int) square] = Piece.None;
                     return (Piece) pieceType;
                 }
