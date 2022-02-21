@@ -83,7 +83,7 @@ namespace Rudim.Board
 
             if (move.IsCapture())
             {
-                capturedPiece = RemovePiece(move.Type == MoveType.EnPassant ? EnPassantSquareFor(move) : move.Target);
+                capturedPiece = RemovePiece(move.Type == MoveTypes.EnPassant ? EnPassantSquareFor(move) : move.Target);
             }
 
             if (move.IsPromotion())
@@ -120,7 +120,7 @@ namespace Rudim.Board
 
             Castle &= (Castle) CastlingRights[(int) move.Source];
             Castle &= (Castle) CastlingRights[(int) move.Target];
-            EnPassantSquare = move.Type == MoveType.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
+            EnPassantSquare = move.Type == MoveTypes.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
             SideToMove = SideToMove.Other();
 
             SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights);
@@ -138,7 +138,7 @@ namespace Rudim.Board
 
             if (state.CapturedPiece != Piece.None)
             {
-                if (move.Type == MoveType.EnPassant)
+                if (move.Type == MoveTypes.EnPassant)
                 {
                     AddPiece(EnPassantSquareFor(move), SideToMove.Other(), Piece.Pawn);
                 }

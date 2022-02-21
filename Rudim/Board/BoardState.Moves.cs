@@ -250,12 +250,12 @@ namespace Rudim.Board
                 if (Castle.HasFlag(Castle.WhiteShort))
                 {
                     if (occ.GetBit(Square.f1) == 0 && occ.GetBit(Square.g1) == 0 && !IsSquareAttacked(Square.e1, Side.Black) && !IsSquareAttacked(Square.f1, Side.Black))
-                        Moves.Add(new Move(Square.e1, Square.g1, MoveType.Castle));
+                        Moves.Add(new Move(Square.e1, Square.g1, MoveTypes.Castle));
                 }
                 if (Castle.HasFlag(Castle.WhiteLong))
                 {
                     if (occ.GetBit(Square.d1) == 0 && occ.GetBit(Square.c1) == 0 && occ.GetBit(Square.b1) == 0 && !IsSquareAttacked(Square.e1, Side.Black) && !IsSquareAttacked(Square.d1, Side.Black))
-                        Moves.Add(new Move(Square.e1, Square.c1, MoveType.Castle));
+                        Moves.Add(new Move(Square.e1, Square.c1, MoveTypes.Castle));
                 }
             }
             else
@@ -263,12 +263,12 @@ namespace Rudim.Board
                 if (Castle.HasFlag(Castle.BlackShort))
                 {
                     if (occ.GetBit(Square.f8) == 0 && occ.GetBit(Square.g8) == 0 && !IsSquareAttacked(Square.e8, Side.White) && !IsSquareAttacked(Square.f8, Side.White))
-                        Moves.Add(new Move(Square.e8, Square.g8, MoveType.Castle));
+                        Moves.Add(new Move(Square.e8, Square.g8, MoveTypes.Castle));
                 }
                 if (Castle.HasFlag(Castle.BlackLong))
                 {
                     if (occ.GetBit(Square.d8) == 0 && occ.GetBit(Square.c8) == 0 && occ.GetBit(Square.b8) == 0 && !IsSquareAttacked(Square.e8, Side.White) && !IsSquareAttacked(Square.d8, Side.White))
-                        Moves.Add(new Move(Square.e8, Square.c8, MoveType.Castle));
+                        Moves.Add(new Move(Square.e8, Square.c8, MoveTypes.Castle));
                 }
             }
         }
@@ -297,14 +297,14 @@ namespace Rudim.Board
             {
                 var capture = IsSquareCapture(target);
 
-                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveType.KnightPromotionCapture : MoveType.KnightPromotion));
-                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveType.BishopPromotionCapture : MoveType.BishopPromotion));
-                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveType.RookPromotionCapture : MoveType.RookPromotion));
-                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveType.QueenPromotionCapture : MoveType.QueenPromotion));
+                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveTypes.KnightPromotionCapture : MoveTypes.KnightPromotion));
+                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveTypes.BishopPromotionCapture : MoveTypes.BishopPromotion));
+                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveTypes.RookPromotionCapture : MoveTypes.RookPromotion));
+                Moves.Add(new Move((Square)source, (Square)target, capture ? MoveTypes.QueenPromotionCapture : MoveTypes.QueenPromotion));
             }
             else if (enpassant || doublePush)
             {
-                Moves.Add(new Move((Square)source, (Square)target, enpassant ? MoveType.EnPassant : MoveType.DoublePush));
+                Moves.Add(new Move((Square)source, (Square)target, enpassant ? MoveTypes.EnPassant : MoveTypes.DoublePush));
             }
             else
             {
@@ -316,7 +316,7 @@ namespace Rudim.Board
         private void AddMoveToMovesList(int source, int target)
         {
             // Makes more sense for source and target to come in as Square instead of int, refactor later
-            var moveType = IsSquareCapture(target) ? MoveType.Capture : MoveType.Quiet;
+            var moveType = IsSquareCapture(target) ? MoveTypes.Capture : MoveTypes.Quiet;
             var move = new Move((Square)source, (Square)target, moveType);
             Moves.Add(move);
         }
