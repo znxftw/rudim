@@ -18,8 +18,8 @@ namespace Rudim.Board
             Moves = new List<Move>();
 
             for (var side = 0; side < Constants.Sides; ++side)
-                for (var piece = 0; piece < Constants.Pieces; ++piece)
-                    Pieces[side, piece] = new Bitboard(0);
+            for (var piece = 0; piece < Constants.Pieces; ++piece)
+                Pieces[side, piece] = new Bitboard(0);
             for (var side = 0; side < Constants.SidesWithBoth; ++side)
                 Occupancies[side] = new Bitboard(0);
             for (var square = 0; square < Constants.Squares; ++square)
@@ -41,10 +41,10 @@ namespace Rudim.Board
 
         private void AddPiece(Square square, Side side, Piece piece)
         {
-            Pieces[(int)side, (int)piece].SetBit(square);
-            Occupancies[(int)side].SetBit(square);
-            Occupancies[(int)Side.Both].SetBit(square);
-            PieceMapping[(int)square] = piece;
+            Pieces[(int) side, (int) piece].SetBit(square);
+            Occupancies[(int) side].SetBit(square);
+            Occupancies[(int) Side.Both].SetBit(square);
+            PieceMapping[(int) square] = piece;
         }
 
         private Piece RemovePiece(Square square)
@@ -56,9 +56,9 @@ namespace Rudim.Board
                     if (Pieces[side, pieceType].GetBit(square) != 1) continue;
                     Pieces[side, pieceType].ClearBit(square);
                     Occupancies[side].ClearBit(square);
-                    Occupancies[(int)Side.Both].ClearBit(square);
-                    PieceMapping[(int)square] = Piece.None;
-                    return (Piece)pieceType;
+                    Occupancies[(int) Side.Both].ClearBit(square);
+                    PieceMapping[(int) square] = Piece.None;
+                    return (Piece) pieceType;
                 }
             }
             return Piece.None;
@@ -66,13 +66,13 @@ namespace Rudim.Board
 
         public int GetPieceOn(Square square, Side side)
         {
-            var piece = PieceMapping[(int)square];
-            return Occupancies[(int)side].GetBit(square) == 1 ? (int)piece : (int)Piece.None;
+            var piece = PieceMapping[(int) square];
+            return Occupancies[(int) side].GetBit(square) == 1 ? (int) piece : (int) Piece.None;
         }
 
         public bool IsInCheck(Side side)
         {
-            return IsSquareAttacked((Square)Pieces[(int)side, (int)Piece.King].GetLsb(), side.Other());
+            return IsSquareAttacked((Square) Pieces[(int) side, (int) Piece.King].GetLsb(), side.Other());
         }
         public void MakeMove(Move move)
         {
@@ -83,23 +83,13 @@ namespace Rudim.Board
 
             if (move.IsCapture())
             {
-                capturedPiece = RemovePiece(move.Type == MoveType.EnPassant ? EnPassantSquareFor(move) : move.Target);
+                capturedPiece = RemovePiece(move.Type == MoveTypes.EnPassant ? EnPassantSquareFor(move) : move.Target);
             }
 
             if (move.IsPromotion())
             {
-                movedPiece = move.Type switch
-                {
-                    MoveType.KnightPromotion => Piece.Knight,
-                    MoveType.KnightPromotionCapture => Piece.Knight,
-                    MoveType.BishopPromotion => Piece.Bishop,
-                    MoveType.BishopPromotionCapture => Piece.Bishop,
-                    MoveType.RookPromotion => Piece.Rook,
-                    MoveType.RookPromotionCapture => Piece.Rook,
-                    MoveType.QueenPromotion => Piece.Queen,
-                    MoveType.QueenPromotionCapture => Piece.Queen,
-                    _ => throw new ArgumentOutOfRangeException(nameof(move.Type))
-                };
+                if (move.Type.Piece == Piece.None) throw new ArgumentOutOfRangeException(nameof(move.Type));
+                movedPiece = move.Type.Piece;
             }
 
             if (move.IsCastle())
@@ -128,9 +118,9 @@ namespace Rudim.Board
 
             AddPiece(move.Target, SideToMove, movedPiece);
 
-            Castle &= (Castle)CastlingRights[(int)move.Source];
-            Castle &= (Castle)CastlingRights[(int)move.Target];
-            EnPassantSquare = move.Type == MoveType.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
+            Castle &= (Castle) CastlingRights[(int) move.Source];
+            Castle &= (Castle) CastlingRights[(int) move.Target];
+            EnPassantSquare = move.Type == MoveTypes.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
             SideToMove = SideToMove.Other();
 
             SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights);
@@ -148,7 +138,7 @@ namespace Rudim.Board
 
             if (state.CapturedPiece != Piece.None)
             {
-                if (move.Type == MoveType.EnPassant)
+                if (move.Type == MoveTypes.EnPassant)
                 {
                     AddPiece(EnPassantSquareFor(move), SideToMove.Other(), Piece.Pawn);
                 }
@@ -202,8 +192,9 @@ namespace Rudim.Board
 
         private const string AsciiPieces = "PNBRQK-";
 
-        private static readonly int[] CastlingRights = {
-            7, 15, 15, 15,  3, 15, 15, 11,
+        private static readonly int[] CastlingRights =
+        {
+            7, 15, 15, 15, 3, 15, 15, 11,
             15, 15, 15, 15, 15, 15, 15, 15,
             15, 15, 15, 15, 15, 15, 15, 15,
             15, 15, 15, 15, 15, 15, 15, 15,
@@ -225,12 +216,12 @@ namespace Rudim.Board
 
                     var boardPiece = Piece.None;
                     for (var side = 0; side < Constants.Sides; ++side)
-                        for (var piece = 0; piece < Constants.Pieces; ++piece)
-                            if (Pieces[side, piece].GetBit(square) == 1)
-                                boardPiece = (Piece)piece;
+                    for (var piece = 0; piece < Constants.Pieces; ++piece)
+                        if (Pieces[side, piece].GetBit(square) == 1)
+                            boardPiece = (Piece) piece;
                     char asciiValue = Occupancies[0].GetBit(square) == 0
-                        ? char.ToLower(AsciiPieces[(int)boardPiece])
-                        : AsciiPieces[(int)boardPiece];
+                        ? char.ToLower(AsciiPieces[(int) boardPiece])
+                        : AsciiPieces[(int) boardPiece];
                     Console.Write(asciiValue + " ");
                 }
 
@@ -265,12 +256,12 @@ namespace Rudim.Board
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((BoardState)obj);
+            return Equals((BoardState) obj);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Pieces, Occupancies, (int)SideToMove, (int)EnPassantSquare, (int)Castle, Moves);
+            return HashCode.Combine(Pieces, Occupancies, (int) SideToMove, (int) EnPassantSquare, (int) Castle, Moves);
         }
 
         public static bool operator ==(BoardState left, BoardState right)

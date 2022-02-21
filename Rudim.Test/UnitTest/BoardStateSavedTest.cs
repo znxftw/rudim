@@ -13,7 +13,7 @@ namespace Rudim.Test
             BoardState.ClearSavedStates();
             var originalState = BoardState.ParseFEN(Helpers.StartingFEN);
             var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
-            var move = new Move(Square.e2, Square.e4, MoveType.Quiet);
+            var move = new Move(Square.e2, Square.e4, MoveTypes.Quiet);
 
             boardState.MakeMove(move);
 
