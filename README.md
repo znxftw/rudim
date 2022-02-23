@@ -10,7 +10,7 @@ If you see Rudim as offline - the server might be down. If Rudim is online but n
 ### What all does Rudim implement?
 
 - Bitboards & Magic Bitboards
-- UCI Protocol
+- UCI Protocol (Partial)
 - Simplified Evaluation (Piece Square Tables)
 - Tapered Evaluation
 - Negamax with Alpha Beta Pruning
