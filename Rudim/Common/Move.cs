@@ -1,9 +1,10 @@
 ﻿using Rudim.Board;
 using System;
+using System.Collections.Generic;
 
 namespace Rudim.Common
 {
-    public class Move
+    public class Move : IEquatable<Move>
     {
         public Square Source { get; set; }
         public Square Target { get; set; }
@@ -65,6 +66,34 @@ namespace Rudim.Common
             var square = Square.NoSquare;
             _ = Enum.TryParse(squareString, out square);
             return square;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Move);
+        }
+
+        public bool Equals(Move other)
+        {
+            return other != null &&
+                   Source == other.Source &&
+                   Target == other.Target &&
+                   EqualityComparer<MoveType>.Default.Equals(Type, other.Type);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Source, Target, Type);
+        }
+
+        public static bool operator ==(Move left, Move right)
+        {
+            return EqualityComparer<Move>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(Move left, Move right)
+        {
+            return !(left == right);
         }
     }
 }

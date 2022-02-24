@@ -5,6 +5,7 @@ namespace Rudim.Board
     static class MoveOrdering
     {
         private static readonly int[,] MVVLVA;
+        private static Move[,] KillerMoves;
 
         static MoveOrdering()
         {
@@ -18,11 +19,20 @@ namespace Rudim.Board
                { 0, 0, 0, 0, 0, 0, 0 },       // K
                { 0, 0, 0, 0, 0, 0, 0 }        // None
             };
+            KillerMoves = new Move[2, Constants.MaxPly];
         }
-        public static void PopulateMoveScore(Move move, BoardState boardState)
+        public static void PopulateMoveScore(Move move, BoardState boardState, int ply = Constants.MaxPly - 1)
         {
             if (!move.IsCapture())
-                move.Score = 0;
+            {
+                if (move == KillerMoves[0, ply])
+                    move.Score = 9; // TODO : Revisit, assign better values and extract to constants
+                else if (move == KillerMoves[1, ply])
+                    move.Score = 8;
+                else
+                    move.Score = 0;
+                return;
+            }
             var targetPiece = (int)Piece.None;
             var sourcePiece = boardState.GetPieceOn(move.Source, boardState.SideToMove);
             if (move.Type == MoveTypes.EnPassant)
@@ -32,6 +42,14 @@ namespace Rudim.Board
             move.Score = MVVLVA[targetPiece, sourcePiece];
         }
 
+        public static void AddKillerMove(Move move, int ply)
+        {
+            if (KillerMoves[0, ply] != move)
+            {
+                KillerMoves[1, ply] = KillerMoves[0, ply];
+                KillerMoves[0, ply] = move;
+            }
+        }
         public static void SortMoves(BoardState boardState)
         {
             // TODO : Partially sort within the loop only to avoid sorting elements that are not going to be queried after beta cutoff?

@@ -11,5 +11,6 @@
         public const int MaxRookMask = 1 << 12;
         public const int MaxMaskIndex = MaxRookMask;
         public const int MaxCentipawnEval = 49000;
+        public const int MaxPly = 64;
     }
 }

@@ -19,10 +19,11 @@ namespace Rudim.Search
             Move bestEvaluation = null;
 
             boardState.GenerateMoves();
+            var ply = SearchDepth - depth;
             // TODO : Flag in GenerateMoves to avoid extra iteration?
             foreach (var move in boardState.Moves)
             {
-                MoveOrdering.PopulateMoveScore(move, boardState);
+                MoveOrdering.PopulateMoveScore(move, boardState, ply);
             }
 
             MoveOrdering.SortMoves(boardState);
@@ -42,7 +43,11 @@ namespace Rudim.Search
                 boardState.UnmakeMove(move);
                 numberOfLegalMoves++;
                 if (score >= beta)
+                {
+                    if (!move.IsCapture())
+                        MoveOrdering.AddKillerMove(move, ply);
                     return beta;
+                }
                 if (score > alpha)
                 {
                     alpha = score;
