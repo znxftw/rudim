@@ -1,4 +1,5 @@
 ﻿using Rudim.Common;
+using System.Linq;
 using System.Numerics;
 
 namespace Rudim
@@ -26,15 +27,14 @@ namespace Rudim
                 if (BitOperations.PopCount((Mask.Board * PotentialMagicNumber) & 0xFF00000000000000) < 6)
                     continue;
 
-                var MagicAttacks = new Bitboard[Constants.MaxMaskIndex];
+                var MagicAttacks = Enumerable.Repeat(new Bitboard(0xFFFFFFFFFFFFFFFF), Constants.MaxMaskIndex).ToArray();
                 var FailureFlag = false;
                 for (var Index = 0; Index < MaxIndex; ++Index)
                 {
-                    var MagicIndex = (int) ((OccupancyMappings[Index].Board * PotentialMagicNumber) >> (64 - bitsInMask));
-                    //todo look for error in cases where null is possible
-                    // if (MagicAttacks[MagicIndex] == null)
-                    //     MagicAttacks[MagicIndex] = Attacks[Index];
-                    if (!Equals(MagicAttacks[MagicIndex], Attacks[Index]))
+                    var MagicIndex = (int)((OccupancyMappings[Index].Board * PotentialMagicNumber) >> (64 - bitsInMask));
+                    if (MagicAttacks[MagicIndex].Board == 0xFFFFFFFFFFFFFFFF)
+                        MagicAttacks[MagicIndex] = Attacks[Index];
+                    else if (!Equals(MagicAttacks[MagicIndex], Attacks[Index]))
                         FailureFlag = true;
                 }
                 // PotentialMagicNumber is actually the magic number
