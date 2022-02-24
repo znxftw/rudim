@@ -3,9 +3,8 @@ using System.Numerics;
 
 namespace Rudim
 {
-    public partial class Bitboard
+    public partial struct Bitboard
     {
-
         public static ulong FindMagicNumber(Square square, int bitsInMask, bool isBishop)
         {
             var MaxIndex = 1 << bitsInMask;
@@ -31,10 +30,11 @@ namespace Rudim
                 var FailureFlag = false;
                 for (var Index = 0; Index < MaxIndex; ++Index)
                 {
-                    var MagicIndex = (int)((OccupancyMappings[Index].Board * PotentialMagicNumber) >> (64 - bitsInMask));
-                    if (MagicAttacks[MagicIndex] == null)
-                        MagicAttacks[MagicIndex] = Attacks[Index];
-                    else if (!Equals(MagicAttacks[MagicIndex], Attacks[Index]))
+                    var MagicIndex = (int) ((OccupancyMappings[Index].Board * PotentialMagicNumber) >> (64 - bitsInMask));
+                    //todo look for error in cases where null is possible
+                    // if (MagicAttacks[MagicIndex] == null)
+                    //     MagicAttacks[MagicIndex] = Attacks[Index];
+                    if (!Equals(MagicAttacks[MagicIndex], Attacks[Index]))
                         FailureFlag = true;
                 }
                 // PotentialMagicNumber is actually the magic number
@@ -48,20 +48,24 @@ namespace Rudim
             var ResultBoard = new Bitboard(0);
             // Masking equivalent to attacks with zero blockers and no edge square
             var OccupancyBoard = new Bitboard(0);
-            var BishopRank = (int)square / 8;
-            var BishopFile = (int)square % 8;
+            var BishopRank = (int) square / 8;
+            var BishopFile = (int) square % 8;
 
             for (int rank = BishopRank + 1, file = BishopFile + 1; rank < 7 && file < 7; ++rank, ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, OccupancyBoard)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
+                    break;
 
             for (int rank = BishopRank - 1, file = BishopFile + 1; rank >= 1 && file < 7; --rank, ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, OccupancyBoard)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
+                    break;
 
             for (int rank = BishopRank - 1, file = BishopFile - 1; rank >= 1 && file >= 1; --rank, --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, OccupancyBoard)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
+                    break;
 
             for (int rank = BishopRank + 1, file = BishopFile - 1; rank < 7 && file >= 1; ++rank, --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, OccupancyBoard)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
+                    break;
 
             return ResultBoard;
         }
@@ -71,20 +75,24 @@ namespace Rudim
             var ResultBoard = new Bitboard(0);
             // Masking equivalent to attacks with zero blockers and no edge square 
             var OccupancyBoard = new Bitboard(0);
-            var RookRank = (int)square / 8;
-            var RookFile = (int)square % 8;
+            var RookRank = (int) square / 8;
+            var RookFile = (int) square % 8;
 
             for (int rank = RookRank + 1; rank < 7; ++rank)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, RookFile, OccupancyBoard)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, OccupancyBoard))
+                    break;
 
             for (int rank = RookRank - 1; rank >= 1; --rank)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, RookFile, OccupancyBoard)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, OccupancyBoard))
+                    break;
 
             for (int file = RookFile + 1; file < 7; ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, RookRank, file, OccupancyBoard)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, RookRank, file, OccupancyBoard))
+                    break;
 
             for (int file = RookFile - 1; file >= 1; --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, RookRank, file, OccupancyBoard)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, RookRank, file, OccupancyBoard))
+                    break;
 
             return ResultBoard;
         }
@@ -100,7 +108,6 @@ namespace Rudim
 
                 if ((index & (1 << count)) != 0)
                     OccupancyMapping.Board |= 1ul << square;
-
             }
             return OccupancyMapping;
         }

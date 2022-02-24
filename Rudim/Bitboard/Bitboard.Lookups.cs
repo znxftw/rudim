@@ -3,7 +3,7 @@ using Rudim.Common;
 
 namespace Rudim
 {
-    public partial class Bitboard
+    public partial struct Bitboard
     {
         private const ulong FileA = 72340172838076673;
         private const ulong FileB = 144680345676153346;

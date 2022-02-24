@@ -2,7 +2,7 @@
 
 namespace Rudim
 {
-    public partial class Bitboard
+    public partial struct Bitboard
     {
         public static Bitboard GetPawnAttacks(Square square, Side side)
         {
@@ -69,16 +69,16 @@ namespace Rudim
             var BishopFile = (int)square % 8;
 
             for (int rank = BishopRank + 1, file = BishopFile + 1; rank < 8 && file < 8; ++rank, ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, occupancy)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, occupancy)) break;
 
             for (int rank = BishopRank - 1, file = BishopFile + 1; rank >= 0 && file < 8; --rank, ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, occupancy)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, occupancy)) break;
 
             for (int rank = BishopRank - 1, file = BishopFile - 1; rank >= 0 && file >= 0; --rank, --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, occupancy)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, occupancy)) break;
 
             for (int rank = BishopRank + 1, file = BishopFile - 1; rank < 8 && file >= 0; ++rank, --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, file, occupancy)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, occupancy)) break;
 
             return ResultBoard;
         }
@@ -90,16 +90,16 @@ namespace Rudim
             var RookFile = (int)square % 8;
 
             for (var rank = RookRank + 1; rank < 8; ++rank)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, RookFile, occupancy)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, occupancy)) break;
 
             for (var rank = RookRank - 1; rank >= 0; --rank)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, rank, RookFile, occupancy)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, occupancy)) break;
 
             for (var file = RookFile + 1; file < 8; ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, RookRank, file, occupancy)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, RookRank, file, occupancy)) break;
 
             for (var file = RookFile - 1; file >= 0; --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ResultBoard, RookRank, file, occupancy)) break;
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, RookRank, file, occupancy)) break;
 
             return ResultBoard;
         }
@@ -111,7 +111,7 @@ namespace Rudim
             return new Bitboard(rookAttacks.Board | bishopAttacks.Board);
         }
 
-        private static bool AddSquareToBoardAndStopAtOccupiedSquare(Bitboard resultBoard, int rank, int file, Bitboard occupancy)
+        private static bool AddSquareToBoardAndStopAtOccupiedSquare(ref Bitboard resultBoard, int rank, int file, Bitboard occupancy)
         {
             resultBoard.Board |= 1ul << (rank * 8) + file;
             return (1ul << (rank * 8) + file & occupancy.Board) > 0;
