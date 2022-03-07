@@ -1,6 +1,7 @@
 ﻿using Rudim.Board;
 using Rudim.CLI;
 using Rudim.Common;
+using System;
 using System.Diagnostics;
 
 namespace Rudim.Search
@@ -27,7 +28,7 @@ namespace Rudim.Search
                 Nodes += NodesTraversed;
 
                 timer.Stop();
-                double time = timer.ElapsedMilliseconds;
+                double time = Math.Max(timer.ElapsedMilliseconds, 1);
                 var nps = (int)(Nodes / time * 1000);
 
                 CliClient.WriteLine($"info depth {i} score cp {Score} nodes {NodesTraversed} time {time} nps {nps}"); // TODO : Refactor
