@@ -3,6 +3,7 @@ using Rudim.CLI;
 using Rudim.Common;
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Rudim.Search
 {
@@ -12,7 +13,7 @@ namespace Rudim.Search
         private static int Score;
         private static int Nodes;
 
-        public static void Search(BoardState boardState, int depth)
+        public static void Search(BoardState boardState, int depth, CancellationToken cancellationToken)
         {
             var timer = new Stopwatch();
             BestMove = Move.NoMove;
@@ -22,7 +23,11 @@ namespace Rudim.Search
             {
                 timer.Restart();
 
-                Score = Negamax.Search(boardState, i);
+                Score = Negamax.Search(boardState, i, cancellationToken);
+
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
                 BestMove = Negamax.BestMove;
                 var NodesTraversed = Negamax.Nodes + Quiescent.Nodes;
                 Nodes += NodesTraversed;

@@ -1,6 +1,6 @@
 ﻿using Rudim.Common;
 using Rudim.Search;
-using System.Collections.Generic;
+using System.Threading;
 
 namespace Rudim.Board
 {
@@ -48,12 +48,10 @@ namespace Rudim.Board
 
         }
 
-        public Move FindBestMove(int depth)
+        public Move FindBestMove(int depth, CancellationToken cancellationToken)
         {
-            GenerateMoves();
-
-            Negamax.Search(this, depth);
-            return Negamax.BestMove;
+            IterativeDeepening.Search(this, depth, cancellationToken);
+            return IterativeDeepening.BestMove;
         }
 
         private void GenerateQueenMoves()

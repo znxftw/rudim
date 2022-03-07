@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Rudim.CLI.UCI
 {
@@ -17,10 +19,19 @@ namespace Rudim.CLI.UCI
             var depth = GetParameter("depth", parameters, 5);
             // TODO : ponder, wtime, btime, winc, binc, movestogo, searchmoves, nodes, mate, movetime
             var infinite = GetOptionlessParameter("infinite", parameters);
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            // TODO : Calculate this with go parameters
+            var moveTime = 1000;
 
             if (!infinite)
             {
-                var move = _uciClient.Board.FindBestMove(depth);
+                var moveTask = Task.Run(() => _uciClient.Board.FindBestMove(depth, cancellationTokenSource.Token));
+                
+                Thread.Sleep(moveTime);
+                cancellationTokenSource.Cancel();
+
+                var move = moveTask.Result;
                 if (move.IsPromotion())
                 {
                     CliClient.WriteLine("bestmove " + move.Source + move.Target + move.GetPromotionChar());
