@@ -19,10 +19,9 @@ namespace Rudim
 
             timer.Start();
             var board = BoardState.Default();
-            Negamax.Search(board, 8);
-            Console.WriteLine(Negamax.Nodes);
-            Console.WriteLine(Quiescent.Nodes);
-            board.MakeMove(Negamax.BestMove);
+            board = BoardState.ParseFEN("r2q1rk1/p1p1ppbp/2pp1np1/8/3PP3/2N2Q1P/PPP2PP1/R1B1K2R w KQ - 0 10");
+            IterativeDeepening.Search(board, 8);
+            board.MakeMove(IterativeDeepening.BestMove);
             board.Print();
             timer.Stop();
 

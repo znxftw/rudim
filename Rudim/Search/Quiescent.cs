@@ -5,7 +5,7 @@ namespace Rudim.Search
 {
     static class Quiescent
     {
-        public static int Nodes = 0;
+        public static int Nodes { get; private set; } = 0;
         public static int Search(BoardState boardState, int alpha, int beta)
         {
             Nodes++;
@@ -47,6 +47,11 @@ namespace Rudim.Search
                     alpha = score;
             }
             return alpha;
+        }
+
+        public static void ResetNodes()
+        {
+            Nodes = 0;
         }
     }
 }

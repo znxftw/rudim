@@ -72,6 +72,9 @@ namespace Rudim.Search
         public static int Search(BoardState boardState, int depth)
         {
             SearchDepth = depth;
+            Nodes = 0;
+            BestMove = Move.NoMove;
+            Quiescent.ResetNodes();
             return Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1);
         }
     }
