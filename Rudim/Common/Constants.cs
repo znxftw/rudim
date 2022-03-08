@@ -12,5 +12,7 @@
         public const int MaxMaskIndex = MaxRookMask;
         public const int MaxCentipawnEval = 49000;
         public const int MaxPly = 64;
+        public const int BufferTime = 50;
+        public const int MaxSearchDepth = 64;
     }
 }

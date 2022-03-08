@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rudim.Common;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,21 +18,39 @@ namespace Rudim.CLI.UCI
         public void Run(string[] parameters)
         {
             var depth = GetParameter("depth", parameters, 5);
-            // TODO : ponder, wtime, btime, winc, binc, movestogo, searchmoves, nodes, mate, movetime
+            var winc = GetParameter("winc", parameters, -1);
+            var binc = GetParameter("binc", parameters, -1);
+            var wtime = GetParameter("wtime", parameters, -1);
+            var btime = GetParameter("btime", parameters, -1);
+            var movetime = GetParameter("movetime", parameters, -1);
+            // TODO : ponder, movestogo, searchmoves, nodes, mate, infinite
             var infinite = GetOptionlessParameter("infinite", parameters);
+
             var cancellationTokenSource = new CancellationTokenSource();
 
-            // TODO : Calculate this with go parameters
-            var moveTime = 1000;
+            var clock = _uciClient.Board.SideToMove == Side.White ? wtime : btime;
+            var increment = _uciClient.Board.SideToMove == Side.White ? winc : binc;
+
+            var allottedTime = movetime == -1 ? (clock == -1 ? -1 : TimeManagement.CalculateMoveTime(_uciClient.Board.MoveCount, clock, increment)) : movetime;
 
             if (!infinite)
             {
-                var moveTask = Task.Run(() => _uciClient.Board.FindBestMove(depth, cancellationTokenSource.Token));
-                
-                Thread.Sleep(moveTime);
-                cancellationTokenSource.Cancel();
+                var move = Move.NoMove;
+                if(allottedTime == -1)
+                {
+                    move = _uciClient.Board.FindBestMove(depth, cancellationTokenSource.Token);
+                }
+                else
+                {
+                    var moveTask = Task.Run(() => _uciClient.Board.FindBestMove(Constants.MaxSearchDepth, cancellationTokenSource.Token));
 
-                var move = moveTask.Result;
+                    Thread.Sleep(allottedTime);
+                    cancellationTokenSource.Cancel();
+
+                    move = moveTask.Result;
+                }
+                
+
                 if (move.IsPromotion())
                 {
                     CliClient.WriteLine("bestmove " + move.Source + move.Target + move.GetPromotionChar());
@@ -41,6 +60,7 @@ namespace Rudim.CLI.UCI
                     CliClient.WriteLine("bestmove " + move.Source + move.Target);
                 }
             }
+
         }
 
         private static bool GetOptionlessParameter(string name, string[] parameters)

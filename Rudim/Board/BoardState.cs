@@ -16,10 +16,11 @@ namespace Rudim.Board
             EnPassantSquare = Square.NoSquare;
             Castle = Castle.None;
             Moves = new List<Move>();
+            MoveCount = 0;
 
             for (var side = 0; side < Constants.Sides; ++side)
-            for (var piece = 0; piece < Constants.Pieces; ++piece)
-                Pieces[side, piece] = new Bitboard(0);
+                for (var piece = 0; piece < Constants.Pieces; ++piece)
+                    Pieces[side, piece] = new Bitboard(0);
             for (var side = 0; side < Constants.SidesWithBoth; ++side)
                 Occupancies[side] = new Bitboard(0);
             for (var square = 0; square < Constants.Squares; ++square)
@@ -38,6 +39,7 @@ namespace Rudim.Board
         public Square EnPassantSquare { get; private set; }
         public Castle Castle { get; private set; }
         public List<Move> Moves { get; set; }
+        public int MoveCount { get; set; }
 
         private void AddPiece(Square square, Side side, Piece piece)
         {
@@ -124,6 +126,7 @@ namespace Rudim.Board
             SideToMove = SideToMove.Other();
 
             SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights);
+            MoveCount++;
 
             Moves = new List<Move>();
         }
@@ -183,6 +186,7 @@ namespace Rudim.Board
 
             Castle = state.CastlingRights;
             EnPassantSquare = state.EnPassantSquare;
+            MoveCount--;
         }
         private Square EnPassantSquareFor(Move move)
         {
