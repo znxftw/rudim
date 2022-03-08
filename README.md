@@ -15,7 +15,7 @@ If you see Rudim as offline - the server might be down. If Rudim is online but n
 - Tapered Evaluation
 - Negamax with Alpha Beta Pruning
 - Quiescent Search
-- Move Ordering - MVV LVA
+- Move Ordering - MVV LVA, Killer Heuristic
 
 ### What's next for Rudim?
 
