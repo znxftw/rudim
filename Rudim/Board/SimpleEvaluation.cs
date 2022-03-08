@@ -61,8 +61,8 @@ namespace Rudim.Board
 
         private static int MirrorSquare(int square)
         {
-            int row = square / 8;
-            int col = square % 8;
+            int row = square >> 3;
+            int col = square - (square >> 3) * 8;
 
             return (7 - row) * 8 + col;
         }
