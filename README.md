@@ -13,7 +13,7 @@ If you see Rudim as offline - the server might be down. If Rudim is online but n
 - UCI Protocol (Partial)
 - Simplified Evaluation (Piece Square Tables)
 - Tapered Evaluation
-- Negamax with Alpha Beta Pruning
+- Iterative Deepening + Negamax with Alpha Beta Pruning
 - Quiescent Search
 - Move Ordering - MVV LVA, Killer Heuristic
 
