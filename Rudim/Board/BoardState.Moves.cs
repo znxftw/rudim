@@ -8,14 +8,14 @@ namespace Rudim.Board
 {
     public partial class BoardState
     {
-        private static Dictionary<ulong, List<Move>> _moveCache = new Dictionary<ulong, List<Move>>();
+        private static readonly Dictionary<ulong, List<Move>> MoveCache = new Dictionary<ulong, List<Move>>();
         private static readonly ulong[,] ZobristTable;
 
         public void GenerateMoves()
         {
             ulong boardHash = GetBoardHash();
 
-            if (_moveCache.TryGetValue(boardHash, out var cachedMoves))
+            if (MoveCache.TryGetValue(boardHash, out var cachedMoves))
             {
                 Moves = cachedMoves;
                 return;
@@ -30,7 +30,7 @@ namespace Rudim.Board
             GenerateQueenMoves();
             GenerateKingMoves();
 
-            _moveCache[boardHash] = new List<Move>(Moves);
+            MoveCache[boardHash] = new List<Move>(Moves);
         }
 
         private void GenerateKingMoves()
