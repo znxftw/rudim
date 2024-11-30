@@ -72,6 +72,13 @@ namespace Rudim.Board
             return Occupancies[(int) side].GetBit(square) == 1 ? (int) piece : (int) Piece.None;
         }
 
+        private int GetPieceOn(Square square)
+        {
+          var piece = (int)PieceMapping[(int) square];
+          if(piece == (int)Piece.None) return -1;
+          return Occupancies[(int) Side.White].GetBit(square) == 1 ? piece : 6 + piece;
+        }
+
         public bool IsInCheck(Side side)
         {
             return IsSquareAttacked((Square) Pieces[(int) side, (int) Piece.King].GetLsb(), side.Other());
@@ -292,6 +299,12 @@ namespace Rudim.Board
             }
 
             return first.SequenceEqual(second);
+        }
+
+        public override string ToString()
+        {
+          var boardHash = GetBoardHash();
+          return CommonStateNames.TryGetValue(boardHash, out var commonName) ? commonName : boardHash.ToString();
         }
     }
 }
