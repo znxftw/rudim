@@ -2,8 +2,18 @@ name: Tests
 
 on:
   push:
+    paths:
+      - 'Rudim/**'
+      - 'Rudim.Test/**'
+      - 'Rudim.sln'
+      - '.github/workflows/pipeline.yaml'
     branches: [ main ]
   pull_request:
+    paths:
+      - 'Rudim/**'
+      - 'Rudim.Test/**'
+      - 'Rudim.sln'
+      - '.github/workflows/pipeline.yaml'
     branches: [ main ]
 
 jobs:
