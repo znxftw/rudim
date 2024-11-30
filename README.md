@@ -30,4 +30,6 @@ I've written a series of blog posts on my journey through creating Rudim - you c
 
 Tests - `dotnet test`
 
-CLI - `dotnet run -p Rudim`
+Benchmark  - `dotnet run --project Rudim -c Release --benchmark`
+
+CLI - `dotnet run --project Rudim`
