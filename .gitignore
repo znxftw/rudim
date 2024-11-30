@@ -1,4 +1,4 @@
-  
+
 *.swp
 *.*~
 project.lock.json
@@ -19,6 +19,8 @@ nupkg/
 *.sln.docstates
 
 # Build results
+**/Benchmark
+**/BenchmarkDotNet.Artifacts
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/

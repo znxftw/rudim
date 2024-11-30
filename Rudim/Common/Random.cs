@@ -1,7 +1,7 @@
 ﻿namespace Rudim.Common
 {
-    /* 
-     * This class is to generate fast random numbers using 
+    /*
+     * This class is to generate fast random numbers using
      * https://en.wikipedia.org/wiki/Xorshift
      */
     internal static class Random

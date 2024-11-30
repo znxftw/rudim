@@ -2,9 +2,13 @@
 using Rudim.CLI;
 using Rudim.Search;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using Rudim.Common;
 
 namespace Rudim
 {
@@ -12,7 +16,15 @@ namespace Rudim
     {
         static void Main(string[] args)
         {
+          // TODO: better arg parse
+          if (args.Length >= 1 && args[0] == "--benchmark")
+          {
+            BenchmarkRunner.Run<NegamaxBenchmark>();
+          }
+          else
+          {
             CliClient.Run();
+          }
         }
         // Rename when debugging
         static void DebugMain(string[] args)
@@ -35,5 +47,27 @@ namespace Rudim
 
             Console.WriteLine(timer.ElapsedMilliseconds);
         }
+    }
+
+    public class NegamaxBenchmark
+    {
+      [Benchmark]
+      [ArgumentsSource(nameof(GenerateBenchmarks))]
+      public void BenchmarkSearch(BoardState boardState, int depth, CancellationToken cancellationToken)
+      {
+         Negamax.Search(boardState, depth, cancellationToken);
+      }
+
+      public IEnumerable<object[]> GenerateBenchmarks()
+      {
+        yield return new object[] { BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 6, new CancellationToken(false) };
+        yield return new object[] { BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 7, new CancellationToken(false) };
+        yield return new object[] { BoardState.ParseFEN(Helpers.StartingFEN), 6, new CancellationToken(false) };
+        yield return new object[] { BoardState.ParseFEN(Helpers.StartingFEN), 7, new CancellationToken(false) };
+        yield return new object[] { BoardState.ParseFEN(Helpers.EndgameFEN), 6, new CancellationToken(false) };
+        yield return new object[] { BoardState.ParseFEN(Helpers.EndgameFEN), 7, new CancellationToken(false) };
+        yield return new object[] { BoardState.ParseFEN(Helpers.KiwiPeteFEN), 6, new CancellationToken(false) };
+        yield return new object[] { BoardState.ParseFEN(Helpers.KiwiPeteFEN), 7, new CancellationToken(false) };
+      }
     }
 }

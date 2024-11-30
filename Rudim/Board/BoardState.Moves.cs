@@ -1,13 +1,26 @@
 ﻿using Rudim.Common;
 using Rudim.Search;
 using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Rudim.Board
 {
     public partial class BoardState
     {
+        private static Dictionary<ulong, List<Move>> _moveCache = new Dictionary<ulong, List<Move>>();
+        private static readonly ulong[,] ZobristTable;
+
         public void GenerateMoves()
         {
+            // ulong boardHash = GetBoardHash();
+            //
+            // if (moveCache.TryGetValue(boardHash, out var cachedMoves))
+            // {
+            //     Moves = cachedMoves;
+            //     return;
+            // }
+
             Moves.Clear();
 
             GeneratePawnMoves();
@@ -16,6 +29,8 @@ namespace Rudim.Board
             GenerateRookMoves();
             GenerateQueenMoves();
             GenerateKingMoves();
+
+            // moveCache[boardHash] = new List<Move>(Moves);
         }
 
         private void GenerateKingMoves()
@@ -321,6 +336,34 @@ namespace Rudim.Board
         private bool IsSquareCapture(int target)
         {
             return Occupancies[(int)SideToMove.Other()].GetBit(target) == 1;
+        }
+
+        private ulong GetBoardHash()
+        {
+            ulong currentHash = 0;
+
+            for (var square = 0; square < 64; square++)
+            {
+                var piece = GetPieceOn((Square)square);
+                if (piece != -1)
+                {
+                    currentHash ^= ZobristTable[piece, square];
+                }
+            }
+
+            currentHash ^= (SideToMove == Side.White) ? ZobristTable[14, 0] : ZobristTable[14, 1];
+
+            currentHash ^= (Castle.HasFlag(Castle.WhiteLong)) ? ZobristTable[14, 2] : 0;
+            currentHash ^= (Castle.HasFlag(Castle.BlackShort)) ? ZobristTable[14, 3] : 0;
+            currentHash ^= (Castle.HasFlag(Castle.BlackLong)) ? ZobristTable[14, 4] : 0;
+            currentHash ^= (Castle.HasFlag(Castle.WhiteShort)) ? ZobristTable[14, 5] : 0;
+
+            if (EnPassantSquare != Square.NoSquare)
+            {
+                currentHash ^= ZobristTable[12, (int)EnPassantSquare];
+            }
+
+            return Moves.Where(move => move.IsPromotion()).Aggregate(currentHash, (current, move) => current ^ ZobristTable[13, (int)move.Type.Piece]);
         }
     }
 }
