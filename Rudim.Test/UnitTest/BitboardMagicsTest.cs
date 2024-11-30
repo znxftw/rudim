@@ -112,7 +112,6 @@ namespace Rudim.Test
             Assert.Equal(1, OccupancyMapping.GetBit(Square.b5));
 
             Assert.Equal(3, BitOperations.PopCount(OccupancyMapping.Board));
-            Assert.NotNull(Mask);
         }
 
         [Fact(Skip = "Heavy test, one-time run function, to be re-enabled if changing FindMagicNumber / regenerating magics")]

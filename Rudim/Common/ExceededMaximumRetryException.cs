@@ -3,7 +3,6 @@ using System.Runtime.Serialization;
 
 namespace Rudim.Common
 {
-    [Serializable]
     internal class ExceededMaximumRetryException : Exception
     {
         public ExceededMaximumRetryException()
@@ -18,8 +17,5 @@ namespace Rudim.Common
         {
         }
 
-        protected ExceededMaximumRetryException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }
