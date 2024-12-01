@@ -32,7 +32,10 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c Release
     - name: Test
-      run: dotnet test --no-build --verbosity normal -c Release
+      run: |
+        dotnet test --no-build --verbosity normal -c Release --logger "trx;LogFileName=test-results.trx"
+        SCORE=$(grep -o "Score: [0-9.]*/100" Rudim.Test/TestResults/test-results.trx | cut -d' ' -f2)
+        echo "### Test Position Score: $SCORE" >> $GITHUB_STEP_SUMMARY
     - name: Benchmark
       working-directory: Rudim
       run: |

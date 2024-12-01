@@ -23,4 +23,10 @@
     <ProjectReference Include="..\Rudim\Rudim.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="TestSuite\**\*.epd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

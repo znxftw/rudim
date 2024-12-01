@@ -95,5 +95,63 @@ namespace Rudim.Common
         {
             return !(left == right);
         }
+
+        public string ToSan(BoardState board)
+        {
+            if (Type == MoveTypes.Castle)
+            {
+                return Target == Square.g1 || Target == Square.g8 ? "O-O" : "O-O-O";
+            }
+
+            var piece = board.GetPieceOn(Source, board.SideToMove);
+
+            if (piece == (int)Piece.Pawn)
+            {
+                if (IsCapture())
+                {
+                    return $"{Source.ToString()[0]}x{Target}{(IsPromotion() ? "=" + GetPromotionChar().ToUpper() : "")}";
+                }
+                return $"{Target}{(IsPromotion() ? "=" + GetPromotionChar().ToUpper() : "")}";
+            }
+
+            var pieceChar = piece switch
+            {
+                (int)Piece.Knight => "N",
+                (int)Piece.Bishop => "B",
+                (int)Piece.Rook => "R",
+                (int)Piece.Queen => "Q",
+                _ => ""
+            };
+
+            bool needFile = false;
+            bool needRank = false;
+
+            board.GenerateMoves();
+            foreach (var move in board.Moves)
+            {
+                if (move.Target != Target || move == this)
+                    continue;
+
+                var otherPiece = board.GetPieceOn(move.Source, board.SideToMove);
+                if (otherPiece != piece)
+                    continue;
+
+                if (move.Source.ToString()[0] == Source.ToString()[0])
+                    needRank = true;
+                if (move.Source.ToString()[1] == Source.ToString()[1])
+                    needFile = true;
+            }
+
+            if (needFile)
+                pieceChar += Source.ToString()[0];
+            if (needRank)
+                pieceChar += Source.ToString()[1];
+
+            string captureSymbol = IsCapture() ? "x" : "";
+            string targetSquare = Target.ToString();
+            string promotion = IsPromotion() ? "=" + GetPromotionChar().ToUpper() : "";
+
+            return $"{pieceChar}{captureSymbol}{targetSquare}{promotion}";
+        }
     }
 }
