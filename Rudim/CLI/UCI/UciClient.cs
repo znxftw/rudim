@@ -11,12 +11,13 @@ namespace Rudim.CLI.UCI
         public BoardState Board;
         public UciClient()
         {
+            var goCommand = new GoCommand(this);
             _commands = new Dictionary<string, IUciCommand>
             {
                 ["isready"] = new IsReadyCommand(this),
                 ["position"] = new PositionCommand(this),
-                ["go"] = new GoCommand(this)
-
+                ["go"] = goCommand,
+                ["stop"] = new StopCommand(goCommand)
             };
             Board = BoardState.Default();
         }

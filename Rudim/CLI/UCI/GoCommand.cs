@@ -9,56 +9,83 @@ namespace Rudim.CLI.UCI
     internal class GoCommand : IUciCommand
     {
         private readonly UciClient _uciClient;
+        private CancellationTokenSource _currentSearch;
+        private Move _bestMove;
 
         public GoCommand(UciClient uciClient)
         {
             _uciClient = uciClient;
+            _currentSearch = null;
+            _bestMove = Move.NoMove;
         }
 
-        public void Run(string[] parameters)
+        public void StopSearch()
         {
+            if (_currentSearch != null)
+            {
+                _currentSearch.Cancel();
+                if (_bestMove != Move.NoMove)
+                {
+                    OutputBestMove(_bestMove);
+                }
+            }
+        }
+
+        private void OutputBestMove(Move move)
+        {
+            if (move.IsPromotion())
+            {
+                CliClient.WriteLine("bestmove " + move.Source + move.Target + move.GetPromotionChar());
+            }
+            else
+            {
+                CliClient.WriteLine("bestmove " + move.Source + move.Target);
+            }
+        }
+
+        public async void Run(string[] parameters)
+        {
+            // Cancel any existing search
+            _currentSearch?.Cancel();
+            _currentSearch = new CancellationTokenSource();
+            _bestMove = Move.NoMove;
+
             var depth = GetParameter("depth", parameters, 5);
             var winc = GetParameter("winc", parameters, -1);
             var binc = GetParameter("binc", parameters, -1);
             var wtime = GetParameter("wtime", parameters, -1);
             var btime = GetParameter("btime", parameters, -1);
             var movetime = GetParameter("movetime", parameters, -1);
-            // TODO : ponder, movestogo, searchmoves, nodes, mate, infinite
-            var infinite = GetOptionlessParameter("infinite", parameters);
-
-            var cancellationTokenSource = new CancellationTokenSource();
+            var infinite = GetOptionlessParameter("infinite", parameters); // Not yet implemented
 
             var clock = _uciClient.Board.SideToMove == Side.White ? wtime : btime;
             var increment = _uciClient.Board.SideToMove == Side.White ? winc : binc;
-
             var allottedTime = movetime == -1 ? (clock == -1 ? -1 : TimeManagement.CalculateMoveTime(_uciClient.Board.MoveCount, clock, increment)) : movetime;
+
 
             if (!infinite)
             {
-                var move = Move.NoMove;
-                if(allottedTime == -1)
+                if (allottedTime == -1)
                 {
-                    move = _uciClient.Board.FindBestMove(depth, cancellationTokenSource.Token);
+                    _bestMove = await Task.Run(() => _uciClient.Board.FindBestMove(depth, _currentSearch.Token));
                 }
                 else
                 {
-                    var moveTask = Task.Run(() => _uciClient.Board.FindBestMove(Constants.MaxSearchDepth, cancellationTokenSource.Token));
+                    var searchTask = Task.Run(() => _uciClient.Board.FindBestMove(Constants.MaxSearchDepth, _currentSearch.Token));
+                    var timeoutTask = Task.Delay(allottedTime);
 
-                    Thread.Sleep(allottedTime);
-                    cancellationTokenSource.Cancel();
+                    if (await Task.WhenAny(searchTask, timeoutTask) == timeoutTask)
+                    {
+                        await _currentSearch.CancelAsync();
+                        _bestMove = await searchTask;
+                    }
+                    else
+                    {
+                        _bestMove = await searchTask;
+                    }
+                }
 
-                    move = moveTask.Result;
-                }
-                
-
-                if (move.IsPromotion())
-                {
-                    CliClient.WriteLine("bestmove " + move.Source + move.Target + move.GetPromotionChar());
-                }
-                else
-                {
-                    CliClient.WriteLine("bestmove " + move.Source + move.Target);
-                }
+                OutputBestMove(_bestMove);
             }
 
         }
