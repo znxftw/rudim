@@ -17,7 +17,8 @@ namespace Rudim.CLI.UCI
                 ["isready"] = new IsReadyCommand(this),
                 ["position"] = new PositionCommand(this),
                 ["go"] = goCommand,
-                ["stop"] = new StopCommand(goCommand)
+                ["stop"] = new StopCommand(goCommand),
+                ["ucinewgame"] = new UciNewGameCommand(this)
             };
             Board = BoardState.Default();
         }

@@ -365,5 +365,10 @@ namespace Rudim.Board
 
             return Moves.Where(move => move.IsPromotion()).Aggregate(currentHash, (current, move) => current ^ ZobristTable[13, (int)move.Type.Piece]);
         }
+
+        public static void ClearMoveCache()
+        {
+            MoveCache.Clear();
+        }
     }
 }
