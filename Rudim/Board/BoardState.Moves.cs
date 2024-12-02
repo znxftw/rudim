@@ -363,7 +363,7 @@ namespace Rudim.Board
                 currentHash ^= ZobristTable[12, (int)EnPassantSquare];
             }
 
-            return Moves.Where(move => move.IsPromotion()).Aggregate(currentHash, (current, move) => current ^ ZobristTable[13, (int)move.Type.Piece]);
+            return currentHash;
         }
 
         public static void ClearMoveCache()
