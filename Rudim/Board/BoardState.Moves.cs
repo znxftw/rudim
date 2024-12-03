@@ -13,14 +13,6 @@ namespace Rudim.Board
 
         public void GenerateMoves()
         {
-            ulong boardHash = GetBoardHash();
-
-            if (MoveCache.TryGetValue(boardHash, out var cachedMoves))
-            {
-                Moves = cachedMoves;
-                return;
-            }
-
             Moves.Clear();
 
             GeneratePawnMoves();
@@ -29,8 +21,6 @@ namespace Rudim.Board
             GenerateRookMoves();
             GenerateQueenMoves();
             GenerateKingMoves();
-
-            MoveCache[boardHash] = new List<Move>(Moves);
         }
 
         private void GenerateKingMoves()
