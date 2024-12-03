@@ -21,6 +21,7 @@ namespace Rudim.Board
         {
             SavedStates = new Stack<SavedState>();
 
+            // TODO: To be moved out into a separate class and fixed before working on this again
             ZobristTable = new ulong[15, 64]; // 12 piece types (6 for each color) and 64 squares, and extra 3 rows
             for (int piece = 0; piece < 14; piece++)
             {
