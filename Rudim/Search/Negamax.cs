@@ -27,8 +27,6 @@ namespace Rudim.Search
                 MoveOrdering.PopulateMoveScore(move, boardState, ply);
             }
 
-            // MoveOrdering.SortMoves(boardState);
-
             var numberOfLegalMoves = 0;
             for (var i = 0; i < boardState.Moves.Count; ++i)
             {
