@@ -53,7 +53,7 @@ namespace Rudim.Search
                 if (score > alpha)
                 {
                     alpha = score;
-                    bestEvaluation = boardState.Moves[i];
+                    bestEvaluation = move;
                 }
             }
 

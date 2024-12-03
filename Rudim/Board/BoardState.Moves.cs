@@ -365,7 +365,7 @@ namespace Rudim.Board
         {
           return Moves
             .Where(move => !move.Traversed)
-            .Aggregate(Move.NoMove, (current, move) => move.Score > current.Score ? move : current);
+            .Aggregate(Move.NoMove, (current, move) => move.Score >= current.Score ? move : current);
         }
     }
 }
