@@ -24,14 +24,12 @@ namespace Rudim.Search
             {
                 MoveOrdering.PopulateMoveScore(move, boardState);
             }
-            MoveOrdering.SortMoves(boardState);
-
 
             for (var i = 0; i < boardState.Moves.Count; ++i)
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
-                var move = boardState.Moves[i];
+                var move = boardState.NextTopScoringMove();
                 if (!move.IsCapture())
                     break; // If sorted, once a quiet move is reached we won't need to visit the remaining nodes
 
