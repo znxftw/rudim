@@ -27,14 +27,15 @@ namespace Rudim.Search
                 MoveOrdering.PopulateMoveScore(move, boardState, ply);
             }
 
-            MoveOrdering.SortMoves(boardState);
+            // MoveOrdering.SortMoves(boardState);
 
             var numberOfLegalMoves = 0;
             for (var i = 0; i < boardState.Moves.Count; ++i)
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
-                var move = boardState.Moves[i];
+                var move = boardState.NextTopScoringMove();
+                move.Traversed = true;
                 boardState.MakeMove(move);
                 if (boardState.IsInCheck(boardState.SideToMove.Other()))
                 {

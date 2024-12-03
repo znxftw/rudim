@@ -360,5 +360,12 @@ namespace Rudim.Board
         {
             MoveCache.Clear();
         }
+
+        public Move NextTopScoringMove()
+        {
+          return Moves
+            .Where(move => !move.Traversed)
+            .Aggregate(Move.NoMove, (current, move) => move.Score > current.Score ? move : current);
+        }
     }
 }
