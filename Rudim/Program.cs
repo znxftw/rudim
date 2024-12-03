@@ -49,6 +49,7 @@ namespace Rudim
         }
     }
 
+    [MemoryDiagnoser]
     public class NegamaxBenchmark
     {
       [Benchmark]
@@ -60,14 +61,18 @@ namespace Rudim
 
       public IEnumerable<object[]> GenerateBenchmarks()
       {
-        yield return new object[] { BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 6, new CancellationToken(false) };
-        yield return new object[] { BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 7, new CancellationToken(false) };
-        yield return new object[] { BoardState.ParseFEN(Helpers.StartingFEN), 6, new CancellationToken(false) };
-        yield return new object[] { BoardState.ParseFEN(Helpers.StartingFEN), 7, new CancellationToken(false) };
-        yield return new object[] { BoardState.ParseFEN(Helpers.EndgameFEN), 6, new CancellationToken(false) };
-        yield return new object[] { BoardState.ParseFEN(Helpers.EndgameFEN), 7, new CancellationToken(false) };
-        yield return new object[] { BoardState.ParseFEN(Helpers.KiwiPeteFEN), 6, new CancellationToken(false) };
-        yield return new object[] { BoardState.ParseFEN(Helpers.KiwiPeteFEN), 7, new CancellationToken(false) };
+        yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 6, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 7, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 8, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.StartingFEN), 6, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.StartingFEN), 7, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.StartingFEN), 8, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 6, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 7, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 8, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 6, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 7, new CancellationToken(false)];
+        yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 8, new CancellationToken(false)];
       }
     }
 }
