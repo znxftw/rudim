@@ -1,0 +1,30 @@
+name: publish
+run-name: "Generate binaries for ${{ inputs.commit }}"
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit id to generate binaries for"
+        required: true
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit }}
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Publish
+        run: dotnet publish -c Release -p:PublishProfile=FolderProfile
+      - name: Compress archive
+        working-directory: Rudim/bin/Release/net9.0/publish/
+        run: tar -xvzf linux-x64.tar.gz *
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64.tar.gz
+          path: Rudim/bin/Release/net9.0/publish/linux-x64.tar.gz
+
