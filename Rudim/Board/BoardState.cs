@@ -272,7 +272,7 @@ namespace Rudim.Board
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Pieces, Occupancies, (int)SideToMove, (int)EnPassantSquare, (int)Castle, Moves);
+            return HashCode.Combine(Pieces, Occupancies);
         }
 
         public static bool operator ==(BoardState left, BoardState right)
