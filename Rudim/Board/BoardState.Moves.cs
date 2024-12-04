@@ -304,7 +304,6 @@ namespace Rudim.Board
 
         private void AddMoveToMovesList(int source, int target)
         {
-            // Makes more sense for source and target to come in as Square instead of int, refactor later
             var moveType = IsSquareCapture(target) ? MoveTypes.Capture : MoveTypes.Quiet;
             var move = new Move((Square)source, (Square)target, moveType);
             Moves.Add(move);

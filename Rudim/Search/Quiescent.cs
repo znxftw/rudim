@@ -19,7 +19,6 @@ namespace Rudim.Search
                 alpha = eval;
 
             boardState.GenerateMoves();
-            // TODO : Flag in GenerateMoves to avoid extra iteration?
             foreach (var move in boardState.Moves)
             {
                 MoveOrdering.PopulateMoveScore(move, boardState);
@@ -41,7 +40,10 @@ namespace Rudim.Search
                     boardState.UnmakeMove(move);
                     continue;
                 }
-                var score = -Search(boardState, -beta, -alpha, cancellationToken);
+                int score = 0;
+                
+                if(!boardState.IsDraw())
+                    score = -Search(boardState, -beta, -alpha, cancellationToken);
                 boardState.UnmakeMove(move);
 
                 if (score >= beta)

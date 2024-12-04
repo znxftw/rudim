@@ -15,6 +15,7 @@ namespace Rudim.Board
             public Piece CapturedPiece { get; set; }
             public Square EnPassantSquare { get; set; }
             public Castle CastlingRights { get; internal set; }
+            public List<ulong> SavedDrawHistory { get; set; }
         }
 
 
@@ -34,7 +35,8 @@ namespace Rudim.Board
             {
                 CapturedPiece = capturedPiece,
                 EnPassantSquare = enPassant,
-                CastlingRights = originalCastlingRights
+                CastlingRights = originalCastlingRights,
+                SavedDrawHistory = DrawHistory
             };
         }
 

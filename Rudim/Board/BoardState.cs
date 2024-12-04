@@ -19,12 +19,15 @@ namespace Rudim.Board
             MoveCount = 0;
             for (var square = 0; square < Constants.Squares; ++square)
                 PieceMapping[square] = Piece.None;
+            BoardHash = Zobrist.GetBoardHash(this);
         }
 
         public static BoardState Default()
         {
             return ParseFEN(Helpers.StartingFEN);
         }
+
+        private ulong BoardHash { get; set; }
 
         public Bitboard[,] Pieces { get; }
         public Bitboard[] Occupancies { get; }
@@ -33,6 +36,7 @@ namespace Rudim.Board
         public Square EnPassantSquare { get; private set; }
         public Castle Castle { get; private set; }
         public List<Move> Moves { get; set; }
+        public List<ulong> DrawHistory { get; set; }
         public int MoveCount { get; set; }
 
         private void AddPiece(Square square, Side side, Piece piece)
@@ -78,10 +82,14 @@ namespace Rudim.Board
             var capturedPiece = Piece.None;
             var originalEnPassantSquare = EnPassantSquare;
             var originalCastlingRights = Castle;
+            var resetHistory = movedPiece == Piece.Pawn;
+            ulong boardHash = BoardHash;
+
 
             if (move.IsCapture())
             {
                 capturedPiece = RemovePiece(move.Type == MoveTypes.EnPassant ? EnPassantSquareFor(move) : move.Target);
+                resetHistory = true;
             }
 
             if (move.IsPromotion())
@@ -125,6 +133,15 @@ namespace Rudim.Board
             MoveCount++;
 
             Moves = new List<Move>(32);
+            if (resetHistory)
+            {
+                DrawHistory = [];
+            }
+            else
+            {
+                DrawHistory.Add(boardHash);
+            }
+            BoardHash = Zobrist.GetBoardHash(this);
         }
 
 
@@ -176,6 +193,7 @@ namespace Rudim.Board
             Castle = state.CastlingRights;
             EnPassantSquare = state.EnPassantSquare;
             MoveCount--;
+            BoardHash = Zobrist.GetBoardHash(this);
         }
         private Square EnPassantSquareFor(Move move)
         {
@@ -255,8 +273,15 @@ namespace Rudim.Board
 
         public override string ToString()
         {
-            var boardHash = Zobrist.GetBoardHash(this);
+            var boardHash = BoardHash;
             return CommonStateNames.TryGetValue(boardHash, out var commonName) ? commonName : boardHash.ToString();
+        }
+
+        public bool IsDraw()
+        {
+            if (DrawHistory.Count > 99) return true;
+
+            return DrawHistory.Count(e => e == BoardHash) >= 2;
         }
     }
 }

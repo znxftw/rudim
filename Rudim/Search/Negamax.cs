@@ -41,7 +41,10 @@ namespace Rudim.Search
                     continue;
                 }
 
-                int score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+                int score = 0;
+                
+                if(!boardState.IsDraw())
+                    score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
                 boardState.UnmakeMove(move);
                 numberOfLegalMoves++;
                 if (score >= beta)
