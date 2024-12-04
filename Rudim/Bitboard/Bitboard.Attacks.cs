@@ -65,8 +65,8 @@ namespace Rudim
         public static Bitboard GetBishopAttacks(Square square, Bitboard occupancy)
         {
             var resultBoard = new Bitboard(0);
-            var bishopRank = (int)square / 8;
-            var bishopFile = (int)square % 8;
+            var bishopRank = (int)square >> 3;
+            var bishopFile = (int)square & (8 - 1);
 
             for (int rank = bishopRank + 1, file = bishopFile + 1; rank < 8 && file < 8; ++rank, ++file)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancy)) break;
@@ -86,8 +86,8 @@ namespace Rudim
         public static Bitboard GetRookAttacks(Square square, Bitboard occupancy)
         {
             var resultBoard = new Bitboard(0);
-            var rookRank = (int)square / 8;
-            var rookFile = (int)square % 8;
+            var rookRank = (int)square >> 3;
+            var rookFile = (int)square & (8 - 1);
 
             for (var rank = rookRank + 1; rank < 8; ++rank)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, rookFile, occupancy)) break;

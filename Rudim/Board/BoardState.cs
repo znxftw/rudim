@@ -182,14 +182,7 @@ namespace Rudim.Board
                 }
             }
 
-            if (move.IsPromotion())
-            {
-                AddPiece(move.Source, SideToMove, Piece.Pawn);
-            }
-            else
-            {
-                AddPiece(move.Source, SideToMove, movedPiece);
-            }
+            AddPiece(move.Source, SideToMove, move.IsPromotion() ? Piece.Pawn : movedPiece);
 
             Castle = state.CastlingRights;
             EnPassantSquare = state.EnPassantSquare;
