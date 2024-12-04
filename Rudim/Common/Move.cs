@@ -4,21 +4,14 @@ using System.Collections.Generic;
 
 namespace Rudim.Common
 {
-    public class Move : IEquatable<Move>
+    public class Move(Square source, Square target, MoveType type) : IEquatable<Move>
     {
-        public Square Source { get; set; }
-        public Square Target { get; set; }
-        public MoveType Type { get; set; }
+        public Square Source { get; set; } = source;
+        public Square Target { get; set; } = target;
+        public MoveType Type { get; set; } = type;
         public int Score { get; set; }
 
         public static readonly Move NoMove = new(Square.NoSquare, Square.NoSquare, MoveTypes.Quiet);
-
-        public Move(Square source, Square target, MoveType type)
-        {
-            Source = source;
-            Target = target;
-            Type = type;
-        }
 
         public bool IsCapture()
         {

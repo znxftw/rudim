@@ -4,14 +4,9 @@ using System.Numerics;
 
 namespace Rudim
 {
-    public partial struct Bitboard
+    public partial struct Bitboard(ulong board) : IEquatable<Bitboard>
     {
-        public ulong Board { get; private set; }
-
-        public Bitboard(ulong board)
-        {
-            Board = board;
-        }
+        public ulong Board { get; private set; } = board;
 
         public Bitboard CreateCopy()
         {
@@ -79,6 +74,11 @@ namespace Rudim
         public override int GetHashCode()
         {
             return HashCode.Combine(Board);
+        }
+
+        public bool Equals(Bitboard other)
+        {
+            return Equals((object)other);
         }
     }
 }

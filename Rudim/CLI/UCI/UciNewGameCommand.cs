@@ -14,7 +14,6 @@ namespace Rudim.CLI.UCI
 
         public void Run(string[] parameters)
         {
-            BoardState.ClearMoveCache();
             _uciClient.Board = BoardState.Default();
             MoveOrdering.ResetKillerMoves();
         }

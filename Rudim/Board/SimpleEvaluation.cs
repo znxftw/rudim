@@ -3,12 +3,12 @@ using System.Numerics;
 
 namespace Rudim.Board
 {
-    internal class SimpleEvaluation
+    internal static class SimpleEvaluation
     {
         private static readonly int[] PieceValues;
         private static readonly int[,] PositionValues;
-        private static readonly int[] MidgameKingValues;
-        private static readonly int[] EndgameKingValues;
+        private static readonly int[] MidGameKingValues;
+        private static readonly int[] EndGameKingValues;
 
 
         public static int Evaluate(BoardState boardState)
@@ -24,8 +24,8 @@ namespace Rudim.Board
         private static int ScorePosition(BoardState boardState)
         {
             var positionalScore = 0;
-            var midgamePhase = GamePhase.Calculate(boardState);
-            var endgamePhase = GamePhase.TotalPhase - midgamePhase;
+            var midGamePhase = GamePhase.Calculate(boardState);
+            var endGamePhase = GamePhase.TotalPhase - midGamePhase;
             for (var piece = 0; piece < Constants.Pieces; ++piece)
             {
                 var whiteBoard = new Bitboard(boardState.Pieces[(int)Side.White, piece].Board);
@@ -36,8 +36,8 @@ namespace Rudim.Board
                     var whiteKing = whiteBoard.GetLsb();
                     var blackKing = MirrorSquare(blackBoard.GetLsb());
 
-                    positionalScore += (int)(((MidgameKingValues[whiteKing] * midgamePhase) + (EndgameKingValues[whiteKing] * endgamePhase)) * GamePhase.PhaseFactor);
-                    positionalScore -= (int)(((MidgameKingValues[blackKing] * midgamePhase) + (EndgameKingValues[blackKing] * endgamePhase)) * GamePhase.PhaseFactor);
+                    positionalScore += (int)(((MidGameKingValues[whiteKing] * midGamePhase) + (EndGameKingValues[whiteKing] * endGamePhase)) * GamePhase.PhaseFactor);
+                    positionalScore -= (int)(((MidGameKingValues[blackKing] * midGamePhase) + (EndGameKingValues[blackKing] * endGamePhase)) * GamePhase.PhaseFactor);
                     continue;
                 }
 
@@ -80,8 +80,8 @@ namespace Rudim.Board
 
         static SimpleEvaluation()
         {
-            PieceValues = new int[] { 100, 320, 330, 500, 900, 20000 };
-            PositionValues = new int[,]
+            PieceValues = [100, 320, 330, 500, 900, 20000];
+            PositionValues = new[,]
             { { 0,  0,  0,  0,  0,  0,  0,  0,
                 50, 50, 50, 50, 50, 50, 50, 50,
                 10, 10, 20, 30, 30, 20, 10, 10,
@@ -123,8 +123,8 @@ namespace Rudim.Board
                  -10,  0,  5,  0,  0,  0,  0,-10,
                  -20,-10,-10, -5, -5,-10,-10,-20}
             };
-            MidgameKingValues = new[]
-            {
+            MidGameKingValues =
+            [
                 -30,-40,-40,-50,-50,-40,-40,-30,
                 -30,-40,-40,-50,-50,-40,-40,-30,
                 -30,-40,-40,-50,-50,-40,-40,-30,
@@ -133,9 +133,9 @@ namespace Rudim.Board
                 -10,-20,-20,-20,-20,-20,-20,-10,
                 20, 20,  0,  0,  0,  0, 20, 20,
                 20, 30, 10,  0,  0, 10, 30, 20
-            };
-            EndgameKingValues = new[]
-            {
+            ];
+            EndGameKingValues =
+            [
                 -50,-40,-30,-20,-20,-30,-40,-50,
                 -30,-20,-10,  0,  0,-10,-20,-30,
                 -30,-10, 20, 30, 30, 20,-10,-30,
@@ -144,7 +144,7 @@ namespace Rudim.Board
                 -30,-10, 20, 30, 30, 20,-10,-30,
                 -30,-30,  0,  0,  0,  0,-30,-30,
                 -50,-30,-30,-30,-30,-30,-30,-50
-            };
+            ];
         }
     }
 }

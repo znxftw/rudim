@@ -8,7 +8,6 @@ namespace Rudim.Board
 {
     public partial class BoardState
     {
-        private static readonly Dictionary<ulong, List<Move>> MoveCache = new Dictionary<ulong, List<Move>>();
         private static readonly ulong[,] ZobristTable;
 
         public void GenerateMoves()
@@ -354,11 +353,6 @@ namespace Rudim.Board
             }
 
             return currentHash;
-        }
-
-        public static void ClearMoveCache()
-        {
-            MoveCache.Clear();
         }
     }
 }

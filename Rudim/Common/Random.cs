@@ -12,20 +12,20 @@
 
         public static ulong NextULong()
         {
-            var RandomNumber = _ulongState;
-            RandomNumber ^= RandomNumber << 13;
-            RandomNumber ^= RandomNumber >> 7;
-            RandomNumber ^= RandomNumber << 17;
-            return _ulongState = RandomNumber;
+            var randomNumber = _ulongState;
+            randomNumber ^= randomNumber << 13;
+            randomNumber ^= randomNumber >> 7;
+            randomNumber ^= randomNumber << 17;
+            return _ulongState = randomNumber;
         }
 
         public static int NextInt()
         {
-            var RandomNumber = _intState;
-            RandomNumber ^= RandomNumber << 13;
-            RandomNumber ^= RandomNumber >> 17;
-            RandomNumber ^= RandomNumber << 5;
-            return _intState = RandomNumber;
+            var randomNumber = _intState;
+            randomNumber ^= randomNumber << 13;
+            randomNumber ^= randomNumber >> 17;
+            randomNumber ^= randomNumber << 5;
+            return _intState = randomNumber;
         }
     }
 }

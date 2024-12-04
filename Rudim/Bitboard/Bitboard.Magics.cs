@@ -8,108 +8,108 @@ namespace Rudim
     {
         public static ulong FindMagicNumber(Square square, int bitsInMask, bool isBishop)
         {
-            var MaxIndex = 1 << bitsInMask;
-            var OccupancyMappings = new Bitboard[Constants.MaxMaskIndex];
-            var Attacks = new Bitboard[Constants.MaxMaskIndex];
-            var Mask = isBishop ? GetBishopMask(square) : GetRookMask(square);
+            var maxIndex = 1 << bitsInMask;
+            var occupancyMappings = new Bitboard[Constants.MaxMaskIndex];
+            var attacks = new Bitboard[Constants.MaxMaskIndex];
+            var mask = isBishop ? GetBishopMask(square) : GetRookMask(square);
 
-            for (int index = 0; index < MaxIndex; ++index)
+            for (int index = 0; index < maxIndex; ++index)
             {
-                OccupancyMappings[index] = GetOccupancyMapping(index, bitsInMask, Mask);
-                Attacks[index] = isBishop ? GetBishopAttacks(square, OccupancyMappings[index]) : GetRookAttacks(square, OccupancyMappings[index]);
+                occupancyMappings[index] = GetOccupancyMapping(index, bitsInMask, mask);
+                attacks[index] = isBishop ? GetBishopAttacks(square, occupancyMappings[index]) : GetRookAttacks(square, occupancyMappings[index]);
             }
 
             for (int count = 0; count < Constants.MaxRetryCount; ++count)
             {
-                ulong PotentialMagicNumber = GeneratePotentialMagicNumber();
+                ulong potentialMagicNumber = GeneratePotentialMagicNumber();
 
                 // Early exit impossible magics
-                if (BitOperations.PopCount((Mask.Board * PotentialMagicNumber) & 0xFF00000000000000) < 6)
+                if (BitOperations.PopCount((mask.Board * potentialMagicNumber) & 0xFF00000000000000) < 6)
                     continue;
 
-                var MagicAttacks = Enumerable.Repeat(new Bitboard(0xFFFFFFFFFFFFFFFF), Constants.MaxMaskIndex).ToArray();
-                var FailureFlag = false;
-                for (var Index = 0; Index < MaxIndex; ++Index)
+                var magicAttacks = Enumerable.Repeat(new Bitboard(0xFFFFFFFFFFFFFFFF), Constants.MaxMaskIndex).ToArray();
+                var failureFlag = false;
+                for (var index = 0; index < maxIndex; ++index)
                 {
-                    var MagicIndex = (int)((OccupancyMappings[Index].Board * PotentialMagicNumber) >> (64 - bitsInMask));
-                    if (MagicAttacks[MagicIndex].Board == 0xFFFFFFFFFFFFFFFF)
-                        MagicAttacks[MagicIndex] = Attacks[Index];
-                    else if (!Equals(MagicAttacks[MagicIndex], Attacks[Index]))
-                        FailureFlag = true;
+                    var magicIndex = (int)((occupancyMappings[index].Board * potentialMagicNumber) >> (64 - bitsInMask));
+                    if (magicAttacks[magicIndex].Board == 0xFFFFFFFFFFFFFFFF)
+                        magicAttacks[magicIndex] = attacks[index];
+                    else if (!Equals(magicAttacks[magicIndex], attacks[index]))
+                        failureFlag = true;
                 }
                 // PotentialMagicNumber is actually the magic number
-                if (!FailureFlag)
-                    return PotentialMagicNumber;
+                if (!failureFlag)
+                    return potentialMagicNumber;
             }
             throw new ExceededMaximumRetryException("No magic number found");
         }
         public static Bitboard GetBishopMask(Square square)
         {
-            var ResultBoard = new Bitboard(0);
+            var resultBoard = new Bitboard(0);
             // Masking equivalent to attacks with zero blockers and no edge square
-            var OccupancyBoard = new Bitboard(0);
-            var BishopRank = (int)square / 8;
-            var BishopFile = (int)square % 8;
+            var occupancyBoard = new Bitboard(0);
+            var bishopRank = (int)square / 8;
+            var bishopFile = (int)square % 8;
 
-            for (int rank = BishopRank + 1, file = BishopFile + 1; rank < 7 && file < 7; ++rank, ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
+            for (int rank = bishopRank + 1, file = bishopFile + 1; rank < 7 && file < 7; ++rank, ++file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancyBoard))
                     break;
 
-            for (int rank = BishopRank - 1, file = BishopFile + 1; rank >= 1 && file < 7; --rank, ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
+            for (int rank = bishopRank - 1, file = bishopFile + 1; rank >= 1 && file < 7; --rank, ++file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancyBoard))
                     break;
 
-            for (int rank = BishopRank - 1, file = BishopFile - 1; rank >= 1 && file >= 1; --rank, --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
+            for (int rank = bishopRank - 1, file = bishopFile - 1; rank >= 1 && file >= 1; --rank, --file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancyBoard))
                     break;
 
-            for (int rank = BishopRank + 1, file = BishopFile - 1; rank < 7 && file >= 1; ++rank, --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
+            for (int rank = bishopRank + 1, file = bishopFile - 1; rank < 7 && file >= 1; ++rank, --file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancyBoard))
                     break;
 
-            return ResultBoard;
+            return resultBoard;
         }
 
         public static Bitboard GetRookMask(Square square)
         {
-            var ResultBoard = new Bitboard(0);
+            var resultBoard = new Bitboard(0);
             // Masking equivalent to attacks with zero blockers and no edge square 
-            var OccupancyBoard = new Bitboard(0);
-            var RookRank = (int)square / 8;
-            var RookFile = (int)square % 8;
+            var occupancyBoard = new Bitboard(0);
+            var rookRank = (int)square / 8;
+            var rookFile = (int)square % 8;
 
-            for (int rank = RookRank + 1; rank < 7; ++rank)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, OccupancyBoard))
+            for (int rank = rookRank + 1; rank < 7; ++rank)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, rookFile, occupancyBoard))
                     break;
 
-            for (int rank = RookRank - 1; rank >= 1; --rank)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, OccupancyBoard))
+            for (int rank = rookRank - 1; rank >= 1; --rank)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, rookFile, occupancyBoard))
                     break;
 
-            for (int file = RookFile + 1; file < 7; ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, RookRank, file, OccupancyBoard))
+            for (int file = rookFile + 1; file < 7; ++file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rookRank, file, occupancyBoard))
                     break;
 
-            for (int file = RookFile - 1; file >= 1; --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, RookRank, file, OccupancyBoard))
+            for (int file = rookFile - 1; file >= 1; --file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rookRank, file, occupancyBoard))
                     break;
 
-            return ResultBoard;
+            return resultBoard;
         }
 
         public static Bitboard GetOccupancyMapping(int index, int nBitsInMask, Bitboard mask)
         {
-            var OccupancyMapping = new Bitboard(0);
-            var TemporaryMask = new Bitboard(mask.Board);
+            var occupancyMapping = new Bitboard(0);
+            var temporaryMask = new Bitboard(mask.Board);
             for (int count = 0; count < nBitsInMask; ++count)
             {
-                int square = BitOperations.TrailingZeroCount(TemporaryMask.Board);
-                TemporaryMask.ClearBit(square);
+                int square = BitOperations.TrailingZeroCount(temporaryMask.Board);
+                temporaryMask.ClearBit(square);
 
                 if ((index & (1 << count)) != 0)
-                    OccupancyMapping.Board |= 1ul << square;
+                    occupancyMapping.Board |= 1ul << square;
             }
-            return OccupancyMapping;
+            return occupancyMapping;
         }
         private static ulong GeneratePotentialMagicNumber()
         {

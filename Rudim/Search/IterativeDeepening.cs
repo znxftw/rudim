@@ -29,14 +29,14 @@ namespace Rudim.Search
                     break;
 
                 BestMove = Negamax.BestMove;
-                var NodesTraversed = Negamax.Nodes + Quiescent.Nodes;
-                Nodes += NodesTraversed;
+                var nodesTraversed = Negamax.Nodes + Quiescent.Nodes;
+                Nodes += nodesTraversed;
 
                 timer.Stop();
                 double time = Math.Max(timer.ElapsedMilliseconds, 1);
                 var nps = (int)(Nodes / time * 1000);
 
-                CliClient.WriteLine($"info depth {i} score cp {Score} nodes {NodesTraversed} time {time} nps {nps}"); // TODO : Refactor
+                CliClient.WriteLine($"info depth {i} score cp {Score} nodes {nodesTraversed} time {time} nps {nps}"); // TODO : Refactor
             }
         }
     }

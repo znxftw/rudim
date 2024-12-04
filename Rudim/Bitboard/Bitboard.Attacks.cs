@@ -6,102 +6,102 @@ namespace Rudim
     {
         public static Bitboard GetPawnAttacks(Square square, Side side)
         {
-            var ResultBoard = new Bitboard(0);
-            var PawnBoard = new Bitboard(0);
-            PawnBoard.SetBit(square);
+            var resultBoard = new Bitboard(0);
+            var pawnBoard = new Bitboard(0);
+            pawnBoard.SetBit(square);
 
             if (side == Side.White)
             {
-                ResultBoard.Board |= (PawnBoard.Board >> 9) & ~FileH;
-                ResultBoard.Board |= (PawnBoard.Board >> 7) & ~FileA;
+                resultBoard.Board |= (pawnBoard.Board >> 9) & ~FileH;
+                resultBoard.Board |= (pawnBoard.Board >> 7) & ~FileA;
             }
             else
             {
-                ResultBoard.Board |= (PawnBoard.Board << 7) & ~FileH;
-                ResultBoard.Board |= (PawnBoard.Board << 9) & ~FileA;
+                resultBoard.Board |= (pawnBoard.Board << 7) & ~FileH;
+                resultBoard.Board |= (pawnBoard.Board << 9) & ~FileA;
             }
 
-            return ResultBoard;
+            return resultBoard;
         }
 
         public static Bitboard GetKnightAttacks(Square square)
         {
-            var ResultBoard = new Bitboard(0);
-            var KnightBoard = new Bitboard(0);
-            KnightBoard.SetBit(square);
+            var resultBoard = new Bitboard(0);
+            var knightBoard = new Bitboard(0);
+            knightBoard.SetBit(square);
 
-            ResultBoard.Board |= (KnightBoard.Board << 17) & ~FileA;
-            ResultBoard.Board |= (KnightBoard.Board << 10) & ~FileAb;
-            ResultBoard.Board |= (KnightBoard.Board >> 6) & ~FileAb;
-            ResultBoard.Board |= (KnightBoard.Board >> 15) & ~FileA;
-            ResultBoard.Board |= (KnightBoard.Board << 15) & ~FileH;
-            ResultBoard.Board |= (KnightBoard.Board << 6) & ~FileGh;
-            ResultBoard.Board |= (KnightBoard.Board >> 10) & ~FileGh;
-            ResultBoard.Board |= (KnightBoard.Board >> 17) & ~FileH;
+            resultBoard.Board |= (knightBoard.Board << 17) & ~FileA;
+            resultBoard.Board |= (knightBoard.Board << 10) & ~FileAb;
+            resultBoard.Board |= (knightBoard.Board >> 6) & ~FileAb;
+            resultBoard.Board |= (knightBoard.Board >> 15) & ~FileA;
+            resultBoard.Board |= (knightBoard.Board << 15) & ~FileH;
+            resultBoard.Board |= (knightBoard.Board << 6) & ~FileGh;
+            resultBoard.Board |= (knightBoard.Board >> 10) & ~FileGh;
+            resultBoard.Board |= (knightBoard.Board >> 17) & ~FileH;
 
-            return ResultBoard;
+            return resultBoard;
         }
 
         public static Bitboard GetKingAttacks(Square square)
         {
-            var ResultBoard = new Bitboard(0);
-            var KingBoard = new Bitboard(0);
-            KingBoard.SetBit(square);
+            var resultBoard = new Bitboard(0);
+            var kingBoard = new Bitboard(0);
+            kingBoard.SetBit(square);
 
-            ResultBoard.Board |= (KingBoard.Board << 1) & ~FileA;
-            ResultBoard.Board |= (KingBoard.Board >> 7) & ~FileA;
-            ResultBoard.Board |= (KingBoard.Board << 9) & ~FileA;
+            resultBoard.Board |= (kingBoard.Board << 1) & ~FileA;
+            resultBoard.Board |= (kingBoard.Board >> 7) & ~FileA;
+            resultBoard.Board |= (kingBoard.Board << 9) & ~FileA;
 
-            ResultBoard.Board |= (KingBoard.Board >> 1) & ~FileH;
-            ResultBoard.Board |= (KingBoard.Board << 7) & ~FileH;
-            ResultBoard.Board |= (KingBoard.Board >> 9) & ~FileH;
+            resultBoard.Board |= (kingBoard.Board >> 1) & ~FileH;
+            resultBoard.Board |= (kingBoard.Board << 7) & ~FileH;
+            resultBoard.Board |= (kingBoard.Board >> 9) & ~FileH;
 
-            ResultBoard.Board |= (KingBoard.Board << 8);
-            ResultBoard.Board |= (KingBoard.Board >> 8);
+            resultBoard.Board |= (kingBoard.Board << 8);
+            resultBoard.Board |= (kingBoard.Board >> 8);
 
-            return ResultBoard;
+            return resultBoard;
         }
 
         public static Bitboard GetBishopAttacks(Square square, Bitboard occupancy)
         {
-            var ResultBoard = new Bitboard(0);
-            var BishopRank = (int)square / 8;
-            var BishopFile = (int)square % 8;
+            var resultBoard = new Bitboard(0);
+            var bishopRank = (int)square / 8;
+            var bishopFile = (int)square % 8;
 
-            for (int rank = BishopRank + 1, file = BishopFile + 1; rank < 8 && file < 8; ++rank, ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, occupancy)) break;
+            for (int rank = bishopRank + 1, file = bishopFile + 1; rank < 8 && file < 8; ++rank, ++file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancy)) break;
 
-            for (int rank = BishopRank - 1, file = BishopFile + 1; rank >= 0 && file < 8; --rank, ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, occupancy)) break;
+            for (int rank = bishopRank - 1, file = bishopFile + 1; rank >= 0 && file < 8; --rank, ++file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancy)) break;
 
-            for (int rank = BishopRank - 1, file = BishopFile - 1; rank >= 0 && file >= 0; --rank, --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, occupancy)) break;
+            for (int rank = bishopRank - 1, file = bishopFile - 1; rank >= 0 && file >= 0; --rank, --file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancy)) break;
 
-            for (int rank = BishopRank + 1, file = BishopFile - 1; rank < 8 && file >= 0; ++rank, --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, occupancy)) break;
+            for (int rank = bishopRank + 1, file = bishopFile - 1; rank < 8 && file >= 0; ++rank, --file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancy)) break;
 
-            return ResultBoard;
+            return resultBoard;
         }
 
         public static Bitboard GetRookAttacks(Square square, Bitboard occupancy)
         {
-            var ResultBoard = new Bitboard(0);
-            var RookRank = (int)square / 8;
-            var RookFile = (int)square % 8;
+            var resultBoard = new Bitboard(0);
+            var rookRank = (int)square / 8;
+            var rookFile = (int)square % 8;
 
-            for (var rank = RookRank + 1; rank < 8; ++rank)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, occupancy)) break;
+            for (var rank = rookRank + 1; rank < 8; ++rank)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, rookFile, occupancy)) break;
 
-            for (var rank = RookRank - 1; rank >= 0; --rank)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, occupancy)) break;
+            for (var rank = rookRank - 1; rank >= 0; --rank)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, rookFile, occupancy)) break;
 
-            for (var file = RookFile + 1; file < 8; ++file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, RookRank, file, occupancy)) break;
+            for (var file = rookFile + 1; file < 8; ++file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rookRank, file, occupancy)) break;
 
-            for (var file = RookFile - 1; file >= 0; --file)
-                if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, RookRank, file, occupancy)) break;
+            for (var file = rookFile - 1; file >= 0; --file)
+                if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rookRank, file, occupancy)) break;
 
-            return ResultBoard;
+            return resultBoard;
         }
 
         public static Bitboard GetQueenAttacks(Square square, Bitboard occupancy)

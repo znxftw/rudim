@@ -2,14 +2,14 @@
 
 namespace Rudim.Board
 {
-    static class MoveOrdering
+    internal static class MoveOrdering
     {
         private static readonly int[,] MVVLVA;
-        private static Move[,] KillerMoves;
+        private static Move[,] _killerMoves;
 
         static MoveOrdering()
         {
-            MVVLVA = new int[,]
+            MVVLVA = new[,]
             { // P , N , B , R , Q , K , None
                { 15, 14, 13, 12, 11, 10, 0 }, // P
                { 25, 24, 23, 22, 21, 20, 0 }, // N
@@ -19,21 +19,21 @@ namespace Rudim.Board
                { 0, 0, 0, 0, 0, 0, 0 },       // K
                { 0, 0, 0, 0, 0, 0, 0 }        // None
             };
-            KillerMoves = new Move[2, Constants.MaxPly];
+            _killerMoves = new Move[2, Constants.MaxPly];
         }
         public static void PopulateMoveScore(Move move, BoardState boardState, int ply = Constants.MaxPly - 1)
         {
             if (!move.IsCapture())
             {
-                if (move == KillerMoves[0, ply])
+                if (move == _killerMoves[0, ply])
                     move.Score = 9; // TODO : Revisit, assign better values and extract to constants
-                else if (move == KillerMoves[1, ply])
+                else if (move == _killerMoves[1, ply])
                     move.Score = 8;
                 else
                     move.Score = 0;
                 return;
             }
-            var targetPiece = (int)Piece.None;
+            int targetPiece;
             var sourcePiece = boardState.GetPieceOn(move.Source, boardState.SideToMove);
             if (move.Type == MoveTypes.EnPassant)
                 targetPiece = (int)Piece.Pawn;
@@ -44,11 +44,13 @@ namespace Rudim.Board
 
         public static void AddKillerMove(Move move, int ply)
         {
-            if (KillerMoves[0, ply] != move)
+            if (_killerMoves[0, ply] == move)
             {
-                KillerMoves[1, ply] = KillerMoves[0, ply];
-                KillerMoves[0, ply] = move;
+                return;
             }
+
+            _killerMoves[1, ply] = _killerMoves[0, ply];
+            _killerMoves[0, ply] = move;
         }
         public static void SortMoves(BoardState boardState)
         {
@@ -57,7 +59,7 @@ namespace Rudim.Board
         }
         public static void ResetKillerMoves()
         {
-            KillerMoves = new Move[2, Constants.MaxPly];
+            _killerMoves = new Move[2, Constants.MaxPly];
         }
     }
 }
