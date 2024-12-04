@@ -25,10 +25,10 @@ namespace Rudim.Board
             ZobristTable = new ulong[15, 64]; // 12 piece types (6 for each color) and 64 squares, and extra 3 rows
             for (int piece = 0; piece < 14; piece++)
             {
-              for (int square = 0; square < 64; square++)
-              {
-                ZobristTable[piece, square] = Random.NextULong() << 32 | Random.NextULong();
-              }
+                for (int square = 0; square < 64; square++)
+                {
+                    ZobristTable[piece, square] = Random.NextULong() << 32 | Random.NextULong();
+                }
             }
 
             ZobristTable[14, 0] = Random.NextULong() << 32 | Random.NextULong(); // White to move

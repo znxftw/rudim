@@ -20,18 +20,18 @@ namespace Rudim
 
         public int GetBit(Square square)
         {
-            return GetBit((int) square);
+            return GetBit((int)square);
         }
 
         public Bitboard SetBit(Square square)
         {
-            SetBit((int) square);
+            SetBit((int)square);
             return this;
         }
 
         public Bitboard ClearBit(Square square)
         {
-            ClearBit((int) square);
+            ClearBit((int)square);
             return this;
         }
 

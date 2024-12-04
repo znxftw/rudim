@@ -48,8 +48,8 @@ namespace Rudim
             var ResultBoard = new Bitboard(0);
             // Masking equivalent to attacks with zero blockers and no edge square
             var OccupancyBoard = new Bitboard(0);
-            var BishopRank = (int) square / 8;
-            var BishopFile = (int) square % 8;
+            var BishopRank = (int)square / 8;
+            var BishopFile = (int)square % 8;
 
             for (int rank = BishopRank + 1, file = BishopFile + 1; rank < 7 && file < 7; ++rank, ++file)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, file, OccupancyBoard))
@@ -75,8 +75,8 @@ namespace Rudim
             var ResultBoard = new Bitboard(0);
             // Masking equivalent to attacks with zero blockers and no edge square 
             var OccupancyBoard = new Bitboard(0);
-            var RookRank = (int) square / 8;
-            var RookFile = (int) square % 8;
+            var RookRank = (int)square / 8;
+            var RookFile = (int)square % 8;
 
             for (int rank = RookRank + 1; rank < 7; ++rank)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref ResultBoard, rank, RookFile, OccupancyBoard))

@@ -16,15 +16,15 @@ namespace Rudim
     {
         static void Main(string[] args)
         {
-          // TODO: better arg parse
-          if (args.Length >= 1 && args[0] == "--benchmark")
-          {
-            BenchmarkRunner.Run<NegamaxBenchmark>();
-          }
-          else
-          {
-            CliClient.Run();
-          }
+            // TODO: better arg parse
+            if (args.Length >= 1 && args[0] == "--benchmark")
+            {
+                BenchmarkRunner.Run<NegamaxBenchmark>();
+            }
+            else
+            {
+                CliClient.Run();
+            }
         }
         // Rename when debugging
         static void DebugMain(string[] args)
@@ -52,27 +52,27 @@ namespace Rudim
     [MemoryDiagnoser]
     public class NegamaxBenchmark
     {
-      [Benchmark]
-      [ArgumentsSource(nameof(GenerateBenchmarks))]
-      public void BenchmarkSearch(BoardState boardState, int depth, CancellationToken cancellationToken)
-      {
-         Negamax.Search(boardState, depth, cancellationToken);
-      }
+        [Benchmark]
+        [ArgumentsSource(nameof(GenerateBenchmarks))]
+        public void BenchmarkSearch(BoardState boardState, int depth, CancellationToken cancellationToken)
+        {
+            Negamax.Search(boardState, depth, cancellationToken);
+        }
 
-      public IEnumerable<object[]> GenerateBenchmarks()
-      {
-        yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 6, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 7, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 8, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.StartingFEN), 6, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.StartingFEN), 7, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.StartingFEN), 8, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 6, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 7, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 8, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 6, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 7, new CancellationToken(false)];
-        yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 8, new CancellationToken(false)];
-      }
+        public IEnumerable<object[]> GenerateBenchmarks()
+        {
+            yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 6, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 7, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.AdvancedMoveFEN), 8, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.StartingFEN), 6, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.StartingFEN), 7, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.StartingFEN), 8, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 6, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 7, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.EndgameFEN), 8, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 6, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 7, new CancellationToken(false)];
+            yield return [BoardState.ParseFEN(Helpers.KiwiPeteFEN), 8, new CancellationToken(false)];
+        }
     }
 }

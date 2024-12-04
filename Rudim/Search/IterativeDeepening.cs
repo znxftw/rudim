@@ -19,7 +19,7 @@ namespace Rudim.Search
             BestMove = Move.NoMove;
             Score = 0;
             Nodes = 0;
-            for(int i = 1; i <= depth; ++i)
+            for (int i = 1; i <= depth; ++i)
             {
                 timer.Restart();
 
@@ -37,7 +37,7 @@ namespace Rudim.Search
                 var nps = (int)(Nodes / time * 1000);
 
                 CliClient.WriteLine($"info depth {i} score cp {Score} nodes {NodesTraversed} time {time} nps {nps}"); // TODO : Refactor
-            }           
+            }
         }
     }
 }
