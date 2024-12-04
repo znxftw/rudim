@@ -30,6 +30,7 @@ namespace Rudim.Search
                 if (cancellationToken.IsCancellationRequested)
                     break;
                 var move = boardState.NextTopScoringMove();
+                move.Traversed = true;
                 if (!move.IsCapture())
                     break; // If sorted, once a quiet move is reached we won't need to visit the remaining nodes
 
