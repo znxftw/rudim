@@ -52,8 +52,8 @@ namespace Rudim.Board
         private Piece RemovePiece(Square square)
         {
             Piece pieceOnSquare = PieceMapping[(int)square];
-            Pieces[(int)Side.White, (int) pieceOnSquare] = Pieces[(int)Side.White, (int)pieceOnSquare].ClearBit(square);
-            Pieces[(int)Side.Black, (int) pieceOnSquare] = Pieces[(int)Side.Black, (int)pieceOnSquare].ClearBit(square);
+            Pieces[(int)Side.White, (int)pieceOnSquare] = Pieces[(int)Side.White, (int)pieceOnSquare].ClearBit(square);
+            Pieces[(int)Side.Black, (int)pieceOnSquare] = Pieces[(int)Side.Black, (int)pieceOnSquare].ClearBit(square);
             Occupancies[(int)Side.Black] = Occupancies[(int)Side.Black].ClearBit(square);
             Occupancies[(int)Side.White] = Occupancies[(int)Side.White].ClearBit(square);
             Occupancies[(int)Side.Both] = Occupancies[(int)Side.Both].ClearBit(square);
