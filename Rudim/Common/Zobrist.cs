@@ -2,7 +2,7 @@ using Rudim.Board;
 
 namespace Rudim.Common
 {
-    public class Zobrist
+    public static class Zobrist
     {
         private static readonly ulong[,] ZobristTable;
 

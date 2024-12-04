@@ -127,8 +127,8 @@ namespace Rudim.Board
 
             AddPiece(move.Target, SideToMove, movedPiece);
 
-            Castle &= (Castle)CastlingRights[(int)move.Source];
-            Castle &= (Castle)CastlingRights[(int)move.Target];
+            Castle &= (Castle)CastlingConstants[(int)move.Source];
+            Castle &= (Castle)CastlingConstants[(int)move.Target];
             EnPassantSquare = move.Type == MoveTypes.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
             SideToMove = SideToMove.Other();
 
@@ -196,7 +196,7 @@ namespace Rudim.Board
 
         private const string AsciiPieces = "PNBRQK-";
 
-        private static readonly int[] CastlingRights =
+        private static readonly int[] CastlingConstants =
         {
             7, 15, 15, 15, 3, 15, 15, 11,
             15, 15, 15, 15, 15, 15, 15, 15,
