@@ -15,7 +15,7 @@ namespace Rudim
         {
             if (args.Length >= 1 && args[0] == "--benchmark")
             {
-                BenchmarkRunner.Run<NegamaxBenchmark>();
+                BenchmarkRunner.Run<Benchmark>();
             }
             else
             {
@@ -25,13 +25,13 @@ namespace Rudim
     }
 
     [MemoryDiagnoser]
-    public class NegamaxBenchmark
+    public class Benchmark
     {
         [Benchmark]
         [ArgumentsSource(nameof(GenerateBenchmarks))]
-        public void BenchmarkSearch(BoardState boardState, int depth, CancellationToken cancellationToken)
+        public void BenchmarkBestMove(BoardState boardState, int depth, CancellationToken cancellationToken)
         {
-            Negamax.Search(boardState, depth, cancellationToken);
+            boardState.FindBestMove(depth, cancellationToken);
         }
 
         public IEnumerable<object[]> GenerateBenchmarks()
