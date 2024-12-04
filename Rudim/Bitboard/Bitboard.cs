@@ -1,6 +1,6 @@
+using Rudim.Common;
 using System;
 using System.Numerics;
-using Rudim.Common;
 
 namespace Rudim
 {

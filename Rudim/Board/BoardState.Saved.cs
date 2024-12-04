@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Rudim.Common;
+using System.Collections.Generic;
 
 namespace Rudim.Board
 {

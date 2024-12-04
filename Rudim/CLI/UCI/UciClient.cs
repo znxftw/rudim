@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Rudim.Board;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Rudim.Board;
 
 namespace Rudim.CLI.UCI
 {

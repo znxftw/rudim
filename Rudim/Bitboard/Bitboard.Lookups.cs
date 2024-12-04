@@ -1,5 +1,5 @@
-﻿using System.Numerics;
-using Rudim.Common;
+﻿using Rudim.Common;
+using System.Numerics;
 
 namespace Rudim
 {

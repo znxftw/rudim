@@ -1,14 +1,14 @@
-﻿using Rudim.Board;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using Rudim.Board;
 using Rudim.CLI;
+using Rudim.Common;
 using Rudim.Search;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
-using Rudim.Common;
 
 namespace Rudim
 {
