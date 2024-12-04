@@ -21,10 +21,10 @@ jobs:
       - name: Publish
         run: dotnet publish -c Release -p:PublishProfile=FolderProfile
       - name: Compress archive
-        working-directory: Rudim/bin/Release/net5.0/publish/
+        working-directory: Rudim/bin/Release/net6.0/publish/
         run: tar -xvzf linux-x64.tar.gz *
       - uses: actions/upload-artifact@v4
         with:
           name: linux-x64.tar.gz
-          path: Rudim/bin/Release/net5.0/publish/linux-x64.tar.gz
+          path: Rudim/bin/Release/net6.0/publish/linux-x64.tar.gz
 
