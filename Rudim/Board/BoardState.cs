@@ -72,7 +72,7 @@ namespace Rudim.Board
             return Occupancies[(int)side].GetBit(square) == 1 ? (int)piece : (int)Piece.None;
         }
 
-        private int GetPieceOn(Square square)
+        public int GetPieceOn(Square square)
         {
             var piece = (int)PieceMapping[(int)square];
             if (piece == (int)Piece.None) return -1;
@@ -296,7 +296,7 @@ namespace Rudim.Board
 
         public override string ToString()
         {
-            var boardHash = GetBoardHash();
+            var boardHash = Zobrist.GetBoardHash(this);
             return CommonStateNames.TryGetValue(boardHash, out var commonName) ? commonName : boardHash.ToString();
         }
     }
