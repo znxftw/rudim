@@ -203,36 +203,6 @@ namespace Rudim.Board
             13, 15, 15, 15, 12, 15, 15, 14
         };
 
-        public void Print()
-        {
-            for (var rank = 0; rank < 8; ++rank)
-            {
-                for (var file = 0; file < 8; ++file)
-                {
-                    if (file == 0)
-                        Console.Write((8 - rank) + "\t");
-                    var square = (rank * 8) + file;
-
-                    var boardPiece = Piece.None;
-                    for (var side = 0; side < Constants.Sides; ++side)
-                        for (var piece = 0; piece < Constants.Pieces; ++piece)
-                            if (Pieces[side, piece].GetBit(square) == 1)
-                                boardPiece = (Piece)piece;
-                    char asciiValue = Occupancies[0].GetBit(square) == 0
-                        ? char.ToLower(AsciiPieces[(int)boardPiece])
-                        : AsciiPieces[(int)boardPiece];
-                    Console.Write(asciiValue + " ");
-                }
-
-                Console.Write(Environment.NewLine);
-            }
-
-            Console.WriteLine(Environment.NewLine + "\ta b c d e f g h ");
-            Console.WriteLine(Environment.NewLine + "Side to move : " + SideToMove);
-            Console.WriteLine(Environment.NewLine + "En passant square : " + EnPassantSquare);
-            Console.WriteLine(Environment.NewLine + "Castling rights : " + Castle);
-        }
-
 
         public bool Equals(BoardState other)
         {
