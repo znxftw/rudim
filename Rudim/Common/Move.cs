@@ -6,9 +6,9 @@ namespace Rudim.Common
 {
     public class Move(Square source, Square target, MoveType type) : IEquatable<Move>
     {
-        public Square Source { get; set; } = source;
-        public Square Target { get; set; } = target;
-        public MoveType Type { get; set; } = type;
+        public Square Source { get; init; } = source;
+        public Square Target { get; init; } = target;
+        public MoveType Type { get; init; } = type;
         public int Score { get; set; }
 
         public static readonly Move NoMove = new(Square.NoSquare, Square.NoSquare, MoveTypes.Quiet);
