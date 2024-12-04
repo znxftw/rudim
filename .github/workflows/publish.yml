@@ -19,6 +19,7 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Publish
+        working-directory: Rudim
         run: dotnet publish -c Release -p:PublishProfile=FolderProfile
       - name: Compress archive
         working-directory: Rudim/bin/Release/net6.0/publish/
