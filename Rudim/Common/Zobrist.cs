@@ -9,7 +9,7 @@ namespace Rudim.Common
         static Zobrist()
         {
             // 12 piece types (6 for each color) and 64 squares, and extra - en passant, + edge cases below
-            ZobristTable = new ulong[14, 64]; 
+            ZobristTable = new ulong[14, 64];
             for (int piece = 0; piece < 13; piece++)
             {
                 for (int square = 0; square < 64; square++)
@@ -27,7 +27,7 @@ namespace Rudim.Common
             ZobristTable[13, 4] = Random.NextULong() << 32 | Random.NextULong();
             ZobristTable[13, 5] = Random.NextULong() << 32 | Random.NextULong();
         }
-        
+
         public static ulong GetBoardHash(BoardState boardState)
         {
             ulong currentHash = 0;

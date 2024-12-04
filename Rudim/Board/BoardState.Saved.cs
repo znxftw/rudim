@@ -30,12 +30,13 @@ namespace Rudim.Board
 
         private void SaveState(Piece capturedPiece, Square enPassant, Castle originalCastlingRights)
         {
-            var savedState = new SavedState();
-            savedState.SavedMoves = Moves;
-            savedState.CapturedPiece = capturedPiece;
-            savedState.EnPassantSquare = enPassant;
-            savedState.CastlingRights = originalCastlingRights;
-            SavedStates.Push(savedState);
+            SavedStates.Push(new SavedState
+            {
+                SavedMoves = Moves,
+                CapturedPiece = capturedPiece,
+                EnPassantSquare = enPassant,
+                CastlingRights = originalCastlingRights
+            });
         }
 
         private SavedState RestoreState()

@@ -22,32 +22,21 @@ namespace Rudim.Board
 
         private void GenerateKingMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.King].CreateCopy();
-            while (bitboard.Board > 0)
+            var source = Pieces[(int)SideToMove, (int)Piece.King].GetLsb();
+            var attacks = new Bitboard(Bitboard.KingAttacks[source]);
+
+            while (attacks.Board > 0)
             {
-                // Ideally this loop should only run once
-                var source = bitboard.GetLsb();
-                var attacks = new Bitboard(Bitboard.KingAttacks[source]);
-
-                while (attacks.Board > 0)
+                var target = attacks.GetLsb();
+                attacks.ClearBit(target);
+                if (Occupancies[(int)SideToMove].GetBit(target) == 1)
                 {
-                    var target = attacks.GetLsb();
-
-                    if (Occupancies[(int)SideToMove].GetBit(target) == 1)
-                    {
-                        attacks.ClearBit(target);
-                        continue;
-                    }
-
-                    AddMoveToMovesList(source, target);
-
-                    attacks.ClearBit(target);
+                    continue;
                 }
-
-                GenerateCastleMoves();
-                bitboard.ClearBit(source);
+                AddMoveToMovesList(source, target);
             }
 
+            GenerateCastleMoves();
         }
 
         public Move FindBestMove(int depth, CancellationToken cancellationToken)
