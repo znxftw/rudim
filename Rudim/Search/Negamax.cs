@@ -30,11 +30,10 @@ namespace Rudim.Search
             MoveOrdering.SortMoves(boardState);
 
             var numberOfLegalMoves = 0;
-            for (var i = 0; i < boardState.Moves.Count; ++i)
+            foreach (var move in boardState.Moves)
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
-                var move = boardState.Moves[i];
                 boardState.MakeMove(move);
                 if (boardState.IsInCheck(boardState.SideToMove.Other()))
                 {
@@ -54,7 +53,7 @@ namespace Rudim.Search
                 if (score > alpha)
                 {
                     alpha = score;
-                    bestEvaluation = boardState.Moves[i];
+                    bestEvaluation = move;
                 }
             }
 
