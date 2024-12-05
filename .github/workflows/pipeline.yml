@@ -64,7 +64,7 @@ jobs:
       run: |
         # Download and setup fastchess
         wget https://github.com/Disservin/fastchess/releases/download/v1.1.0-alpha/fastchess-ubuntu-22.04.zip
-        unzip fastchess-ubuntu-22.04.zip
+        unzip -o fastchess-ubuntu-22.04.zip
         chmod +x fastchess
 
         # Download and extract openings book
