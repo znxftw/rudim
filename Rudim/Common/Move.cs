@@ -56,8 +56,7 @@ namespace Rudim.Common
 
         private static Square ParseFromString(string squareString)
         {
-            var square = Square.NoSquare;
-            _ = Enum.TryParse(squareString, out square);
+            _ = Enum.TryParse(squareString, out Square square);
             return square;
         }
 

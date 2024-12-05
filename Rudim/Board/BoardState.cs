@@ -15,7 +15,7 @@ namespace Rudim.Board
             SideToMove = Side.White;
             EnPassantSquare = Square.NoSquare;
             Castle = Castle.None;
-            Moves = new List<Move>();
+            Moves = new List<Move>(64);
             MoveCount = 0;
 
             for (var side = 0; side < Constants.Sides; ++side)
@@ -130,7 +130,7 @@ namespace Rudim.Board
             SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights);
             MoveCount++;
 
-            Moves = new List<Move>();
+            Moves = new List<Move>(64);
         }
 
 
