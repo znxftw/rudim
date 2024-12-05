@@ -23,6 +23,7 @@ namespace Rudim.Search
             {
                 timer.Restart();
 
+                BoardState.ClearSavedStates();
                 Score = Negamax.Search(boardState, i, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested)

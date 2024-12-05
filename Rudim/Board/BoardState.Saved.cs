@@ -45,7 +45,7 @@ namespace Rudim.Board
 
         public static void ClearSavedStates()
         {
-            _savedStates = new SavedState[2048];
+            _currentState = 0;
         }
     }
 }
