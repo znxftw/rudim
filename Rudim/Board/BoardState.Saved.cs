@@ -6,6 +6,9 @@ namespace Rudim.Board
     public partial class BoardState
     {
         private static readonly Dictionary<ulong, string> CommonStateNames = new();
+        private static SavedState[] _savedStates = new SavedState[2048];
+        private static int _currentState = 0;
+
 
         private class SavedState
         {
@@ -14,11 +17,9 @@ namespace Rudim.Board
             public Castle CastlingRights { get; internal set; }
         }
 
-        private static Stack<SavedState> SavedStates { get; set; }
 
         static BoardState()
         {
-            SavedStates = new Stack<SavedState>();
 
             CommonStateNames[Zobrist.GetBoardHash(ParseFEN(Helpers.StartingFEN))] = "Starting State";
             CommonStateNames[Zobrist.GetBoardHash(ParseFEN(Helpers.EndgameFEN))] = "Endgame State";
@@ -29,23 +30,22 @@ namespace Rudim.Board
 
         private void SaveState(Piece capturedPiece, Square enPassant, Castle originalCastlingRights)
         {
-            SavedStates.Push(new SavedState
+            _savedStates[_currentState++] = new SavedState
             {
                 CapturedPiece = capturedPiece,
                 EnPassantSquare = enPassant,
                 CastlingRights = originalCastlingRights
-            });
+            };
         }
 
         private SavedState RestoreState()
         {
-            var savedState = SavedStates.Pop();
-            return savedState;
+            return _savedStates[--_currentState];
         }
 
         public static void ClearSavedStates()
         {
-            SavedStates.Clear();
+            _savedStates = new SavedState[2048];
         }
     }
 }

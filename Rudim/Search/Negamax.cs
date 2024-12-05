@@ -61,8 +61,7 @@ namespace Rudim.Search
             {
                 if (boardState.IsInCheck(boardState.SideToMove))
                     return -Constants.MaxCentipawnEval + (_searchDepth - depth);
-                else
-                    return 0;
+                return 0;
             }
 
             if (alpha != originalAlpha)
