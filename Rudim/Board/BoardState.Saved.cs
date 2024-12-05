@@ -10,7 +10,6 @@ namespace Rudim.Board
         private class SavedState
         {
             public Piece CapturedPiece { get; set; }
-            public List<Move> SavedMoves { get; set; }
             public Square EnPassantSquare { get; set; }
             public Castle CastlingRights { get; internal set; }
         }
@@ -32,7 +31,6 @@ namespace Rudim.Board
         {
             SavedStates.Push(new SavedState
             {
-                SavedMoves = Moves,
                 CapturedPiece = capturedPiece,
                 EnPassantSquare = enPassant,
                 CastlingRights = originalCastlingRights
@@ -42,7 +40,6 @@ namespace Rudim.Board
         private SavedState RestoreState()
         {
             var savedState = SavedStates.Pop();
-            Moves = savedState.SavedMoves;
             return savedState;
         }
 
