@@ -16,7 +16,7 @@ If you see Rudim as offline - the server might be down. If Rudim is online but n
 - Iterative Deepening + Negamax with Alpha Beta Pruning
 - Quiescent Search
 - Move Ordering - MVV LVA, Killer Heuristic
-- Zobrist Hashing for caching move generation
+- Zobrist Hashing (not integrated with any caches)
 
 ### What's next for Rudim?
 
