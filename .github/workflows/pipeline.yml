@@ -56,8 +56,8 @@ jobs:
     - name: Download Stable Rudim
       run: |
         mkdir -p stable-rudim
-        wget https://github.com/znxftw/rudim/releases/latest/download/linux-x64.tar.gz
-        tar xzf linux-x64.tar.gz -C stable-rudim/
+        wget https://github.com/znxftw/rudim/releases/latest/download/linux-x64.zip
+        unzip -o linux-x64.zip -d stable-rudim
         chmod +x stable-rudim/Rudim
 
     - name: Download Fastchess and Openings
