@@ -17,12 +17,6 @@ namespace Rudim.Board
             Castle = Castle.None;
             Moves = new List<Move>(64);
             MoveCount = 0;
-
-            for (var side = 0; side < Constants.Sides; ++side)
-                for (var piece = 0; piece < Constants.Pieces; ++piece)
-                    Pieces[side, piece] = new Bitboard(0);
-            for (var side = 0; side < Constants.SidesWithBoth; ++side)
-                Occupancies[side] = new Bitboard(0);
             for (var square = 0; square < Constants.Squares; ++square)
                 PieceMapping[square] = Piece.None;
         }
