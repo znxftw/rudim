@@ -74,29 +74,13 @@ jobs:
     - name: Run Tournaments
       run: |
         # 1+0.1 Tournament
-        ./fastchess match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
-          -games 50 -tc 1+0.1 -concurrency 1 -openings 8moves_v3.pgn > tournament_1_01.txt
+        ./fastchess-ubuntu-22.04 match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
+          -games 50 -tc 1+0.1 -concurrency 4 -openings 8moves_v3.pgn
 
         # 2+0.1 Tournament
-        ./fastchess match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
-          -games 50 -tc 2+0.1 -concurrency 1 -openings 8moves_v3.pgn > tournament_2_01.txt
+        ./fastchess-ubuntu-22.04 match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
+          -games 50 -tc 2+0.1 -concurrency 4 -openings 8moves_v3.pgn
 
         # 5+0 Tournament
-        ./fastchess match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
-          -games 50 -tc 5 -concurrency 1 -openings 8moves_v3.pgn > tournament_5_0.txt
-
-        echo "### Tournament Results" >> $GITHUB_STEP_SUMMARY
-        echo "#### Time Control: 1+0.1" >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        cat tournament_1_01.txt >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
-        echo "#### Time Control: 2+0.1" >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        cat tournament_2_01.txt >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
-        echo "#### Time Control: 5+0" >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        cat tournament_5_0.txt >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        ./fastchess-ubuntu-22.04 match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
+          -games 50 -tc 5 -concurrency 4 -openings 8moves_v3.pgn
