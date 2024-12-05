@@ -18,9 +18,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -38,3 +36,67 @@ jobs:
       run: |
         dotnet run -c Release --benchmark
         echo "$(cat BenchmarkDotNet.Artifacts/results/Rudim.NegamaxBenchmark-report-github.md)" >> $GITHUB_STEP_SUMMARY
+
+  tournament:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
+    - name: Build Latest Rudim
+      working-directory: Rudim
+      run: dotnet publish -c Release -p:PublishProfile=FolderProfile
+
+    - name: Download Stable Rudim
+      run: |
+        mkdir -p stable-rudim
+        wget https://github.com/znxftw/rudim/releases/latest/download/linux-x64.tar.gz
+        tar xzf linux-x64.tar.gz -C stable-rudim/
+        chmod +x stable-rudim/Rudim
+
+    - name: Download Fastchess and Openings
+      run: |
+        # Download and setup fastchess
+        wget https://github.com/Disservin/fastchess/releases/download/v1.1.0-alpha/fastchess-linux-x64.tar.gz
+        tar xzf fastchess-linux-x64.tar.gz
+        chmod +x fastchess
+
+        # Download and extract openings book
+        wget https://github.com/official-stockfish/books/raw/master/8moves_v3.pgn.zip
+        unzip 8moves_v3.pgn.zip
+
+    - name: Run Tournaments
+      run: |
+        # 1+0.1 Tournament
+        ./fastchess match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
+          -games 50 -tc 1+0.1 -concurrency 1 -openings 8moves_v3.pgn > tournament_1_01.txt
+
+        # 2+0.1 Tournament
+        ./fastchess match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
+          -games 50 -tc 2+0.1 -concurrency 1 -openings 8moves_v3.pgn > tournament_2_01.txt
+
+        # 5+0 Tournament
+        ./fastchess match -engine cmd=./stable-rudim/Rudim -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim \
+          -games 50 -tc 5 -concurrency 1 -openings 8moves_v3.pgn > tournament_5_0.txt
+
+        echo "### Tournament Results" >> $GITHUB_STEP_SUMMARY
+        echo "#### Time Control: 1+0.1" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        cat tournament_1_01.txt >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+        echo "#### Time Control: 2+0.1" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        cat tournament_2_01.txt >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+        echo "#### Time Control: 5+0" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        cat tournament_5_0.txt >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
