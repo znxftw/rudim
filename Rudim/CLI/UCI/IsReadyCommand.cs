@@ -1,13 +1,8 @@
 ﻿namespace Rudim.CLI.UCI
 {
-    internal class IsReadyCommand : IUciCommand
+    internal class IsReadyCommand(UciClient uciClient) : IUciCommand
     {
-        private UciClient _uciClient;
-
-        public IsReadyCommand(UciClient uciClient)
-        {
-            _uciClient = uciClient;
-        }
+        private UciClient _uciClient = uciClient;
 
         public void Run(string[] parameters)
         {

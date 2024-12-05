@@ -3,18 +3,11 @@ using Rudim.Search;
 
 namespace Rudim.CLI.UCI
 {
-    internal class UciNewGameCommand : IUciCommand
+    internal class UciNewGameCommand(UciClient uciClient) : IUciCommand
     {
-        private readonly UciClient _uciClient;
-
-        public UciNewGameCommand(UciClient uciClient)
-        {
-            _uciClient = uciClient;
-        }
-
         public void Run(string[] parameters)
         {
-            _uciClient.Board = BoardState.Default();
+            uciClient.Board = BoardState.Default();
             MoveOrdering.ResetKillerMoves();
         }
     }

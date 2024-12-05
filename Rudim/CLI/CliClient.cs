@@ -45,7 +45,6 @@ namespace Rudim.CLI
         public static void WriteLine(string message)
         {
             Console.WriteLine(message);
-            // Write to stderr instead if error message flag?
         }
     }
 }

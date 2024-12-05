@@ -5,15 +5,8 @@ using System.Linq;
 
 namespace Rudim.CLI.UCI
 {
-    internal class PositionCommand : IUciCommand
+    internal class PositionCommand(UciClient uciClient) : IUciCommand
     {
-        private readonly UciClient _uciClient;
-
-        public PositionCommand(UciClient uciClient)
-        {
-            _uciClient = uciClient;
-        }
-
         public void Run(string[] parameters)
         {
             var position = parameters[0];
@@ -35,13 +28,13 @@ namespace Rudim.CLI.UCI
 
         private void ParseFen(string fen, IList<string> moves)
         {
-            _uciClient.Board = BoardState.ParseFEN(fen);
+            uciClient.Board = BoardState.ParseFEN(fen);
             ParseMoves(moves);
         }
 
         private void ParseStartPos(IList<string> moves)
         {
-            _uciClient.Board = BoardState.Default();
+            uciClient.Board = BoardState.Default();
             ParseMoves(moves);
         }
 
@@ -57,14 +50,14 @@ namespace Rudim.CLI.UCI
                     CliClient.WriteLine("Invalid Move");
                     return;
                 }
-                _uciClient.Board.MakeMove(move);
+                uciClient.Board.MakeMove(move);
             }
         }
 
         private Move FindMoveFromMoveList(Move move)
         {
-            _uciClient.Board.GenerateMoves();
-            var moves = _uciClient.Board.Moves;
+            uciClient.Board.GenerateMoves();
+            var moves = uciClient.Board.Moves;
             for (var i = 0; i < moves.Count; ++i)
             {
                 if (moves[i].Source == move.Source && moves[i].Target == move.Target)
