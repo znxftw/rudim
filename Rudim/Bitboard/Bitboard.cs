@@ -8,11 +8,6 @@ namespace Rudim
     {
         public ulong Board { get; private set; } = board;
 
-        public Bitboard CreateCopy()
-        {
-            return new(Board);
-        }
-
         public int GetBit(Square square)
         {
             return GetBit((int)square);

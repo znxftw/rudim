@@ -47,7 +47,7 @@ namespace Rudim.Board
 
         private void GenerateQueenMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Queen].CreateCopy();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Queen];
             while (bitboard.Board > 0)
             {
                 var source = bitboard.GetLsb();
@@ -74,7 +74,7 @@ namespace Rudim.Board
 
         private void GenerateRookMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Rook].CreateCopy();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Rook];
             while (bitboard.Board > 0)
             {
                 var source = bitboard.GetLsb();
@@ -101,7 +101,7 @@ namespace Rudim.Board
 
         private void GenerateKnightMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Knight].CreateCopy();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Knight];
             while (bitboard.Board > 0)
             {
                 var source = bitboard.GetLsb();
@@ -128,7 +128,7 @@ namespace Rudim.Board
 
         private void GenerateBishopMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Bishop].CreateCopy();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Bishop];
             while (bitboard.Board > 0)
             {
                 var source = bitboard.GetLsb();
@@ -155,7 +155,7 @@ namespace Rudim.Board
 
         private void GeneratePawnMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Pawn].CreateCopy();
+            var bitboard = Pieces[(int)SideToMove, (int)Piece.Pawn];
             while (bitboard.Board > 0)
             {
                 var source = bitboard.GetLsb();
