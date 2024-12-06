@@ -43,9 +43,7 @@ namespace Rudim.Search
                     boardState.UnmakeMove(move);
                     continue;
                 }
-                int score = 0;
-                
-                score = -Search(boardState, -beta, -alpha, cancellationToken);
+                var score = -Search(boardState, -beta, -alpha, cancellationToken);
                 boardState.UnmakeMove(move);
 
                 if (score >= beta)
