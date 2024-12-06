@@ -6,7 +6,7 @@ namespace Rudim.Board
     public partial class BoardState
     {
         private static readonly Dictionary<ulong, string> CommonStateNames = new();
-        private static SavedState[] _savedStates = new SavedState[2048];
+        private static readonly SavedState[] SavedStates = new SavedState[4096];
         private static int _currentState = 0;
 
 
@@ -15,6 +15,8 @@ namespace Rudim.Board
             public Piece CapturedPiece { get; set; }
             public Square EnPassantSquare { get; set; }
             public Castle CastlingRights { get; internal set; }
+            public ulong BoardHash { get; set; }
+            public int LastDrawKiller { get; set; }
         }
 
 
@@ -28,19 +30,21 @@ namespace Rudim.Board
             CommonStateNames[Zobrist.GetBoardHash(ParseFEN(Helpers.AdvancedMoveFEN))] = "Advanced Move State";
         }
 
-        private void SaveState(Piece capturedPiece, Square enPassant, Castle originalCastlingRights)
+        private void SaveState(Piece capturedPiece, Square enPassant, Castle originalCastlingRights, ulong boardHash, int lastDrawKiller)
         {
-            _savedStates[_currentState++] = new SavedState
+            SavedStates[_currentState++] = new SavedState
             {
                 CapturedPiece = capturedPiece,
                 EnPassantSquare = enPassant,
-                CastlingRights = originalCastlingRights
+                CastlingRights = originalCastlingRights,
+                BoardHash = boardHash,
+                LastDrawKiller = lastDrawKiller
             };
         }
 
         private SavedState RestoreState()
         {
-            return _savedStates[--_currentState];
+            return SavedStates[--_currentState];
         }
 
         public static void ClearSavedStates()

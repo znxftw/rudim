@@ -11,6 +11,9 @@ namespace Rudim.Search
         {
             Nodes++;
 
+            if (boardState.IsRepetition())
+                return 0;
+
             var eval = SimpleEvaluation.Evaluate(boardState);
 
             if (eval >= beta)
@@ -19,7 +22,6 @@ namespace Rudim.Search
                 alpha = eval;
 
             boardState.GenerateMoves();
-            // TODO : Flag in GenerateMoves to avoid extra iteration?
             foreach (var move in boardState.Moves)
             {
                 MoveOrdering.PopulateMoveScore(move, boardState);
