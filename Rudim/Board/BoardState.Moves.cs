@@ -38,10 +38,9 @@ namespace Rudim.Board
 
             GenerateCastleMoves();
         }
-
-        public Move FindBestMove(int depth, CancellationToken cancellationToken)
+        public Move FindBestMove(int depth, CancellationToken cancellationToken, ref bool debugMode)
         {
-            IterativeDeepening.Search(this, depth, cancellationToken);
+            IterativeDeepening.Search(this, depth, cancellationToken, ref debugMode);
             return IterativeDeepening.BestMove;
         }
 

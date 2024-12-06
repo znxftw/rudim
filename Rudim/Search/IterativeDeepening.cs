@@ -13,7 +13,7 @@ namespace Rudim.Search
         private static int Score;
         private static int Nodes;
 
-        public static void Search(BoardState boardState, int depth, CancellationToken cancellationToken)
+        public static void Search(BoardState boardState, int depth, CancellationToken cancellationToken, ref bool debugMode)
         {
             var timer = new Stopwatch();
             BestMove = Move.NoMove;
@@ -23,7 +23,6 @@ namespace Rudim.Search
             {
                 timer.Restart();
 
-                BoardState.ClearSavedStates();
                 Score = Negamax.Search(boardState, i, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested)
@@ -37,7 +36,10 @@ namespace Rudim.Search
                 double time = Math.Max(timer.ElapsedMilliseconds, 1);
                 var nps = (int)(Nodes / time * 1000);
 
-                CliClient.WriteLine($"info depth {i} score cp {Score} nodes {nodesTraversed} time {time} nps {nps}"); // TODO : Refactor
+                if (debugMode)
+                {
+                    CliClient.WriteLine($"info depth {i} score cp {Score} nodes {nodesTraversed} time {time} nps {nps}");
+                }
             }
         }
     }

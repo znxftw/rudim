@@ -9,6 +9,9 @@ namespace Rudim.CLI.UCI
     {
         private readonly Dictionary<string, IUciCommand> _commands;
         public BoardState Board;
+        private bool _debugMode;
+        public ref bool DebugMode => ref _debugMode;
+
         public UciClient()
         {
             var goCommand = new GoCommand(this);
@@ -18,7 +21,8 @@ namespace Rudim.CLI.UCI
                 ["position"] = new PositionCommand(this),
                 ["go"] = goCommand,
                 ["stop"] = new StopCommand(goCommand),
-                ["ucinewgame"] = new UciNewGameCommand(this)
+                ["ucinewgame"] = new UciNewGameCommand(this),
+                ["debug"] = new DebugCommand(this)
             };
             Board = BoardState.Default();
         }

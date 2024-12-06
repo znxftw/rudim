@@ -31,7 +31,8 @@ namespace Rudim
         [ArgumentsSource(nameof(GenerateBenchmarks))]
         public void BenchmarkBestMove(BoardState boardState, int depth, CancellationToken cancellationToken)
         {
-            boardState.FindBestMove(depth, cancellationToken);
+            bool debugMode = false;
+            boardState.FindBestMove(depth, cancellationToken, ref debugMode);
         }
 
         public IEnumerable<object[]> GenerateBenchmarks()

@@ -59,11 +59,11 @@ namespace Rudim.CLI.UCI
             {
                 if (allottedTime == -1)
                 {
-                    _bestMove = await Task.Run(() => uciClient.Board.FindBestMove(depth, _currentSearch.Token));
+                    _bestMove = await Task.Run(() => uciClient.Board.FindBestMove(depth, _currentSearch.Token, ref uciClient.DebugMode));
                 }
                 else
                 {
-                    var searchTask = Task.Run(() => uciClient.Board.FindBestMove(Constants.MaxSearchDepth, _currentSearch.Token));
+                    var searchTask = Task.Run(() => uciClient.Board.FindBestMove(Constants.MaxSearchDepth, _currentSearch.Token, ref uciClient.DebugMode));
                     var timeoutTask = Task.Delay(allottedTime);
 
                     if (await Task.WhenAny(searchTask, timeoutTask) == timeoutTask)
