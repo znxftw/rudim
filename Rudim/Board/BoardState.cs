@@ -19,7 +19,6 @@ namespace Rudim.Board
             MoveCount = 0;
             for (var square = 0; square < Constants.Squares; ++square)
                 PieceMapping[square] = Piece.None;
-            BoardHash = 0;
             MoveHistory = new ulong[4096];
         }
 
@@ -29,7 +28,6 @@ namespace Rudim.Board
         }
 
         private ulong BoardHash { get; set; }
-
         public Bitboard[,] Pieces { get; }
         public Bitboard[] Occupancies { get; }
         public Piece[] PieceMapping { get; set; }
@@ -80,8 +78,8 @@ namespace Rudim.Board
         }
         public void MakeMove(Move move)
         {
-            ulong boardHash = BoardHash;
             var capturedPiece = Piece.None;
+            var originalBoardHash = BoardHash;
             var originalEnPassantSquare = EnPassantSquare;
             var originalCastlingRights = Castle;
             
@@ -95,12 +93,7 @@ namespace Rudim.Board
 
             if (move.IsCapture())
             {
-                Square targetSquare = move.Type == MoveTypes.EnPassant ? EnPassantSquareFor(move) : move.Target;
-
-                BoardHash ^= Zobrist.ZobristTable[GetPieceOn(targetSquare), (int)targetSquare];
-                LastDrawKiller = MoveCount;
-
-                capturedPiece = RemovePiece(targetSquare);
+                capturedPiece = HandleCapture(move);
             }
 
             if (move.IsPromotion())
@@ -110,21 +103,7 @@ namespace Rudim.Board
 
             if (move.IsCastle())
             {
-                switch (move.Target)
-                {
-                    case Square.c1:
-                        MoveRookFrom(Square.a1, Square.d1, SideToMove);
-                        break;
-                    case Square.g1:
-                        MoveRookFrom(Square.h1, Square.f1, SideToMove);
-                        break;
-                    case Square.c8:
-                        MoveRookFrom(Square.a8, Square.d8, SideToMove);
-                        break;
-                    case Square.g8:
-                        MoveRookFrom(Square.h8, Square.f8, SideToMove);
-                        break;
-                }
+                HandleCastle(move);
             }
 
             AddPiece(move.Target, SideToMove, movedPiece);
@@ -134,9 +113,38 @@ namespace Rudim.Board
             UpdateEnPassant(move);
             FlipSideToMove();
 
-            SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights, boardHash, LastDrawKiller);
-            MoveHistory[MoveCount++] = boardHash;
+            SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights, originalBoardHash, LastDrawKiller);
+            MoveHistory[MoveCount++] = originalBoardHash;
             Moves = new List<Move>(32);
+        }
+
+        private void HandleCastle(Move move)
+        {
+            switch (move.Target)
+            {
+                case Square.c1:
+                    MoveRookFrom(Square.a1, Square.d1, SideToMove);
+                    break;
+                case Square.g1:
+                    MoveRookFrom(Square.h1, Square.f1, SideToMove);
+                    break;
+                case Square.c8:
+                    MoveRookFrom(Square.a8, Square.d8, SideToMove);
+                    break;
+                case Square.g8:
+                    MoveRookFrom(Square.h8, Square.f8, SideToMove);
+                    break;
+            }
+        }
+
+        private Piece HandleCapture(Move move)
+        {
+            Square targetSquare = move.Type == MoveTypes.EnPassant ? EnPassantSquareFor(move) : move.Target;
+
+            BoardHash ^= Zobrist.ZobristTable[GetPieceOn(targetSquare), (int)targetSquare];
+            LastDrawKiller = MoveCount;
+
+            return RemovePiece(targetSquare);
         }
 
         private void FlipSideToMove()
