@@ -6,7 +6,7 @@ namespace Rudim.Board
     public partial class BoardState
     {
         private static readonly Dictionary<ulong, string> CommonStateNames = new();
-        private static SavedState[] _savedStates = new SavedState[2048];
+        private static readonly SavedState[] SavedStates = new SavedState[4096];
         private static int _currentState = 0;
 
 
@@ -32,7 +32,7 @@ namespace Rudim.Board
 
         private void SaveState(Piece capturedPiece, Square enPassant, Castle originalCastlingRights, ulong boardHash, int lastDrawKiller)
         {
-            _savedStates[_currentState++] = new SavedState
+            SavedStates[_currentState++] = new SavedState
             {
                 CapturedPiece = capturedPiece,
                 EnPassantSquare = enPassant,
@@ -44,7 +44,7 @@ namespace Rudim.Board
 
         private SavedState RestoreState()
         {
-            return _savedStates[--_currentState];
+            return SavedStates[--_currentState];
         }
 
         public static void ClearSavedStates()
