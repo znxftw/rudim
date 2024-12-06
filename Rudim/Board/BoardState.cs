@@ -19,7 +19,8 @@ namespace Rudim.Board
             MoveCount = 0;
             for (var square = 0; square < Constants.Squares; ++square)
                 PieceMapping[square] = Piece.None;
-            BoardHash = Zobrist.GetBoardHash(this);
+            BoardHash = 0;
+            MoveHistory = new ulong[4096];
         }
 
         public static BoardState Default()
@@ -36,7 +37,8 @@ namespace Rudim.Board
         public Square EnPassantSquare { get; private set; }
         public Castle Castle { get; private set; }
         public List<Move> Moves { get; set; }
-        public List<ulong> DrawHistory { get; set; }
+        public static ulong[] MoveHistory { get; set; }
+        private int LastDrawKiller { get; set; }
         public int MoveCount { get; set; }
 
         private void AddPiece(Square square, Side side, Piece piece)
@@ -78,18 +80,25 @@ namespace Rudim.Board
         }
         public void MakeMove(Move move)
         {
+            ulong boardHash = BoardHash;
+            BoardHash ^= Zobrist.ZobristTable[GetPieceOn(move.Source), (int)move.Source];
+            
             var movedPiece = RemovePiece(move.Source);
             var capturedPiece = Piece.None;
             var originalEnPassantSquare = EnPassantSquare;
             var originalCastlingRights = Castle;
-            var resetHistory = movedPiece == Piece.Pawn;
-            ulong boardHash = BoardHash;
-
+            if(movedPiece == Piece.Pawn)
+                LastDrawKiller = MoveCount;
+            
 
             if (move.IsCapture())
             {
-                capturedPiece = RemovePiece(move.Type == MoveTypes.EnPassant ? EnPassantSquareFor(move) : move.Target);
-                resetHistory = true;
+                Square targetSquare = move.Type == MoveTypes.EnPassant ? EnPassantSquareFor(move) : move.Target;
+
+                BoardHash ^= Zobrist.ZobristTable[GetPieceOn(targetSquare), (int)targetSquare];
+                LastDrawKiller = MoveCount;
+
+                capturedPiece = RemovePiece(targetSquare);
             }
 
             if (move.IsPromotion())
@@ -103,45 +112,50 @@ namespace Rudim.Board
                 switch (move.Target)
                 {
                     case Square.c1:
-                        RemovePiece(Square.a1);
-                        AddPiece(Square.d1, SideToMove, Piece.Rook);
+                        MoveRookFrom(Square.a1, Square.d1, SideToMove);
                         break;
                     case Square.g1:
-                        RemovePiece(Square.h1);
-                        AddPiece(Square.f1, SideToMove, Piece.Rook);
+                        MoveRookFrom(Square.h1, Square.f1, SideToMove);
                         break;
                     case Square.c8:
-                        RemovePiece(Square.a8);
-                        AddPiece(Square.d8, SideToMove, Piece.Rook);
+                        MoveRookFrom(Square.a8, Square.d8, SideToMove);
                         break;
                     case Square.g8:
-                        RemovePiece(Square.h8);
-                        AddPiece(Square.f8, SideToMove, Piece.Rook);
+                        MoveRookFrom(Square.h8, Square.f8, SideToMove);
                         break;
                     default: throw new ArgumentOutOfRangeException(nameof(move.Target));
                 }
             }
 
             AddPiece(move.Target, SideToMove, movedPiece);
+            BoardHash ^= Zobrist.ZobristTable[GetPieceOn(move.Target), (int)move.Target];
 
+            BoardHash ^= Zobrist.ZobristTable[13, (int)Castle];
             Castle &= (Castle)CastlingConstants[(int)move.Source];
             Castle &= (Castle)CastlingConstants[(int)move.Target];
+            BoardHash ^= Zobrist.ZobristTable[13, (int)Castle];
+
+            BoardHash = Zobrist.HashEnPassant(this, BoardHash);
             EnPassantSquare = move.Type == MoveTypes.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
+            BoardHash = Zobrist.HashEnPassant(this, BoardHash);
+
+            BoardHash = Zobrist.FlipSideToMoveHashes(this, BoardHash);
             SideToMove = SideToMove.Other();
 
-            SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights);
-            MoveCount++;
+            SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights, boardHash, LastDrawKiller);
 
             Moves = new List<Move>(32);
-            if (resetHistory)
-            {
-                DrawHistory = [];
-            }
-            else
-            {
-                DrawHistory.Add(boardHash);
-            }
-            BoardHash = Zobrist.GetBoardHash(this);
+            MoveHistory[MoveCount++] = boardHash;
+        }
+
+        private void MoveRookFrom(Square source, Square target, Side sideToMove)
+        {
+            RemovePiece(source);
+            AddPiece(target, sideToMove, Piece.Rook);
+            
+            int rookIndex = (int)Piece.Rook + SideToMove == Side.White ? 0 : 6;
+            BoardHash ^= Zobrist.ZobristTable[rookIndex, (int)source];
+            BoardHash ^= Zobrist.ZobristTable[rookIndex, (int)target];
         }
 
 
@@ -189,19 +203,17 @@ namespace Rudim.Board
             }
 
             AddPiece(move.Source, SideToMove, move.IsPromotion() ? Piece.Pawn : movedPiece);
-
+            LastDrawKiller = state.LastDrawKiller;
+            BoardHash = state.BoardHash;
             Castle = state.CastlingRights;
             EnPassantSquare = state.EnPassantSquare;
             MoveCount--;
-            BoardHash = Zobrist.GetBoardHash(this);
         }
         private Square EnPassantSquareFor(Move move)
         {
             return move.Target + 8 * (SideToMove == Side.Black ? -1 : 1);
         }
 
-
-        private const string AsciiPieces = "PNBRQK-";
 
         private static readonly int[] CastlingConstants =
         {
@@ -277,11 +289,20 @@ namespace Rudim.Board
             return CommonStateNames.TryGetValue(boardHash, out var commonName) ? commonName : boardHash.ToString();
         }
 
-        public bool IsDraw()
+        public bool IsRepetition()
         {
-            if (DrawHistory.Count > 99) return true;
+            if (MoveCount - LastDrawKiller > 99) return true;
+            bool found = false;
+            for (int i = LastDrawKiller + 1; i < MoveCount; ++i)
+            {
+                if (MoveHistory[i] == BoardHash)
+                {
+                    if (!found) found = true;
+                    else return true;
+                }
+            }
 
-            return DrawHistory.Count(e => e == BoardHash) >= 2;
+            return false;
         }
     }
 }

@@ -12,6 +12,9 @@ namespace Rudim.Search
 
         private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
         {
+            if (boardState.IsRepetition())
+                return 0;
+            
             if (depth == 0)
                 return Quiescent.Search(boardState, alpha, beta, cancellationToken);
 
@@ -43,8 +46,7 @@ namespace Rudim.Search
 
                 int score = 0;
                 
-                if(!boardState.IsDraw())
-                    score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+                score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
                 boardState.UnmakeMove(move);
                 numberOfLegalMoves++;
                 if (score >= beta)

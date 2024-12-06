@@ -15,7 +15,8 @@ namespace Rudim.Board
             public Piece CapturedPiece { get; set; }
             public Square EnPassantSquare { get; set; }
             public Castle CastlingRights { get; internal set; }
-            public List<ulong> SavedDrawHistory { get; set; }
+            public ulong BoardHash { get; set; }
+            public int LastDrawKiller { get; set; }
         }
 
 
@@ -29,14 +30,15 @@ namespace Rudim.Board
             CommonStateNames[Zobrist.GetBoardHash(ParseFEN(Helpers.AdvancedMoveFEN))] = "Advanced Move State";
         }
 
-        private void SaveState(Piece capturedPiece, Square enPassant, Castle originalCastlingRights)
+        private void SaveState(Piece capturedPiece, Square enPassant, Castle originalCastlingRights, ulong boardHash, int lastDrawKiller)
         {
             _savedStates[_currentState++] = new SavedState
             {
                 CapturedPiece = capturedPiece,
                 EnPassantSquare = enPassant,
                 CastlingRights = originalCastlingRights,
-                SavedDrawHistory = DrawHistory
+                BoardHash = boardHash,
+                LastDrawKiller = lastDrawKiller
             };
         }
 

@@ -11,6 +11,9 @@ namespace Rudim.Search
         {
             Nodes++;
 
+            if (boardState.IsRepetition())
+                return 0;
+
             var eval = SimpleEvaluation.Evaluate(boardState);
 
             if (eval >= beta)
@@ -42,8 +45,7 @@ namespace Rudim.Search
                 }
                 int score = 0;
                 
-                if(!boardState.IsDraw())
-                    score = -Search(boardState, -beta, -alpha, cancellationToken);
+                score = -Search(boardState, -beta, -alpha, cancellationToken);
                 boardState.UnmakeMove(move);
 
                 if (score >= beta)

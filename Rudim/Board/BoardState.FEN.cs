@@ -14,6 +14,7 @@ namespace Rudim.Board
             ParseCastling(board, sections[2]);
             ParseEnPassant(board, sections[3]);
             // ParsePly(board, sections[4]);
+            board.BoardHash = Zobrist.GetBoardHash(board);
             return board;
         }
 

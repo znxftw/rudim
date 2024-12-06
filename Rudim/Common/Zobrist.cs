@@ -4,7 +4,7 @@ namespace Rudim.Common
 {
     public static class Zobrist
     {
-        private static readonly ulong[,] ZobristTable;
+        public static readonly ulong[,] ZobristTable;
 
         static Zobrist()
         {
@@ -42,13 +42,31 @@ namespace Rudim.Common
                 }
             }
 
+            currentHash = HashSideToMove(boardState, currentHash);
+            
+            // TODO : Is this right?
+            currentHash ^= ZobristTable[13, (int)boardState.Castle];
+
+            currentHash = HashEnPassant(boardState, currentHash);
+
+            return currentHash;
+        }
+
+        private static ulong HashSideToMove(BoardState boardState, ulong currentHash)
+        {
             currentHash ^= boardState.SideToMove == Side.White ? ZobristTable[13, 0] : ZobristTable[13, 1];
+            return currentHash;
+        }
+        
+        public static ulong FlipSideToMoveHashes(BoardState boardState, ulong currentHash)
+        {
+            currentHash ^= ZobristTable[13, 0];
+            currentHash ^= ZobristTable[13, 1];
+            return currentHash;
+        }
 
-            currentHash ^= boardState.Castle.HasFlag(Castle.WhiteLong) ? ZobristTable[13, 2] : 0;
-            currentHash ^= boardState.Castle.HasFlag(Castle.BlackShort) ? ZobristTable[13, 3] : 0;
-            currentHash ^= boardState.Castle.HasFlag(Castle.BlackLong) ? ZobristTable[13, 4] : 0;
-            currentHash ^= boardState.Castle.HasFlag(Castle.WhiteShort) ? ZobristTable[13, 5] : 0;
-
+        public static ulong HashEnPassant(BoardState boardState, ulong currentHash)
+        {
             if (boardState.EnPassantSquare != Square.NoSquare)
             {
                 currentHash ^= ZobristTable[12, (int)boardState.EnPassantSquare];
