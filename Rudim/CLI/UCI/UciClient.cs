@@ -9,7 +9,7 @@ namespace Rudim.CLI.UCI
     {
         private readonly Dictionary<string, IUciCommand> _commands;
         public BoardState Board;
-        private bool _debugMode;
+        private bool _debugMode = true;
         public ref bool DebugMode => ref _debugMode;
 
         public UciClient()
