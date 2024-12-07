@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Rudim.Search
 {
-    static class Negamax
+    public static class Negamax
     {
         public static Move BestMove;
         public static int Nodes = 0;
@@ -12,19 +12,30 @@ namespace Rudim.Search
 
         private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
         {
+            var ply = _searchDepth - depth;
+            var originalAlpha = alpha;
+            var entryType = TranspositionEntryType.Alpha;
+            
+            var (hasValue, ttScore, bestEvaluation) = TranspositionTable.GetEntry(boardState.BoardHash, alpha, beta, depth);
+            if (hasValue)
+            {
+                BestMove = bestEvaluation;
+                return ttScore;
+            }
+            
             if (boardState.IsRepetition())
                 return 0;
-            
+
             if (depth == 0)
-                return Quiescent.Search(boardState, alpha, beta, cancellationToken);
+            {
+                int eval = Quiescent.Search(boardState, alpha, beta, cancellationToken);
+                TranspositionTable.SubmitEntry(boardState.BoardHash, eval, depth, BestMove, TranspositionEntryType.Exact);
+                return eval;
+            }
 
             Nodes++;
-            var originalAlpha = alpha;
-            Move bestEvaluation = null;
 
             boardState.GenerateMoves();
-            var ply = _searchDepth - depth;
-            // TODO : Flag in GenerateMoves to avoid extra iteration?
             foreach (var move in boardState.Moves)
             {
                 MoveOrdering.PopulateMoveScore(move, boardState, ply);
@@ -50,12 +61,14 @@ namespace Rudim.Search
                 {
                     if (!move.IsCapture())
                         MoveOrdering.AddKillerMove(move, ply);
+                    TranspositionTable.SubmitEntry(boardState.BoardHash, beta, depth, BestMove, TranspositionEntryType.Beta);
                     return beta;
                 }
                 if (score > alpha)
                 {
                     alpha = score;
                     bestEvaluation = move;
+                    entryType = TranspositionEntryType.Exact;
                 }
             }
 
@@ -68,7 +81,9 @@ namespace Rudim.Search
 
             if (alpha != originalAlpha)
                 BestMove = bestEvaluation;
-
+            
+            TranspositionTable.SubmitEntry(boardState.BoardHash, alpha, depth, BestMove, entryType);
+            
             return alpha;
         }
 

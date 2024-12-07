@@ -19,6 +19,7 @@ namespace Rudim.Search
             BestMove = Move.NoMove;
             Score = 0;
             Nodes = 0;
+            TranspositionTable.ClearTable();
             for (int i = 1; i <= depth; ++i)
             {
                 timer.Restart();

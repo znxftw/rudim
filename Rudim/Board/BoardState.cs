@@ -27,7 +27,7 @@ namespace Rudim.Board
             return ParseFEN(Helpers.StartingFEN);
         }
 
-        private ulong BoardHash { get; set; }
+        public ulong BoardHash { get; set; }
         public Bitboard[,] Pieces { get; }
         public Bitboard[] Occupancies { get; }
         public Piece[] PieceMapping { get; set; }
