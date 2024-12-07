@@ -173,7 +173,7 @@ namespace Rudim.Board
             RemovePiece(source);
             AddPiece(target, sideToMove, Piece.Rook);
             
-            int rookIndex = (int)Piece.Rook + SideToMove == Side.White ? 0 : 6;
+            int rookIndex = GetPieceOn(target);
             BoardHash ^= Zobrist.ZobristTable[rookIndex, (int)source];
             BoardHash ^= Zobrist.ZobristTable[rookIndex, (int)target];
         }
