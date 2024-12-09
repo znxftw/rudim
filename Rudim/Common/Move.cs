@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Rudim.Common
 {
-    public struct Move(Square source, Square target, MoveType type) : IEquatable<Move>
+    public class Move(Square source, Square target, MoveType type) : IEquatable<Move>
     {
         public Square Source { get; init; } = source;
         public Square Target { get; init; } = target;
@@ -60,9 +60,15 @@ namespace Rudim.Common
             return square;
         }
 
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Move);
+        }
+
         public bool Equals(Move other)
         {
-            return Source == other.Source &&
+            return other != null &&
+                   Source == other.Source &&
                    Target == other.Target &&
                    EqualityComparer<MoveType>.Default.Equals(Type, other.Type);
         }
@@ -80,11 +86,6 @@ namespace Rudim.Common
         public static bool operator !=(Move left, Move right)
         {
             return !(left == right);
-        }
-        
-        public override bool Equals(object obj)
-        {
-            return obj is Move other && Equals(other);
         }
     }
 }
