@@ -20,7 +20,7 @@ namespace Rudim.Search
 
             Nodes++;
             var originalAlpha = alpha;
-            Move bestEvaluation = null;
+            Move bestEvaluation = Move.NoMove;
 
             boardState.GenerateMoves();
             var ply = _searchDepth - depth;
