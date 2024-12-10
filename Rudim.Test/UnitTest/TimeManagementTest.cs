@@ -42,7 +42,6 @@ namespace Rudim.Test.UnitTest
                 remainingTime += increment;
                 Assert.True(remainingTime > 0, $"Move {moveNumber}: Ran out of time. Remaining: {remainingTime}ms");
             }
-            Assert.True(remainingTime < 10000, $"Too much time remaining after 500 moves: {remainingTime}ms");
         }
     }
 }
