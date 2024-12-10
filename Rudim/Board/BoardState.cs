@@ -19,7 +19,6 @@ namespace Rudim.Board
             MoveCount = 0;
             for (var square = 0; square < Constants.Squares; ++square)
                 PieceMapping[square] = Piece.None;
-            MoveHistory = new ulong[4096];
         }
 
         public static BoardState Default()
@@ -35,7 +34,6 @@ namespace Rudim.Board
         public Square EnPassantSquare { get; private set; }
         public Castle Castle { get; private set; }
         public List<Move> Moves { get; set; }
-        public static ulong[] MoveHistory { get; set; }
         private int LastDrawKiller { get; set; }
         public int MoveCount { get; set; }
 
@@ -114,9 +112,9 @@ namespace Rudim.Board
             UpdateEnPassant(move);
             FlipSideToMove();
 
-            SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights, originalBoardHash, originalLastDrawKiller);
-            MoveHistory[MoveCount++] = originalBoardHash;
+            History.SaveBoardHistory(capturedPiece, originalEnPassantSquare, originalCastlingRights, originalBoardHash, originalLastDrawKiller);
             Moves = new List<Move>(32);
+            MoveCount++;
         }
 
         private void HandleCastle(Move move)
@@ -188,12 +186,12 @@ namespace Rudim.Board
 
         public void UnmakeMove(Move move)
         {
-            SavedState state = RestoreState();
+            var (capturedPiece, enPassantSquare, castlingRights, boardHash, lastDrawKiller) = History.RestoreBoardHistory();
 
             var movedPiece = RemovePiece(move.Target);
             SideToMove = SideToMove.Other();
 
-            if (state.CapturedPiece != Piece.None)
+            if (capturedPiece != Piece.None)
             {
                 if (move.Type == MoveTypes.EnPassant)
                 {
@@ -201,7 +199,7 @@ namespace Rudim.Board
                 }
                 else
                 {
-                    AddPiece(move.Target, SideToMove.Other(), state.CapturedPiece);
+                    AddPiece(move.Target, SideToMove.Other(), capturedPiece);
                 }
             }
 
@@ -230,10 +228,10 @@ namespace Rudim.Board
             }
 
             AddPiece(move.Source, SideToMove, move.IsPromotion() ? Piece.Pawn : movedPiece);
-            LastDrawKiller = state.LastDrawKiller;
-            BoardHash = state.BoardHash;
-            Castle = state.CastlingRights;
-            EnPassantSquare = state.EnPassantSquare;
+            LastDrawKiller = lastDrawKiller;
+            BoardHash = boardHash;
+            Castle = castlingRights;
+            EnPassantSquare = enPassantSquare;
             MoveCount--;
         }
         private Square EnPassantSquareFor(Move move)
@@ -320,16 +318,7 @@ namespace Rudim.Board
         {
             if (MoveCount - LastDrawKiller > 100) return true;
             if (MoveCount - LastDrawKiller <= 7) return false;
-            bool found = false;
-            for (int i = LastDrawKiller; i < MoveCount; ++i)
-            {
-                if (MoveHistory[i] == BoardHash)
-                {
-                    if (!found) found = true;
-                    else return true;
-                }
-            }
-            return false;
+            return History.HasHashAppearedTwice(BoardHash, LastDrawKiller);
         }
     }
 }

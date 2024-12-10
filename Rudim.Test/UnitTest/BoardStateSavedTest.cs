@@ -10,7 +10,7 @@ namespace Rudim.Test
         [Fact]
         public void ShouldSaveAndRestoreBoardState()
         {
-            BoardState.ClearSavedStates();
+            History.ClearBoardHistory();
             var originalState = BoardState.ParseFEN(Helpers.StartingFEN);
             var boardState = BoardState.ParseFEN(Helpers.StartingFEN);
             var move = new Move(Square.e2, Square.e4, MoveTypes.Quiet);
@@ -22,7 +22,7 @@ namespace Rudim.Test
             boardState.UnmakeMove(move);
 
             Assert.Equal(boardState, originalState);
-            BoardState.ClearSavedStates();
+            History.ClearBoardHistory();
         }
     }
 }

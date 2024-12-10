@@ -40,7 +40,7 @@ namespace Rudim.Test.Perft
         {
             var timer = new Stopwatch();
 
-            BoardState.ClearSavedStates();
+            History.ClearBoardHistory();
 
             timer.Start();
 
@@ -51,7 +51,7 @@ namespace Rudim.Test.Perft
             timer.Stop();
             Assert.Equal(nodes, PerftDriver.Nodes);
 
-            BoardState.ClearSavedStates();
+            History.ClearBoardHistory();
             output.WriteLine($"Execution Time: {timer.ElapsedMilliseconds} ms");
         }
 
