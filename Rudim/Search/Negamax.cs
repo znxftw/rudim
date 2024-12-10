@@ -14,7 +14,7 @@ namespace Rudim.Search
         {
             if (boardState.IsRepetition())
                 return 0;
-            
+
             if (depth == 0)
                 return Quiescent.Search(boardState, alpha, beta, cancellationToken);
 
@@ -78,7 +78,13 @@ namespace Rudim.Search
             Nodes = 0;
             BestMove = Move.NoMove;
             Quiescent.ResetNodes();
-            return Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
+            var score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
+            if(BestMove == Move.NoMove)
+            {
+                boardState.GenerateMoves();
+                BestMove = boardState.Moves[0];
+            }
+            return score;
         }
     }
 }
