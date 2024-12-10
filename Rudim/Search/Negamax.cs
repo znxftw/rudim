@@ -12,7 +12,7 @@ namespace Rudim.Search
 
         private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
         {
-            if (boardState.IsRepetition())
+            if (boardState.IsDraw())
                 return 0;
 
             if (depth == 0)

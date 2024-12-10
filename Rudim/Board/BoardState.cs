@@ -316,9 +316,10 @@ namespace Rudim.Board
             return CommonStateNames.TryGetValue(boardHash, out var commonName) ? commonName : boardHash.ToString();
         }
 
-        public bool IsRepetition()
+        public bool IsDraw()
         {
-            if (MoveCount - LastDrawKiller > 99) return true;
+            if (MoveCount - LastDrawKiller > 100) return true;
+            if (MoveCount - LastDrawKiller <= 7) return false;
             bool found = false;
             for (int i = LastDrawKiller; i < MoveCount; ++i)
             {

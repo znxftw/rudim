@@ -11,7 +11,7 @@ namespace Rudim.Search
         {
             Nodes++;
 
-            if (boardState.IsRepetition())
+            if (boardState.IsDraw())
                 return 0;
 
             var eval = SimpleEvaluation.Evaluate(boardState);

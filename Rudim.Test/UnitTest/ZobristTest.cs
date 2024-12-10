@@ -1,6 +1,7 @@
 using Rudim.Board;
 using Rudim.Common;
 using Xunit;
+using Helpers = Rudim.Test.Util.Helpers;
 
 namespace Rudim.Test.UnitTest
 {
@@ -26,7 +27,7 @@ namespace Rudim.Test.UnitTest
         {
             var boardState = BoardState.ParseFEN(fen);
             boardState.GenerateMoves();
-            var move = FindMoveFromMoveList(boardState, Move.ParseLongAlgebraic(moveStr));
+            var move = Helpers.FindMoveFromMoveList(boardState, Move.ParseLongAlgebraic(moveStr));
             var originalHash = boardState.BoardHash;
 
             boardState.MakeMove(move);
@@ -37,21 +38,6 @@ namespace Rudim.Test.UnitTest
             Assert.Equal(Zobrist.GetBoardHash(boardState), boardState.BoardHash);
         }
 
-        private Move FindMoveFromMoveList(BoardState board, Move move)
-        {
-            board.GenerateMoves();
-            var moves = board.Moves;
-            for (var i = 0; i < moves.Count; ++i)
-            {
-                if (moves[i].Source == move.Source && moves[i].Target == move.Target)
-                {
-                    if (move.Type == MoveTypes.Quiet || ((byte)moves[i].Type.Value & ~8) == (byte)move.Type.Value)
-                    {
-                        return moves[i];
-                    }
-                }
-            }
-            return Move.NoMove;
-        }
+        
     }
 }
