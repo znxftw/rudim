@@ -82,6 +82,7 @@ namespace Rudim.Board
             var originalBoardHash = BoardHash;
             var originalEnPassantSquare = EnPassantSquare;
             var originalCastlingRights = Castle;
+            var originalLastDrawKiller = LastDrawKiller;
             
             BoardHash ^= Zobrist.ZobristTable[GetPieceOn(move.Source), (int)move.Source];
             var movedPiece = RemovePiece(move.Source);
@@ -113,7 +114,7 @@ namespace Rudim.Board
             UpdateEnPassant(move);
             FlipSideToMove();
 
-            SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights, originalBoardHash, LastDrawKiller);
+            SaveState(capturedPiece, originalEnPassantSquare, originalCastlingRights, originalBoardHash, originalLastDrawKiller);
             MoveHistory[MoveCount++] = originalBoardHash;
             Moves = new List<Move>(32);
         }
