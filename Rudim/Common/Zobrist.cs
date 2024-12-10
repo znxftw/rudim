@@ -14,18 +14,18 @@ namespace Rudim.Common
             {
                 for (int square = 0; square < 64; square++)
                 {
-                    ZobristTable[piece, square] = Random.NextULong() << 32 | Random.NextULong();
+                    ZobristTable[piece, square] = Random.NextULong();
                 }
             }
 
             // Both not needed?
-            ZobristTable[13, 0] = Random.NextULong() << 32 | Random.NextULong(); // White to move
-            ZobristTable[13, 1] = Random.NextULong() << 32 | Random.NextULong(); // Black to move
+            ZobristTable[13, 0] = Random.NextULong(); // White to move
+            ZobristTable[13, 1] = Random.NextULong(); // Black to move
 
-            ZobristTable[13, 2] = Random.NextULong() << 32 | Random.NextULong();
-            ZobristTable[13, 3] = Random.NextULong() << 32 | Random.NextULong();
-            ZobristTable[13, 4] = Random.NextULong() << 32 | Random.NextULong();
-            ZobristTable[13, 5] = Random.NextULong() << 32 | Random.NextULong();
+            ZobristTable[13, 2] = Random.NextULong();
+            ZobristTable[13, 3] = Random.NextULong();
+            ZobristTable[13, 4] = Random.NextULong();
+            ZobristTable[13, 5] = Random.NextULong();
         }
 
         public static ulong GetBoardHash(BoardState boardState)
@@ -44,11 +44,16 @@ namespace Rudim.Common
 
             currentHash = HashSideToMove(boardState, currentHash);
             
-            // TODO : Is this right?
-            currentHash ^= ZobristTable[13, (int)boardState.Castle];
+            currentHash = HashCastlingRights(boardState, currentHash);
 
             currentHash = HashEnPassant(boardState, currentHash);
 
+            return currentHash;
+        }
+
+        public static ulong HashCastlingRights(BoardState boardState, ulong currentHash)
+        {
+            currentHash ^= ZobristTable[13, (int)boardState.Castle];
             return currentHash;
         }
 
