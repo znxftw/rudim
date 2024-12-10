@@ -44,7 +44,7 @@ namespace Rudim.Common
 
         private static MoveType ParsePromotionType(char piece)
         {
-            return piece switch
+            return Char.ToLower(piece) switch
             {
                 'q' => MoveTypes.QueenPromotion,
                 'r' => MoveTypes.RookPromotion,
