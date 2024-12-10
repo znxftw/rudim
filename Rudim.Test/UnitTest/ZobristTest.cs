@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Rudim.Test.UnitTest
 {
+    [Collection("StateRace")]
     public class ZobristHashingTest
     {
         [Theory]
