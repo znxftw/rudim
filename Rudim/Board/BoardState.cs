@@ -27,7 +27,7 @@ namespace Rudim.Board
             return ParseFEN(Helpers.StartingFEN);
         }
 
-        private ulong BoardHash { get; set; }
+        public ulong BoardHash { get; set; }
         public Bitboard[,] Pieces { get; }
         public Bitboard[] Occupancies { get; }
         public Piece[] PieceMapping { get; set; }
@@ -155,17 +155,23 @@ namespace Rudim.Board
 
         private void UpdateEnPassant(Move move)
         {
+            var originalEnPassantSquare = EnPassantSquare;
             BoardHash = Zobrist.HashEnPassant(this, BoardHash);
             EnPassantSquare = move.Type == MoveTypes.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
             BoardHash = Zobrist.HashEnPassant(this, BoardHash);
+            if(originalEnPassantSquare != EnPassantSquare)
+                LastDrawKiller = MoveCount;
         }
 
         private void UpdateCastlingRights(Move move)
         {
-            BoardHash ^= Zobrist.ZobristTable[13, (int)Castle];
+            var originalCastlingRights = Castle;
+            BoardHash = Zobrist.HashCastlingRights(this, BoardHash);
             Castle &= (Castle)CastlingConstants[(int)move.Source];
             Castle &= (Castle)CastlingConstants[(int)move.Target];
-            BoardHash ^= Zobrist.ZobristTable[13, (int)Castle];
+            BoardHash = Zobrist.HashCastlingRights(this, BoardHash);
+            if(Castle != originalCastlingRights)
+                LastDrawKiller = MoveCount;
         }
 
         private void MoveRookFrom(Square source, Square target, Side sideToMove)
@@ -313,7 +319,7 @@ namespace Rudim.Board
         {
             if (MoveCount - LastDrawKiller > 99) return true;
             bool found = false;
-            for (int i = LastDrawKiller + 1; i < MoveCount; ++i)
+            for (int i = LastDrawKiller; i < MoveCount; ++i)
             {
                 if (MoveHistory[i] == BoardHash)
                 {
