@@ -1,7 +1,5 @@
 ﻿using Rudim.Common;
 using Rudim.Search;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace Rudim.Board

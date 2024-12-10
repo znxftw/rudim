@@ -239,20 +239,6 @@ namespace Rudim.Board
             return move.Target + 8 * (SideToMove == Side.Black ? -1 : 1);
         }
 
-
-        private static readonly int[] CastlingConstants =
-        {
-            7, 15, 15, 15, 3, 15, 15, 11,
-            15, 15, 15, 15, 15, 15, 15, 15,
-            15, 15, 15, 15, 15, 15, 15, 15,
-            15, 15, 15, 15, 15, 15, 15, 15,
-            15, 15, 15, 15, 15, 15, 15, 15,
-            15, 15, 15, 15, 15, 15, 15, 15,
-            15, 15, 15, 15, 15, 15, 15, 15,
-            13, 15, 15, 15, 12, 15, 15, 14
-        };
-
-
         public bool Equals(BoardState other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -280,32 +266,6 @@ namespace Rudim.Board
         public override int GetHashCode()
         {
             return HashCode.Combine(Pieces, Occupancies);
-        }
-
-        public static bool operator ==(BoardState left, BoardState right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(BoardState left, BoardState right)
-        {
-            return !Equals(left, right);
-        }
-
-        // This can move to an extension method
-        private static bool NullRespectingSequenceEqual<T>(IEnumerable<T> first, IEnumerable<T> second)
-        {
-            if (first == null && second == null)
-            {
-                return true;
-            }
-
-            if (first == null || second == null)
-            {
-                return false;
-            }
-
-            return first.SequenceEqual(second);
         }
 
         public override string ToString()
