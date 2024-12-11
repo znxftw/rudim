@@ -73,14 +73,6 @@ jobs:
 
     - name: Run Tournaments
       run: |
-        # 1+0.1 Tournament
+        # 5+0.1 Tournament
         ./fastchess-ubuntu-22.04 -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim name="Current Rudim" -engine cmd=./stable-rudim/Rudim name="Stable Rudim" \
-          -games 50 -each tc=1+0.1 -concurrency 4 -openings file=8moves_v3.pgn format=pgn
-
-        # 2+0.1 Tournament
-        ./fastchess-ubuntu-22.04 -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim name="Current Rudim" -engine cmd=./stable-rudim/Rudim name="Stable Rudim" \
-          -games 50 -each tc=2+0.1 -concurrency 4 -openings file=8moves_v3.pgn format=pgn
-
-        # 5+0 Tournament
-        ./fastchess-ubuntu-22.04 -engine cmd=./Rudim/bin/Release/net9.0/publish/Rudim name="Current Rudim" -engine cmd=./stable-rudim/Rudim name="Stable Rudim" \
-          -games 50 -each tc=5 -concurrency 4 -openings file=8moves_v3.pgn format=pgn
+          -games 200 -each tc=5+0.1 -concurrency 4 -openings file=8moves_v3.pgn format=pgn
