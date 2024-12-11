@@ -4,7 +4,8 @@ namespace Rudim.Board
 {
     public static class History
     {
-        private static readonly BoardHistory[] BoardHistories = new BoardHistory[4096];
+        private const int HistorySize = 4096;
+        private static readonly BoardHistory[] BoardHistories = new BoardHistory[HistorySize];
         private static int _historyIndex;
 
 
@@ -21,11 +22,9 @@ namespace Rudim.Board
             };
         }
 
-        public static (Piece, Square, Castle, ulong, int) RestoreBoardHistory()
+        public static BoardHistory RestoreBoardHistory()
         {
-            var state = BoardHistories[--_historyIndex];
-            return (state.CapturedPiece, state.EnPassantSquare, state.CastlingRights, state.BoardHash,
-                state.LastDrawKiller);
+            return BoardHistories[--_historyIndex];
         }
 
         public static void ClearBoardHistory()
@@ -33,7 +32,7 @@ namespace Rudim.Board
             _historyIndex = 0;
         }
 
-        private class BoardHistory
+        public class BoardHistory
         {
             public Piece CapturedPiece { get; set; }
             public Square EnPassantSquare { get; set; }

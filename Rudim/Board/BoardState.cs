@@ -186,12 +186,12 @@ namespace Rudim.Board
 
         public void UnmakeMove(Move move)
         {
-            var (capturedPiece, enPassantSquare, castlingRights, boardHash, lastDrawKiller) = History.RestoreBoardHistory();
+            var history = History.RestoreBoardHistory();
 
             var movedPiece = RemovePiece(move.Target);
             SideToMove = SideToMove.Other();
 
-            if (capturedPiece != Piece.None)
+            if (history.CapturedPiece != Piece.None)
             {
                 if (move.Type == MoveTypes.EnPassant)
                 {
@@ -199,7 +199,7 @@ namespace Rudim.Board
                 }
                 else
                 {
-                    AddPiece(move.Target, SideToMove.Other(), capturedPiece);
+                    AddPiece(move.Target, SideToMove.Other(), history.CapturedPiece);
                 }
             }
 
@@ -228,10 +228,10 @@ namespace Rudim.Board
             }
 
             AddPiece(move.Source, SideToMove, move.IsPromotion() ? Piece.Pawn : movedPiece);
-            LastDrawKiller = lastDrawKiller;
-            BoardHash = boardHash;
-            Castle = castlingRights;
-            EnPassantSquare = enPassantSquare;
+            LastDrawKiller = history.LastDrawKiller;
+            BoardHash = history.BoardHash;
+            Castle = history.CastlingRights;
+            EnPassantSquare = history.EnPassantSquare;
             MoveCount--;
         }
         private Square EnPassantSquareFor(Move move)
