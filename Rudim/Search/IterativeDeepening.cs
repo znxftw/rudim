@@ -22,7 +22,6 @@ namespace Rudim.Search
             for (int i = 1; i <= depth; ++i)
             {
                 timer.Restart();
-                History.ClearBoardHistory();
                 Score = Negamax.Search(boardState, i, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested)
