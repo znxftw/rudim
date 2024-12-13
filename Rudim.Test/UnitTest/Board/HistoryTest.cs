@@ -2,7 +2,7 @@ using Rudim.Board;
 using Rudim.Common;
 using Xunit;
 
-namespace Rudim.Test
+namespace Rudim.Test.UnitTest.Board
 {
     [Collection("StateRace")]
     public class HistoryTest

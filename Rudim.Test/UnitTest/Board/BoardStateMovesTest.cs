@@ -2,7 +2,7 @@
 using Rudim.Common;
 using Xunit;
 
-namespace Rudim.Test
+namespace Rudim.Test.UnitTest.Board
 {
     public class BoardStateMovesTest
     {

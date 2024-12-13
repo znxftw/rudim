@@ -1,65 +1,65 @@
 using Xunit;
 
-namespace Rudim.Test
+namespace Rudim.Test.UnitTest.Bitboard
 {
     public class BitboardTest
     {
         [Fact]
         public void ShouldSetSpecifiedBits()
         {
-            var Board = new Bitboard(0);
+            var board = new Rudim.Bitboard(0);
 
-            Board.SetBit(5);
-            Assert.Equal(32ul, Board.Board);
+            board.SetBit(5);
+            Assert.Equal(32ul, board.Board);
 
-            Board.SetBit(63);
-            Assert.Equal(9223372036854775840, Board.Board);
+            board.SetBit(63);
+            Assert.Equal(9223372036854775840, board.Board);
         }
 
         [Fact]
         public void ShouldClearSpecifiedBits()
         {
-            var Board = new Bitboard(9223372036854775840);
+            var board = new Rudim.Bitboard(9223372036854775840);
 
-            Board.ClearBit(63);
-            Assert.Equal(32ul, Board.Board);
+            board.ClearBit(63);
+            Assert.Equal(32ul, board.Board);
 
-            Board.ClearBit(5);
-            Assert.Equal(0ul, Board.Board);
+            board.ClearBit(5);
+            Assert.Equal(0ul, board.Board);
         }
 
         [Fact]
         public void SetBitShouldBeIdempotent()
         {
-            var Board = new Bitboard(0);
+            var board = new Rudim.Bitboard(0);
 
-            Board.SetBit(63);
-            Assert.Equal(9223372036854775808ul, Board.Board);
+            board.SetBit(63);
+            Assert.Equal(9223372036854775808ul, board.Board);
 
-            Board.SetBit(63);
-            Assert.Equal(9223372036854775808ul, Board.Board);
+            board.SetBit(63);
+            Assert.Equal(9223372036854775808ul, board.Board);
         }
 
         [Fact]
         public void ClearBitShouldBeIdempotent()
         {
-            var Board = new Bitboard(9223372036854775808);
+            var board = new Rudim.Bitboard(9223372036854775808);
 
-            Board.ClearBit(63);
-            Assert.Equal(0ul, Board.Board);
+            board.ClearBit(63);
+            Assert.Equal(0ul, board.Board);
 
-            Board.ClearBit(63);
-            Assert.Equal(0ul, Board.Board);
+            board.ClearBit(63);
+            Assert.Equal(0ul, board.Board);
         }
 
         [Fact]
         public void ShouldGetGivenBits()
         {
-            var Board = new Bitboard(9223372036854775808);
+            var board = new Rudim.Bitboard(9223372036854775808);
 
-            Assert.Equal(0, Board.GetBit(0));
-            Assert.Equal(0, Board.GetBit(5));
-            Assert.Equal(1, Board.GetBit(63));
+            Assert.Equal(0, board.GetBit(0));
+            Assert.Equal(0, board.GetBit(5));
+            Assert.Equal(1, board.GetBit(63));
         }
     }
 }

@@ -1,20 +1,11 @@
 using Rudim.CLI.UCI;
-using Rudim.Common;
-using System;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Rudim.Test.UnitTest
+namespace Rudim.Test.UnitTest.CLI
 {
-    public class TimeManagementTest
+    public class TimeManagementTest(ITestOutputHelper testOutputHelper)
     {
-        private readonly ITestOutputHelper _testOutputHelper;
-
-        public TimeManagementTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
         [Theory]
         [InlineData(180000, 2000)]  
         [InlineData(300000, 0)]     
@@ -35,7 +26,7 @@ namespace Rudim.Test.UnitTest
             for (int moveNumber = 1; moveNumber <= maxMoves; moveNumber++)
             {
                 var moveTime = TimeManagement.CalculateMoveTime(moveNumber, remainingTime, increment);
-                _testOutputHelper.WriteLine(moveTime.ToString());
+                testOutputHelper.WriteLine(moveTime.ToString());
                 Assert.True(moveTime >= 10, $"Move {moveNumber}: Allocated time {moveTime}ms is less than minimum 10ms");
 
                 remainingTime -= moveTime + positionParseDelay + networkDelay + engineCancelDelay;

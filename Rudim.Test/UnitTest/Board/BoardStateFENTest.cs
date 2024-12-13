@@ -1,8 +1,7 @@
-﻿using Rudim.Board;
-using Rudim.Common;
+﻿using Rudim.Common;
 using Xunit;
 
-namespace Rudim.Test
+namespace Rudim.Test.UnitTest.Board
 {
     public class BoardStateFENTest
     {
@@ -11,7 +10,7 @@ namespace Rudim.Test
         {
             var fen = Helpers.StartingFEN;
 
-            var result = BoardState.ParseFEN(fen);
+            var result = Rudim.Board.BoardState.ParseFEN(fen);
 
             Assert.Equal(71776119061217280ul, result.Pieces[(int)Side.White, (int)Piece.Pawn].Board);
             Assert.Equal(4755801206503243776ul, result.Pieces[(int)Side.White, (int)Piece.Knight].Board);

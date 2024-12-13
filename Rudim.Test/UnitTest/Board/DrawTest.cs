@@ -3,7 +3,7 @@ using Rudim.Common;
 using Xunit;
 using Helpers = Rudim.Test.Util.Helpers;
 
-namespace Rudim.Test.UnitTest
+namespace Rudim.Test.UnitTest.Board
 {
     [Collection("StateRace")]
     public class DrawTest
@@ -34,8 +34,8 @@ namespace Rudim.Test.UnitTest
                 boardState.MakeMove(move);
             }
             Assert.False(boardState.IsDraw());
-            var fityMove = new Move(Square.d4, Square.c2, MoveTypes.Quiet);
-            boardState.MakeMove(fityMove);
+            var fiftyMove = new Move(Square.d4, Square.c2, MoveTypes.Quiet);
+            boardState.MakeMove(fiftyMove);
             Assert.True(boardState.IsDraw());
         }
         [Fact]

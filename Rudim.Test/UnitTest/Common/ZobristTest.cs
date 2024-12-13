@@ -3,7 +3,7 @@ using Rudim.Common;
 using Xunit;
 using Helpers = Rudim.Test.Util.Helpers;
 
-namespace Rudim.Test.UnitTest
+namespace Rudim.Test.UnitTest.Common
 {
     [Collection("StateRace")]
     public class ZobristHashingTest
