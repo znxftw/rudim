@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace Rudim.Common
 {
-    static class GamePhase
+    public static class GamePhase
     {
         private static readonly int[] PieceConstants;
         public static readonly int TotalPhase;
