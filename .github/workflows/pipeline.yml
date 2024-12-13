@@ -46,7 +46,7 @@ jobs:
         dotnet tool install --global dotnet-reportgenerator-globaltool
         reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coverage-report" 
     - name: Upload coverage artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-pages-artifact@v3
       with:
         path: coverage-report
         name: 'coverage-report'
