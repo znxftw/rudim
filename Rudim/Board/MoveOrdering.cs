@@ -2,14 +2,14 @@
 
 namespace Rudim.Board
 {
-    internal static class MoveOrdering
+    public static class MoveOrdering
     {
-        private static readonly int[,] MVVLVA;
+        private static readonly int[,] MostValuableVictimLeastValuableAttacker;
         private static Move[,] _killerMoves;
 
         static MoveOrdering()
         {
-            MVVLVA = new[,]
+            MostValuableVictimLeastValuableAttacker = new[,]
             { // P , N , B , R , Q , K , None
                { 15, 14, 13, 12, 11, 10, 0 }, // P
                { 25, 24, 23, 22, 21, 20, 0 }, // N
@@ -39,7 +39,7 @@ namespace Rudim.Board
                 targetPiece = (int)Piece.Pawn;
             else
                 targetPiece = boardState.GetPieceOn(move.Target, boardState.SideToMove.Other());
-            move.Score = MVVLVA[targetPiece, sourcePiece];
+            move.Score = MostValuableVictimLeastValuableAttacker[targetPiece, sourcePiece];
         }
 
         public static void AddKillerMove(Move move, int ply)
