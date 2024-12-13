@@ -1,17 +1,19 @@
 ﻿using Rudim.Board;
 using Rudim.Common;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Rudim.Test.Perft
 {
+    [Trait("Category", "Perft")]
     [Collection("StateRace")]
-    public class Test
+    public class PerftTest
     {
         private readonly ITestOutputHelper output;
 
-        public Test(ITestOutputHelper output)
+        public PerftTest(ITestOutputHelper output)
         {
             this.output = output;
         }

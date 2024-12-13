@@ -43,3 +43,6 @@ msbuild.wrn
 
 # Rider
 Rudim.csproj.DotSettings
+
+# Extra
+**/TestResults
