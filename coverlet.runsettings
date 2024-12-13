@@ -4,7 +4,7 @@
     <DataCollectors>
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
-          <ExcludeByFile>**Perft**</ExcludeByFile>
+          <ExcludeByFile>**/PerftTest.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>

@@ -7,11 +7,11 @@ using Xunit.Abstractions;
 namespace Rudim.Test.Perft
 {
     [Collection("StateRace")]
-    public class Test
+    public class PerftTest
     {
         private readonly ITestOutputHelper output;
 
-        public Test(ITestOutputHelper output)
+        public PerftTest(ITestOutputHelper output)
         {
             this.output = output;
         }
