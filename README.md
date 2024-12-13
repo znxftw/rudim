@@ -1,6 +1,8 @@
 # Rudim
 [![Pipeline](https://github.com/znxftw/rudim/actions/workflows/pipeline.yml/badge.svg)](https://github.com/znxftw/rudim/actions/workflows/pipeline.yml)
 
+[Coverage Reports](https://znxftw.github.io/rudim)
+
 ## What does Rudim do?
 
 Rudim is currently a work in progress but is in an MVP phase - you can [play with Rudim on Lichess](https://lichess.org/@/rudim-bot).  
