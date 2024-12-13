@@ -1,6 +1,6 @@
 namespace Rudim.CLI.UCI;
 
-internal class DebugCommand(UciClient uciClient) : IUciCommand
+public class DebugCommand(UciClient uciClient) : IUciCommand
 {
     public void Run(string[] parameters)
     {

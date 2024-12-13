@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Rudim.CLI.UCI
 {
-    internal class UciClient : ICliCommand
+    public class UciClient : ICliCommand
     {
         private readonly Dictionary<string, IUciCommand> _commands;
         public BoardState Board;
