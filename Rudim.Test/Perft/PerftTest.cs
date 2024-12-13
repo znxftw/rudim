@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Rudim.Test.Perft
 {
-    [ExcludeFromCodeCoverage]
+    [Trait("Category", "Perft")]
     [Collection("StateRace")]
     public class PerftTest
     {
