@@ -5,10 +5,10 @@ using Xunit;
 namespace Rudim.Test
 {
     [Collection("StateRace")]
-    public class BoardStateSavedTest
+    public class HistoryTest
     {
         [Fact]
-        public void ShouldSaveAndRestoreBoardState()
+        public void ShouldSaveAndRestoreBoardHistory()
         {
             History.ClearBoardHistory();
             var originalState = BoardState.ParseFEN(Helpers.StartingFEN);
