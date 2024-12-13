@@ -1,11 +1,13 @@
 ﻿using Rudim.Board;
 using Rudim.Common;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Rudim.Test.Perft
 {
+    [ExcludeFromCodeCoverage]
     [Collection("StateRace")]
     public class PerftTest
     {
