@@ -30,7 +30,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c Release
     - name: Test
-      run: dotnet test --no-build --verbosity normal -c Release --collect:"XPlat Code Coverage"
+      run: dotnet test --no-build --verbosity normal -c Release --collect:"XPlat Code Coverage" --settings:coverlet.runsettings
     - name: Benchmark
       working-directory: Rudim
       run: |
