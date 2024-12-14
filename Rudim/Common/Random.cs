@@ -4,7 +4,7 @@
      * This class is to generate fast random numbers using
      * https://en.wikipedia.org/wiki/Xorshift
      */
-    internal static class Random
+    public static class Random
     {
         // Arbitrary starting seed
         private static ulong _ulongState = 1804289383;
