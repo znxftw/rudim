@@ -33,7 +33,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c Release
     - name: Perft 
-      run: dotnet test --no-build --filter Category=Perft --verbosity normal -c Release
+      run: dotnet run -c Release --perft
     - name: Test
       run: dotnet test --no-build --filter Category!=Perft --verbosity normal -c Release --collect:"XPlat Code Coverage"
     - name: Benchmark
