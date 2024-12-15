@@ -8,9 +8,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace Rudim.Test.Perft
 {
 
-    public class PerftTest
+    public static class PerftTest
     {
-        public void Perft(int depth, ulong nodes, string position)
+        public static void  Perft(int depth, ulong nodes, string position)
         {
             var timer = new Stopwatch();
 
@@ -30,10 +30,10 @@ namespace Rudim.Test.Perft
             }
 
             History.ClearBoardHistory();
-            Console.WriteLine($"Execution Time: {timer.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Execution Time: {timer.ElapsedMilliseconds} ms for {boardState} at depth {depth}");
         }
 
-        public void PerftDebug()
+        public static void PerftDebug()
         {
             var depth = 2;
 

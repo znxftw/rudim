@@ -26,10 +26,8 @@ namespace Rudim
             else if (args.Length >= 1 && args[0] == "--perft")
             {
 
-                PerftTest perft = new PerftTest();
-
                 var data = new List<PerftData> {
-                     new(0, 2, Helpers.StartingFEN),
+                     new(0, 1, Helpers.StartingFEN),
                      new(1, 20, Helpers.StartingFEN),
                      new(2, 400, Helpers.StartingFEN),
                      new(3, 8_902, Helpers.StartingFEN),
@@ -51,7 +49,7 @@ namespace Rudim
                 };
                 foreach (var item in data)
                 {
-                    perft.Perft(item.Depth, item.Nodes, item.Position);
+                    PerftTest.Perft(item.Depth, item.Nodes, item.Position);
                 }
             }
             else
