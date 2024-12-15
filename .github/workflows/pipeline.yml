@@ -33,7 +33,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c Release
     - name: Perft 
-      run: dotnet run -c Release --perft
+      run: dotnet run -c Release --perft --project='Rudim'
     - name: Test
       run: dotnet test --no-build --verbosity normal -c Release --collect:"XPlat Code Coverage"
     - name: Benchmark
