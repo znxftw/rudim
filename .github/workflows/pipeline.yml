@@ -35,7 +35,7 @@ jobs:
     - name: Perft 
       run: dotnet run -c Release --perft
     - name: Test
-      run: dotnet test --no-build --filter Category!=Perft --verbosity normal -c Release --collect:"XPlat Code Coverage"
+      run: dotnet test --no-build --verbosity normal -c Release --collect:"XPlat Code Coverage"
     - name: Benchmark
       working-directory: Rudim
       run: |
