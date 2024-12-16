@@ -1,8 +1,10 @@
 ﻿using Rudim.Board;
 using Rudim.Common;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Rudim.Test.Perft
+namespace Rudim.Perft
 {
+    [ExcludeFromCodeCoverage]
     static class PerftDriver
     {
         // Not thread safe

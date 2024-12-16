@@ -1,13 +1,13 @@
-﻿using CommandLine;
-using Rudim.Board;
+﻿using Rudim.Board;
 using Rudim.Common;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Rudim.Test.Perft
+namespace Rudim.Perft
 {
 
+    [ExcludeFromCodeCoverage]
     public static class PerftTest
     {
         public static void Perft(int depth, ulong nodes, string position)

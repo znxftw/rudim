@@ -1,16 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.DotNetCli;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Rudim.Board;
 using Rudim.CLI;
 using Rudim.Common;
-using Rudim.Search;
-using Rudim.Test.Perft;
-using System;
+using Rudim.Perft;
 using System.Collections.Generic;
-using System.Dynamic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Rudim
@@ -59,6 +54,7 @@ namespace Rudim
         }
     }
 
+    [ExcludeFromCodeCoverage]
     internal class PerftData
     {
         public int Depth { get; set; }
@@ -76,6 +72,7 @@ namespace Rudim
         }
     }
 
+    [ExcludeFromCodeCoverage]
     [MemoryDiagnoser]
     public class Benchmark
     {
