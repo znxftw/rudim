@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Rudim.CLI
 {
-    class CliClient
+    public class CliClient
     {
         private static IDictionary<string, ICliCommand> Commands;
 

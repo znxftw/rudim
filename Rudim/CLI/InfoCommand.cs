@@ -1,6 +1,6 @@
 ﻿namespace Rudim.CLI
 {
-    internal class InfoCommand : ICliCommand
+    public class InfoCommand : ICliCommand
     {
         public void Run(string[] parameters)
         {
