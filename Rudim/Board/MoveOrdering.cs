@@ -1,4 +1,6 @@
 ﻿using Rudim.Common;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Rudim.Board
 {
@@ -60,6 +62,11 @@ namespace Rudim.Board
         public static void ResetKillerMoves()
         {
             _killerMoves = new Move[2, Constants.MaxPly];
+        }
+
+        public static bool IsKillerMovesEmpty()
+        {
+            return _killerMoves.Cast<Move>().All(move => move == null);
         }
     }
 }
