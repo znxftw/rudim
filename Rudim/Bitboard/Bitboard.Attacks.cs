@@ -6,8 +6,8 @@ namespace Rudim
     {
         public static Bitboard GetPawnAttacks(Square square, Side side)
         {
-            var resultBoard = new Bitboard(0);
-            var pawnBoard = new Bitboard(0);
+            Bitboard resultBoard = new Bitboard(0);
+            Bitboard pawnBoard = new Bitboard(0);
             pawnBoard.SetBit(square);
 
             if (side == Side.White)
@@ -26,8 +26,8 @@ namespace Rudim
 
         public static Bitboard GetKnightAttacks(Square square)
         {
-            var resultBoard = new Bitboard(0);
-            var knightBoard = new Bitboard(0);
+            Bitboard resultBoard = new Bitboard(0);
+            Bitboard knightBoard = new Bitboard(0);
             knightBoard.SetBit(square);
 
             resultBoard.Board |= (knightBoard.Board << 17) & ~FileA;
@@ -44,8 +44,8 @@ namespace Rudim
 
         public static Bitboard GetKingAttacks(Square square)
         {
-            var resultBoard = new Bitboard(0);
-            var kingBoard = new Bitboard(0);
+            Bitboard resultBoard = new Bitboard(0);
+            Bitboard kingBoard = new Bitboard(0);
             kingBoard.SetBit(square);
 
             resultBoard.Board |= (kingBoard.Board << 1) & ~FileA;
@@ -64,9 +64,9 @@ namespace Rudim
 
         public static Bitboard GetBishopAttacks(Square square, Bitboard occupancy)
         {
-            var resultBoard = new Bitboard(0);
-            var bishopRank = (int)square >> 3;
-            var bishopFile = (int)square & (8 - 1);
+            Bitboard resultBoard = new Bitboard(0);
+            int bishopRank = (int)square >> 3;
+            int bishopFile = (int)square & (8 - 1);
 
             for (int rank = bishopRank + 1, file = bishopFile + 1; rank < 8 && file < 8; ++rank, ++file)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, file, occupancy)) break;
@@ -85,20 +85,20 @@ namespace Rudim
 
         public static Bitboard GetRookAttacks(Square square, Bitboard occupancy)
         {
-            var resultBoard = new Bitboard(0);
-            var rookRank = (int)square >> 3;
-            var rookFile = (int)square & (8 - 1);
+            Bitboard resultBoard = new Bitboard(0);
+            int rookRank = (int)square >> 3;
+            int rookFile = (int)square & (8 - 1);
 
-            for (var rank = rookRank + 1; rank < 8; ++rank)
+            for (int rank = rookRank + 1; rank < 8; ++rank)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, rookFile, occupancy)) break;
 
-            for (var rank = rookRank - 1; rank >= 0; --rank)
+            for (int rank = rookRank - 1; rank >= 0; --rank)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rank, rookFile, occupancy)) break;
 
-            for (var file = rookFile + 1; file < 8; ++file)
+            for (int file = rookFile + 1; file < 8; ++file)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rookRank, file, occupancy)) break;
 
-            for (var file = rookFile - 1; file >= 0; --file)
+            for (int file = rookFile - 1; file >= 0; --file)
                 if (AddSquareToBoardAndStopAtOccupiedSquare(ref resultBoard, rookRank, file, occupancy)) break;
 
             return resultBoard;
@@ -106,8 +106,8 @@ namespace Rudim
 
         public static Bitboard GetQueenAttacks(Square square, Bitboard occupancy)
         {
-            var rookAttacks = GetRookAttacks(square, occupancy);
-            var bishopAttacks = GetBishopAttacks(square, occupancy);
+            Bitboard rookAttacks = GetRookAttacks(square, occupancy);
+            Bitboard bishopAttacks = GetBishopAttacks(square, occupancy);
             return new Bitboard(rookAttacks.Board | bishopAttacks.Board);
         }
 

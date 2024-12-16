@@ -9,8 +9,8 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCentralPawn()
         {
-            var pawnAttacksWhite = Rudim.Bitboard.GetPawnAttacks(Square.e5, Side.White);
-            var pawnAttacksBlack = Rudim.Bitboard.GetPawnAttacks(Square.e5, Side.Black);
+            Rudim.Bitboard pawnAttacksWhite = Rudim.Bitboard.GetPawnAttacks(Square.e5, Side.White);
+            Rudim.Bitboard pawnAttacksBlack = Rudim.Bitboard.GetPawnAttacks(Square.e5, Side.Black);
 
             Assert.Equal(1, pawnAttacksWhite.GetBit(Square.f6));
             Assert.Equal(1, pawnAttacksWhite.GetBit(Square.d6));
@@ -23,8 +23,8 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForWhiteCornerPawn()
         {
-            var pawnAttacksWhiteA1 = Rudim.Bitboard.GetPawnAttacks(Square.a1, Side.White);
-            var pawnAttacksWhiteA8 = Rudim.Bitboard.GetPawnAttacks(Square.a8, Side.White);
+            Rudim.Bitboard pawnAttacksWhiteA1 = Rudim.Bitboard.GetPawnAttacks(Square.a1, Side.White);
+            Rudim.Bitboard pawnAttacksWhiteA8 = Rudim.Bitboard.GetPawnAttacks(Square.a8, Side.White);
 
             Assert.Equal(1, pawnAttacksWhiteA1.GetBit(Square.b2));
             Assert.Equal(1, BitOperations.PopCount(pawnAttacksWhiteA1.Board));
@@ -35,8 +35,8 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForBlackCornerPawn()
         {
-            var pawnAttacksBlackA1 = Rudim.Bitboard.GetPawnAttacks(Square.a1, Side.Black);
-            var pawnAttacksBlackA8 = Rudim.Bitboard.GetPawnAttacks(Square.a8, Side.Black);
+            Rudim.Bitboard pawnAttacksBlackA1 = Rudim.Bitboard.GetPawnAttacks(Square.a1, Side.Black);
+            Rudim.Bitboard pawnAttacksBlackA8 = Rudim.Bitboard.GetPawnAttacks(Square.a8, Side.Black);
 
             Assert.Equal(0, BitOperations.PopCount(pawnAttacksBlackA1.Board));
 
@@ -47,7 +47,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCentralKnight()
         {
-            var knightAttacksE5 = Rudim.Bitboard.GetKnightAttacks(Square.e5);
+            Rudim.Bitboard knightAttacksE5 = Rudim.Bitboard.GetKnightAttacks(Square.e5);
 
             Assert.Equal(1, knightAttacksE5.GetBit(Square.f3));
             Assert.Equal(1, knightAttacksE5.GetBit(Square.g4));
@@ -63,7 +63,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCornerKnight()
         {
-            var knightAttacksA1 = Rudim.Bitboard.GetKnightAttacks(Square.a1);
+            Rudim.Bitboard knightAttacksA1 = Rudim.Bitboard.GetKnightAttacks(Square.a1);
 
             Assert.Equal(1, knightAttacksA1.GetBit(Square.b3));
             Assert.Equal(1, knightAttacksA1.GetBit(Square.c2));
@@ -73,7 +73,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCentralKing()
         {
-            var kingAttacksE5 = Rudim.Bitboard.GetKingAttacks(Square.e5);
+            Rudim.Bitboard kingAttacksE5 = Rudim.Bitboard.GetKingAttacks(Square.e5);
 
             Assert.Equal(1, kingAttacksE5.GetBit(Square.e4));
             Assert.Equal(1, kingAttacksE5.GetBit(Square.e6));
@@ -89,7 +89,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCornerKing()
         {
-            var kingAttacksA1 = Rudim.Bitboard.GetKingAttacks(Square.a1);
+            Rudim.Bitboard kingAttacksA1 = Rudim.Bitboard.GetKingAttacks(Square.a1);
 
             Assert.Equal(1, kingAttacksA1.GetBit(Square.a2));
             Assert.Equal(1, kingAttacksA1.GetBit(Square.b1));
@@ -100,8 +100,8 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCentralBishopWithNoBlockers()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
-            var bishopAttacksE5 = Rudim.Bitboard.GetBishopAttacks(Square.e5, occupancyBoard);
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
+            Rudim.Bitboard bishopAttacksE5 = Rudim.Bitboard.GetBishopAttacks(Square.e5, occupancyBoard);
 
             Assert.Equal(1, bishopAttacksE5.GetBit(Square.f4));
             Assert.Equal(1, bishopAttacksE5.GetBit(Square.g3));
@@ -126,11 +126,11 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCentralBishopWithBlockers()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
             occupancyBoard.SetBit(Square.d4); // Should prune c3,b2,a1
             occupancyBoard.SetBit(Square.a5); // Should not cause any problems because it is not in the diagonal
             occupancyBoard.SetBit(Square.h2); // Should not change anything as it is an edge square
-            var bishopAttacksE5 = Rudim.Bitboard.GetBishopAttacks(Square.e5, occupancyBoard);
+            Rudim.Bitboard bishopAttacksE5 = Rudim.Bitboard.GetBishopAttacks(Square.e5, occupancyBoard);
 
             Assert.Equal(1, bishopAttacksE5.GetBit(Square.f4));
             Assert.Equal(1, bishopAttacksE5.GetBit(Square.g3));
@@ -152,8 +152,8 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCornerBishopWithNoBlockers()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
-            var bishopAttacksA1 = Rudim.Bitboard.GetBishopAttacks(Square.a1, occupancyBoard);
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
+            Rudim.Bitboard bishopAttacksA1 = Rudim.Bitboard.GetBishopAttacks(Square.a1, occupancyBoard);
 
             Assert.Equal(1, bishopAttacksA1.GetBit(Square.b2));
             Assert.Equal(1, bishopAttacksA1.GetBit(Square.c3));
@@ -168,10 +168,10 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCornerBishopWithBlockers()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
             occupancyBoard.SetBit(Square.e5); // Should prune f6, g7, h8
             occupancyBoard.SetBit(Square.e4); // Should not make a difference
-            var bishopAttacksA1 = Rudim.Bitboard.GetBishopAttacks(Square.a1, occupancyBoard);
+            Rudim.Bitboard bishopAttacksA1 = Rudim.Bitboard.GetBishopAttacks(Square.a1, occupancyBoard);
 
             Assert.Equal(1, bishopAttacksA1.GetBit(Square.b2));
             Assert.Equal(1, bishopAttacksA1.GetBit(Square.c3));
@@ -183,8 +183,8 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCentralRookWithNoBlockers()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
-            var rookAttacksE5 = Rudim.Bitboard.GetRookAttacks(Square.e5, occupancyBoard);
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
+            Rudim.Bitboard rookAttacksE5 = Rudim.Bitboard.GetRookAttacks(Square.e5, occupancyBoard);
 
             Assert.Equal(1, rookAttacksE5.GetBit(Square.e1));
             Assert.Equal(1, rookAttacksE5.GetBit(Square.e2));
@@ -208,12 +208,12 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCentralRookWithBlockers()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
             occupancyBoard.SetBit(Square.e3); // Should prune e2, e1
             occupancyBoard.SetBit(Square.g7); // Should not make a difference
             occupancyBoard.SetBit(Square.e8); // Should not make a difference
             occupancyBoard.SetBit(Square.f5); // Should prune g5, h5
-            var rookAttacksE5 = Rudim.Bitboard.GetRookAttacks(Square.e5, occupancyBoard);
+            Rudim.Bitboard rookAttacksE5 = Rudim.Bitboard.GetRookAttacks(Square.e5, occupancyBoard);
 
             Assert.Equal(1, rookAttacksE5.GetBit(Square.e3));
             Assert.Equal(1, rookAttacksE5.GetBit(Square.e4));
@@ -233,8 +233,8 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCornerRookWithNoBlockers()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
-            var rookAttacksA1 = Rudim.Bitboard.GetRookAttacks(Square.a1, occupancyBoard);
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
+            Rudim.Bitboard rookAttacksA1 = Rudim.Bitboard.GetRookAttacks(Square.a1, occupancyBoard);
 
             Assert.Equal(1, rookAttacksA1.GetBit(Square.a2));
             Assert.Equal(1, rookAttacksA1.GetBit(Square.a3));
@@ -258,12 +258,12 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForCornerRookWithBlockers()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
             occupancyBoard.SetBit(Square.a5); // Should prune a6, a7, a8
             occupancyBoard.SetBit(Square.g7); // Should not make a difference
             occupancyBoard.SetBit(Square.e8); // Should not make a difference
             occupancyBoard.SetBit(Square.b1); // Should prune c1, d1, e1, f1, g1, h1
-            var rookAttacksA1 = Rudim.Bitboard.GetRookAttacks(Square.a1, occupancyBoard);
+            Rudim.Bitboard rookAttacksA1 = Rudim.Bitboard.GetRookAttacks(Square.a1, occupancyBoard);
 
             Assert.Equal(1, rookAttacksA1.GetBit(Square.a2));
             Assert.Equal(1, rookAttacksA1.GetBit(Square.a3));
@@ -278,10 +278,10 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetAttacksForQueen()
         {
-            var occupancyBoard = new Rudim.Bitboard(0);
-            var expectedBoard = Rudim.Bitboard.GetBishopAttacks(Square.e5, occupancyBoard).Board | Rudim.Bitboard.GetRookAttacks(Square.e5, occupancyBoard).Board;
+            Rudim.Bitboard occupancyBoard = new Rudim.Bitboard(0);
+            ulong expectedBoard = Rudim.Bitboard.GetBishopAttacks(Square.e5, occupancyBoard).Board | Rudim.Bitboard.GetRookAttacks(Square.e5, occupancyBoard).Board;
 
-            var queenAttacksE5 = Rudim.Bitboard.GetQueenAttacks(Square.e5, occupancyBoard);
+            Rudim.Bitboard queenAttacksE5 = Rudim.Bitboard.GetQueenAttacks(Square.e5, occupancyBoard);
 
             Assert.Equal(expectedBoard, queenAttacksE5.Board);
         }

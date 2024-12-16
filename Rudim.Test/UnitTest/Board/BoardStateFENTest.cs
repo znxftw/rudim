@@ -8,9 +8,9 @@ namespace Rudim.Test.UnitTest.Board
         [Fact]
         public void ShouldParseStartingFENCorrectly()
         {
-            var fen = Helpers.StartingFEN;
+            string fen = Helpers.StartingFEN;
 
-            var result = Rudim.Board.BoardState.ParseFEN(fen);
+            Rudim.Board.BoardState result = Rudim.Board.BoardState.ParseFEN(fen);
 
             Assert.Equal(71776119061217280ul, result.Pieces[(int)Side.White, (int)Piece.Pawn].Board);
             Assert.Equal(4755801206503243776ul, result.Pieces[(int)Side.White, (int)Piece.Knight].Board);

@@ -8,9 +8,9 @@ namespace Rudim.Test.UnitTest.CLI
         [Fact]
         public void ShouldSetDebugModeOn()
         {
-            var uciClient = new UciClient();
-            var debugCommand = new DebugCommand(uciClient);
-            var parameters = new[] { "on" };
+            UciClient uciClient = new UciClient();
+            DebugCommand debugCommand = new DebugCommand(uciClient);
+            string[] parameters = new[] { "on" };
 
             debugCommand.Run(parameters);
 
@@ -20,9 +20,9 @@ namespace Rudim.Test.UnitTest.CLI
         [Fact]
         public void ShouldSetDebugModeOff()
         {
-            var uciClient = new UciClient();
-            var debugCommand = new DebugCommand(uciClient);
-            var parameters = new[] { "off" };
+            UciClient uciClient = new UciClient();
+            DebugCommand debugCommand = new DebugCommand(uciClient);
+            string[] parameters = new[] { "off" };
 
             debugCommand.Run(parameters);
 
@@ -32,10 +32,10 @@ namespace Rudim.Test.UnitTest.CLI
         [Fact]
         public void ShouldNotChangeDebugModeWithInvalidParameter()
         {
-            var uciClient = new UciClient();
-            var debugCommand = new DebugCommand(uciClient);
-            var initialDebugMode = uciClient.DebugMode;
-            var parameters = new[] { "invalid" };
+            UciClient uciClient = new UciClient();
+            DebugCommand debugCommand = new DebugCommand(uciClient);
+            bool initialDebugMode = uciClient.DebugMode;
+            string[] parameters = new[] { "invalid" };
 
             debugCommand.Run(parameters);
 

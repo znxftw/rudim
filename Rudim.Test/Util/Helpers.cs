@@ -8,8 +8,8 @@ namespace Rudim.Test.Util
         public static Move FindMoveFromMoveList(BoardState board, Move move)
         {
             board.GenerateMoves();
-            var moves = board.Moves;
-            for (var i = 0; i < moves.Count; ++i)
+            System.Collections.Generic.List<Move> moves = board.Moves;
+            for (int i = 0; i < moves.Count; ++i)
             {
                 if (moves[i].Source == move.Source && moves[i].Target == move.Target)
                 {

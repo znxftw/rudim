@@ -25,10 +25,10 @@ namespace Rudim.Test.UnitTest.Common
         [InlineData("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1", "e8c8")]
         public void ShouldRestoreCorrectHashAfterUnmakingMove(string fen, string moveStr)
         {
-            var boardState = BoardState.ParseFEN(fen);
+            BoardState boardState = BoardState.ParseFEN(fen);
             boardState.GenerateMoves();
-            var move = Helpers.FindMoveFromMoveList(boardState, Move.ParseLongAlgebraic(moveStr));
-            var originalHash = boardState.BoardHash;
+            Move move = Helpers.FindMoveFromMoveList(boardState, Move.ParseLongAlgebraic(moveStr));
+            ulong originalHash = boardState.BoardHash;
 
             boardState.MakeMove(move);
             Assert.Equal(Zobrist.GetBoardHash(boardState), boardState.BoardHash);
@@ -38,6 +38,6 @@ namespace Rudim.Test.UnitTest.Common
             Assert.Equal(Zobrist.GetBoardHash(boardState), boardState.BoardHash);
         }
 
-        
+
     }
 }

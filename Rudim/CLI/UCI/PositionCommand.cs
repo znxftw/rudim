@@ -9,19 +9,19 @@ namespace Rudim.CLI.UCI
     {
         public void Run(string[] parameters)
         {
-            var position = parameters[0];
-            var positionParameters = parameters.Skip(1).ToList();
+            string position = parameters[0];
+            List<string> positionParameters = parameters.Skip(1).ToList();
 
             if (position == "startpos")
             {
-                var moves = positionParameters.Skip(1).ToList();
+                List<string> moves = positionParameters.Skip(1).ToList();
                 ParseStartPos(moves);
             }
 
             if (position == "fen")
             {
-                var fen = string.Join(" ", positionParameters.Take(6));
-                var moves = positionParameters.Skip(7).ToList();
+                string fen = string.Join(" ", positionParameters.Take(6));
+                List<string> moves = positionParameters.Skip(7).ToList();
                 ParseFen(fen, moves);
             }
         }
@@ -42,9 +42,9 @@ namespace Rudim.CLI.UCI
 
         private void ParseMoves(IList<string> moves)
         {
-            foreach (var moveString in moves)
+            foreach (string moveString in moves)
             {
-                var move = Move.ParseLongAlgebraic(moveString);
+                Move move = Move.ParseLongAlgebraic(moveString);
                 move = FindMoveFromMoveList(move);
                 // Todo : Check move is valid before making move
                 if (move == Move.NoMove)
@@ -59,8 +59,8 @@ namespace Rudim.CLI.UCI
         private Move FindMoveFromMoveList(Move move)
         {
             uciClient.Board.GenerateMoves();
-            var moves = uciClient.Board.Moves;
-            for (var i = 0; i < moves.Count; ++i)
+            List<Move> moves = uciClient.Board.Moves;
+            for (int i = 0; i < moves.Count; ++i)
             {
                 if (moves[i].Source == move.Source && moves[i].Target == move.Target)
                 {

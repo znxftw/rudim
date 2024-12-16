@@ -7,7 +7,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldSetSpecifiedBits()
         {
-            var board = new Rudim.Bitboard(0);
+            Rudim.Bitboard board = new Rudim.Bitboard(0);
 
             board.SetBit(5);
             Assert.Equal(32ul, board.Board);
@@ -19,7 +19,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldClearSpecifiedBits()
         {
-            var board = new Rudim.Bitboard(9223372036854775840);
+            Rudim.Bitboard board = new Rudim.Bitboard(9223372036854775840);
 
             board.ClearBit(63);
             Assert.Equal(32ul, board.Board);
@@ -31,7 +31,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void SetBitShouldBeIdempotent()
         {
-            var board = new Rudim.Bitboard(0);
+            Rudim.Bitboard board = new Rudim.Bitboard(0);
 
             board.SetBit(63);
             Assert.Equal(9223372036854775808ul, board.Board);
@@ -43,7 +43,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ClearBitShouldBeIdempotent()
         {
-            var board = new Rudim.Bitboard(9223372036854775808);
+            Rudim.Bitboard board = new Rudim.Bitboard(9223372036854775808);
 
             board.ClearBit(63);
             Assert.Equal(0ul, board.Board);
@@ -55,7 +55,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetGivenBits()
         {
-            var board = new Rudim.Bitboard(9223372036854775808);
+            Rudim.Bitboard board = new Rudim.Bitboard(9223372036854775808);
 
             Assert.Equal(0, board.GetBit(0));
             Assert.Equal(0, board.GetBit(5));

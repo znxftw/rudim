@@ -34,7 +34,7 @@ namespace Rudim.Board
                 return;
             }
             int targetPiece;
-            var sourcePiece = boardState.GetPieceOn(move.Source, boardState.SideToMove);
+            int sourcePiece = boardState.GetPieceOn(move.Source, boardState.SideToMove);
             if (move.Type == MoveTypes.EnPassant)
                 targetPiece = (int)Piece.Pawn;
             else

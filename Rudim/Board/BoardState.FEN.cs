@@ -7,8 +7,8 @@ namespace Rudim.Board
     {
         public static BoardState ParseFEN(string FEN)
         {
-            var board = new BoardState();
-            var sections = FEN.Split(' ');
+            BoardState board = new BoardState();
+            string[] sections = FEN.Split(' ');
             ParsePieces(board, sections[0]);
             ParseSideToMove(board, sections[1]);
             ParseCastling(board, sections[2]);
@@ -26,7 +26,7 @@ namespace Rudim.Board
 
         private static void ParseCastling(BoardState board, string fen)
         {
-            foreach (var character in fen)
+            foreach (char character in fen)
             {
                 switch (character)
                 {
@@ -45,14 +45,14 @@ namespace Rudim.Board
 
         private static void ParsePieces(BoardState board, string fen)
         {
-            var ranks = fen.Split('/');
+            string[] ranks = fen.Split('/');
 
-            for (var rank = 0; rank < 8; rank++)
+            for (int rank = 0; rank < 8; rank++)
             {
-                var index = rank * 8;
-                for (var file = 0; file < ranks[rank].Length; file++)
+                int index = rank * 8;
+                for (int file = 0; file < ranks[rank].Length; file++)
                 {
-                    var symbol = ranks[rank][file];
+                    char symbol = ranks[rank][file];
                     if (char.IsLetter(symbol))
                     {
                         board.AddPiece((Square)index, SymbolToSide(symbol), SymbolToPiece(symbol));

@@ -17,7 +17,7 @@ namespace Rudim.Board
             Castle = Castle.None;
             Moves = new List<Move>(32);
             MoveCount = 0;
-            for (var square = 0; square < Constants.Squares; ++square)
+            for (int square = 0; square < Constants.Squares; ++square)
                 PieceMapping[square] = Piece.None;
         }
 
@@ -59,13 +59,13 @@ namespace Rudim.Board
 
         public int GetPieceOn(Square square, Side side)
         {
-            var piece = PieceMapping[(int)square];
+            Piece piece = PieceMapping[(int)square];
             return Occupancies[(int)side].GetBit(square) == 1 ? (int)piece : (int)Piece.None;
         }
 
         public int GetPieceOn(Square square)
         {
-            var piece = (int)PieceMapping[(int)square];
+            int piece = (int)PieceMapping[(int)square];
             if (piece == (int)Piece.None) return -1;
             return Occupancies[(int)Side.White].GetBit(square) == 1 ? piece : 6 + piece;
         }
@@ -76,14 +76,14 @@ namespace Rudim.Board
         }
         public void MakeMove(Move move)
         {
-            var capturedPiece = Piece.None;
-            var originalBoardHash = BoardHash;
-            var originalEnPassantSquare = EnPassantSquare;
-            var originalCastlingRights = Castle;
-            var originalLastDrawKiller = LastDrawKiller;
-            
+            Piece capturedPiece = Piece.None;
+            ulong originalBoardHash = BoardHash;
+            Square originalEnPassantSquare = EnPassantSquare;
+            Castle originalCastlingRights = Castle;
+            int originalLastDrawKiller = LastDrawKiller;
+
             BoardHash ^= Zobrist.ZobristTable[GetPieceOn(move.Source), (int)move.Source];
-            var movedPiece = RemovePiece(move.Source);
+            Piece movedPiece = RemovePiece(move.Source);
             if (movedPiece == Piece.Pawn)
             {
                 LastDrawKiller = MoveCount;
@@ -154,22 +154,22 @@ namespace Rudim.Board
 
         private void UpdateEnPassant(Move move)
         {
-            var originalEnPassantSquare = EnPassantSquare;
+            Square originalEnPassantSquare = EnPassantSquare;
             BoardHash = Zobrist.HashEnPassant(this, BoardHash);
             EnPassantSquare = move.Type == MoveTypes.DoublePush ? EnPassantSquareFor(move) : Square.NoSquare;
             BoardHash = Zobrist.HashEnPassant(this, BoardHash);
-            if(originalEnPassantSquare != EnPassantSquare)
+            if (originalEnPassantSquare != EnPassantSquare)
                 LastDrawKiller = MoveCount;
         }
 
         private void UpdateCastlingRights(Move move)
         {
-            var originalCastlingRights = Castle;
+            Castle originalCastlingRights = Castle;
             BoardHash = Zobrist.HashCastlingRights(this, BoardHash);
             Castle &= (Castle)CastlingConstants[(int)move.Source];
             Castle &= (Castle)CastlingConstants[(int)move.Target];
             BoardHash = Zobrist.HashCastlingRights(this, BoardHash);
-            if(Castle != originalCastlingRights)
+            if (Castle != originalCastlingRights)
                 LastDrawKiller = MoveCount;
         }
 
@@ -177,7 +177,7 @@ namespace Rudim.Board
         {
             RemovePiece(source);
             AddPiece(target, sideToMove, Piece.Rook);
-            
+
             int rookIndex = GetPieceOn(target);
             BoardHash ^= Zobrist.ZobristTable[rookIndex, (int)source];
             BoardHash ^= Zobrist.ZobristTable[rookIndex, (int)target];
@@ -186,9 +186,9 @@ namespace Rudim.Board
 
         public void UnmakeMove(Move move)
         {
-            var history = History.RestoreBoardHistory();
+            History.BoardHistory history = History.RestoreBoardHistory();
 
-            var movedPiece = RemovePiece(move.Target);
+            Piece movedPiece = RemovePiece(move.Target);
             SideToMove = SideToMove.Other();
 
             if (history.CapturedPiece != Piece.None)
@@ -270,8 +270,8 @@ namespace Rudim.Board
 
         public override string ToString()
         {
-            var boardHash = BoardHash;
-            return CommonStateNames.TryGetValue(boardHash, out var commonName) ? commonName : boardHash.ToString();
+            ulong boardHash = BoardHash;
+            return CommonStateNames.TryGetValue(boardHash, out string commonName) ? commonName : boardHash.ToString();
         }
 
         public bool IsDraw()

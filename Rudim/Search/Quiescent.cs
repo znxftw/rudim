@@ -14,7 +14,7 @@ namespace Rudim.Search
             if (boardState.IsDraw())
                 return 0;
 
-            var eval = SimpleEvaluation.Evaluate(boardState);
+            int eval = SimpleEvaluation.Evaluate(boardState);
 
             if (eval >= beta)
                 return beta;
@@ -22,18 +22,18 @@ namespace Rudim.Search
                 alpha = eval;
 
             boardState.GenerateMoves();
-            foreach (var move in boardState.Moves)
+            foreach (Move move in boardState.Moves)
             {
                 MoveOrdering.PopulateMoveScore(move, boardState);
             }
             MoveOrdering.SortMoves(boardState);
 
 
-            for (var i = 0; i < boardState.Moves.Count; ++i)
+            for (int i = 0; i < boardState.Moves.Count; ++i)
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
-                var move = boardState.Moves[i];
+                Move move = boardState.Moves[i];
                 if (!move.IsCapture())
                     break; // If sorted, once a quiet move is reached we won't need to visit the remaining nodes
 
@@ -43,7 +43,7 @@ namespace Rudim.Search
                     boardState.UnmakeMove(move);
                     continue;
                 }
-                var score = -Search(boardState, -beta, -alpha, cancellationToken);
+                int score = -Search(boardState, -beta, -alpha, cancellationToken);
                 boardState.UnmakeMove(move);
 
                 if (score >= beta)

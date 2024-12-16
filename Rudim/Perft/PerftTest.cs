@@ -10,21 +10,22 @@ namespace Rudim.Test.Perft
 
     public static class PerftTest
     {
-        public static void  Perft(int depth, ulong nodes, string position)
+        public static void Perft(int depth, ulong nodes, string position)
         {
-            var timer = new Stopwatch();
+            Stopwatch timer = new Stopwatch();
 
             History.ClearBoardHistory();
 
             timer.Start();
 
-            var boardState = BoardState.ParseFEN(position);
+            BoardState boardState = BoardState.ParseFEN(position);
             PerftDriver.ResetNodeCount();
             PerftDriver.Traverse(boardState, depth);
 
             timer.Stop();
 
-            if(nodes != PerftDriver.Nodes){
+            if (nodes != PerftDriver.Nodes)
+            {
                 Console.WriteLine($"There's a difference Expected: {nodes} Actual: {PerftDriver.Nodes}");
                 Environment.Exit(2);
             }
@@ -35,12 +36,12 @@ namespace Rudim.Test.Perft
 
         public static void PerftDebug()
         {
-            var depth = 2;
+            int depth = 2;
 
-            var boardState = BoardState.ParseFEN(Helpers.KiwiPeteFEN);
+            BoardState boardState = BoardState.ParseFEN(Helpers.KiwiPeteFEN);
             ulong total = 0;
             boardState.GenerateMoves();
-            foreach (var move in boardState.Moves)
+            foreach (Move move in boardState.Moves)
             {
                 PerftDriver.ResetNodeCount();
                 boardState.MakeMove(move);

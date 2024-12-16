@@ -42,17 +42,17 @@ namespace Rudim.CLI.UCI
             _currentSearch = new CancellationTokenSource();
             _bestMove = Move.NoMove;
 
-            var depth = GetParameter("depth", parameters, 5);
-            var winc = GetParameter("winc", parameters, -1);
-            var binc = GetParameter("binc", parameters, -1);
-            var wtime = GetParameter("wtime", parameters, -1);
-            var btime = GetParameter("btime", parameters, -1);
-            var movetime = GetParameter("movetime", parameters, -1);
-            var infinite = GetOptionlessParameter("infinite", parameters); // Not yet implemented
+            int depth = GetParameter("depth", parameters, 5);
+            int winc = GetParameter("winc", parameters, -1);
+            int binc = GetParameter("binc", parameters, -1);
+            int wtime = GetParameter("wtime", parameters, -1);
+            int btime = GetParameter("btime", parameters, -1);
+            int movetime = GetParameter("movetime", parameters, -1);
+            bool infinite = GetOptionlessParameter("infinite", parameters); // Not yet implemented
 
-            var clock = uciClient.Board.SideToMove == Side.White ? wtime : btime;
-            var increment = uciClient.Board.SideToMove == Side.White ? winc : binc;
-            var allottedTime = movetime == -1 ? (clock == -1 ? -1 : TimeManagement.CalculateMoveTime(uciClient.Board.MoveCount, clock, increment)) : movetime;
+            int clock = uciClient.Board.SideToMove == Side.White ? wtime : btime;
+            int increment = uciClient.Board.SideToMove == Side.White ? winc : binc;
+            int allottedTime = movetime == -1 ? (clock == -1 ? -1 : TimeManagement.CalculateMoveTime(uciClient.Board.MoveCount, clock, increment)) : movetime;
 
 
             if (!infinite)
@@ -63,8 +63,8 @@ namespace Rudim.CLI.UCI
                 }
                 else
                 {
-                    var searchTask = Task.Run(() => uciClient.Board.FindBestMove(Constants.MaxSearchDepth, _currentSearch.Token, ref uciClient.DebugMode));
-                    var timeoutTask = Task.Delay(allottedTime);
+                    Task<Move> searchTask = Task.Run(() => uciClient.Board.FindBestMove(Constants.MaxSearchDepth, _currentSearch.Token, ref uciClient.DebugMode));
+                    Task timeoutTask = Task.Delay(allottedTime);
 
                     if (await Task.WhenAny(searchTask, timeoutTask) == timeoutTask)
                     {

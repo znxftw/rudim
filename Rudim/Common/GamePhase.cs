@@ -20,10 +20,10 @@ namespace Rudim.Common
         public static int Calculate(BoardState boardState)
         {
             int phase = 0;
-            for (var piece = 0; piece < Constants.Pieces - 1; ++piece)
+            for (int piece = 0; piece < Constants.Pieces - 1; ++piece)
             {
-                var whiteBoard = boardState.Pieces[(int)Side.White, piece].Board;
-                var blackBoard = boardState.Pieces[(int)Side.Black, piece].Board;
+                ulong whiteBoard = boardState.Pieces[(int)Side.White, piece].Board;
+                ulong blackBoard = boardState.Pieces[(int)Side.Black, piece].Board;
 
                 phase += PieceConstants[piece] * BitOperations.PopCount(whiteBoard);
                 phase += PieceConstants[piece] * BitOperations.PopCount(blackBoard);

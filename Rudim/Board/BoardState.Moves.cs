@@ -20,12 +20,12 @@ namespace Rudim.Board
 
         private void GenerateKingMoves()
         {
-            var source = Pieces[(int)SideToMove, (int)Piece.King].GetLsb();
-            var attacks = new Bitboard(Bitboard.KingAttacks[source]);
+            int source = Pieces[(int)SideToMove, (int)Piece.King].GetLsb();
+            Bitboard attacks = new Bitboard(Bitboard.KingAttacks[source]);
 
             while (attacks.Board > 0)
             {
-                var target = attacks.GetLsb();
+                int target = attacks.GetLsb();
                 attacks.ClearBit(target);
                 if (Occupancies[(int)SideToMove].GetBit(target) == 1)
                 {
@@ -44,15 +44,15 @@ namespace Rudim.Board
 
         private void GenerateQueenMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Queen];
+            Bitboard bitboard = Pieces[(int)SideToMove, (int)Piece.Queen];
             while (bitboard.Board > 0)
             {
-                var source = bitboard.GetLsb();
-                var attacks = Bitboard.GetQueenAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
+                int source = bitboard.GetLsb();
+                Bitboard attacks = Bitboard.GetQueenAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
 
                 while (attacks.Board > 0)
                 {
-                    var target = attacks.GetLsb();
+                    int target = attacks.GetLsb();
 
                     if (Occupancies[(int)SideToMove].GetBit(target) == 1)
                     {
@@ -71,15 +71,15 @@ namespace Rudim.Board
 
         private void GenerateRookMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Rook];
+            Bitboard bitboard = Pieces[(int)SideToMove, (int)Piece.Rook];
             while (bitboard.Board > 0)
             {
-                var source = bitboard.GetLsb();
-                var attacks = Bitboard.GetRookAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
+                int source = bitboard.GetLsb();
+                Bitboard attacks = Bitboard.GetRookAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
 
                 while (attacks.Board > 0)
                 {
-                    var target = attacks.GetLsb();
+                    int target = attacks.GetLsb();
 
                     if (Occupancies[(int)SideToMove].GetBit(target) == 1)
                     {
@@ -98,15 +98,15 @@ namespace Rudim.Board
 
         private void GenerateKnightMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Knight];
+            Bitboard bitboard = Pieces[(int)SideToMove, (int)Piece.Knight];
             while (bitboard.Board > 0)
             {
-                var source = bitboard.GetLsb();
-                var attacks = new Bitboard(Bitboard.KnightAttacks[source]);
+                int source = bitboard.GetLsb();
+                Bitboard attacks = new Bitboard(Bitboard.KnightAttacks[source]);
 
                 while (attacks.Board > 0)
                 {
-                    var target = attacks.GetLsb();
+                    int target = attacks.GetLsb();
 
                     if (Occupancies[(int)SideToMove].GetBit(target) == 1)
                     {
@@ -125,15 +125,15 @@ namespace Rudim.Board
 
         private void GenerateBishopMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Bishop];
+            Bitboard bitboard = Pieces[(int)SideToMove, (int)Piece.Bishop];
             while (bitboard.Board > 0)
             {
-                var source = bitboard.GetLsb();
-                var attacks = Bitboard.GetBishopAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
+                int source = bitboard.GetLsb();
+                Bitboard attacks = Bitboard.GetBishopAttacksFromTable((Square)source, Occupancies[(int)Side.Both]);
 
                 while (attacks.Board > 0)
                 {
-                    var target = attacks.GetLsb();
+                    int target = attacks.GetLsb();
 
                     if (Occupancies[(int)SideToMove].GetBit(target) == 1)
                     {
@@ -152,10 +152,10 @@ namespace Rudim.Board
 
         private void GeneratePawnMoves()
         {
-            var bitboard = Pieces[(int)SideToMove, (int)Piece.Pawn];
+            Bitboard bitboard = Pieces[(int)SideToMove, (int)Piece.Pawn];
             while (bitboard.Board > 0)
             {
-                var source = bitboard.GetLsb();
+                int source = bitboard.GetLsb();
                 GeneratePawnPushes(source);
                 GenerateEnPassants(source);
                 GeneratePawnAttacks(source);
@@ -169,10 +169,10 @@ namespace Rudim.Board
             if (EnPassantSquare == Square.NoSquare)
                 return;
 
-            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & (1ul << (int)EnPassantSquare));
+            Bitboard attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & (1ul << (int)EnPassantSquare));
             if (attacks.Board > 0)
             {
-                var target = attacks.GetLsb();
+                int target = attacks.GetLsb();
                 AddPawnMove(source, target, true, false);
             }
 
@@ -183,24 +183,24 @@ namespace Rudim.Board
         {
             if (SideToMove == Side.Black)
             {
-                var oneSquarePush = source + 8;
+                int oneSquarePush = source + 8;
                 if (Occupancies[(int)Side.Both].GetBit(oneSquarePush) != 0) return;
                 AddPawnMove(source, oneSquarePush, false, false);
                 if (source is <= (int)Square.h7 and >= (int)Square.a7)
                 {
-                    var twoSquarePush = oneSquarePush + 8;
+                    int twoSquarePush = oneSquarePush + 8;
                     if (Occupancies[(int)Side.Both].GetBit(twoSquarePush) != 0) return;
                     AddPawnMove(source, twoSquarePush, false, true);
                 }
             }
             else
             {
-                var oneSquarePush = source - 8;
+                int oneSquarePush = source - 8;
                 if (Occupancies[(int)Side.Both].GetBit(oneSquarePush) != 0) return;
                 AddPawnMove(source, oneSquarePush, false, false);
                 if (source is <= (int)Square.h2 and >= (int)Square.a2)
                 {
-                    var twoSquarePush = oneSquarePush - 8;
+                    int twoSquarePush = oneSquarePush - 8;
                     if (Occupancies[(int)Side.Both].GetBit(twoSquarePush) != 0) return;
                     AddPawnMove(source, twoSquarePush, false, true);
                 }
@@ -209,11 +209,11 @@ namespace Rudim.Board
 
         private void GeneratePawnAttacks(int source)
         {
-            var attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & Occupancies[(int)SideToMove.Other()].Board);
+            Bitboard attacks = new Bitboard(Bitboard.PawnAttacks[(int)SideToMove, source] & Occupancies[(int)SideToMove.Other()].Board);
 
             while (attacks.Board > 0)
             {
-                var target = attacks.GetLsb();
+                int target = attacks.GetLsb();
 
                 if (Occupancies[(int)SideToMove].GetBit(target) == 1)
                 {
@@ -230,7 +230,7 @@ namespace Rudim.Board
         {
             // Squares should be empty and shouldn't castle through check, can avoid checking if landing position is check to do legal move check in make move function
 
-            var occ = Occupancies[(int)Side.Both];
+            Bitboard occ = Occupancies[(int)Side.Both];
             if (SideToMove == Side.White)
             {
                 if (Castle.HasFlag(Castle.WhiteShort))
@@ -281,7 +281,7 @@ namespace Rudim.Board
             // This assumes all incoming pawn moves are valid
             if (target is >= (int)Square.a1 and <= (int)Square.h1 || target is <= (int)Square.h8 and >= (int)Square.a8)
             {
-                var capture = IsSquareCapture(target);
+                bool capture = IsSquareCapture(target);
 
                 Moves.Add(new Move((Square)source, (Square)target, capture ? MoveTypes.KnightPromotionCapture : MoveTypes.KnightPromotion));
                 Moves.Add(new Move((Square)source, (Square)target, capture ? MoveTypes.BishopPromotionCapture : MoveTypes.BishopPromotion));
@@ -301,8 +301,8 @@ namespace Rudim.Board
 
         private void AddMoveToMovesList(int source, int target)
         {
-            var moveType = IsSquareCapture(target) ? MoveTypes.Capture : MoveTypes.Quiet;
-            var move = new Move((Square)source, (Square)target, moveType);
+            MoveType moveType = IsSquareCapture(target) ? MoveTypes.Capture : MoveTypes.Quiet;
+            Move move = new Move((Square)source, (Square)target, moveType);
             Moves.Add(move);
         }
         private bool IsSquareCapture(int target)

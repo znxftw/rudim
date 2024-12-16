@@ -41,17 +41,17 @@ namespace Rudim
                 RookMasks[square] = GetRookMask((Square)square).Board;
                 RookMaskBits[square] = BitOperations.PopCount(RookMasks[square]);
 
-                for (var index = 0; index < (1 << BishopMaskBits[square]); ++index)
+                for (int index = 0; index < (1 << BishopMaskBits[square]); ++index)
                 {
-                    var occupancyMapping = GetOccupancyMapping(index, BishopMaskBits[square], new Bitboard(BishopMasks[square]));
-                    var magicIndex = (occupancyMapping.Board * BishopMagics[square]) >> (64 - BishopMaskBits[square]);
+                    Bitboard occupancyMapping = GetOccupancyMapping(index, BishopMaskBits[square], new Bitboard(BishopMasks[square]));
+                    ulong magicIndex = (occupancyMapping.Board * BishopMagics[square]) >> (64 - BishopMaskBits[square]);
                     BishopAttacks[square, magicIndex] = GetBishopAttacks((Square)square, occupancyMapping).Board;
                 }
 
-                for (var index = 0; index < (1 << RookMaskBits[square]); ++index)
+                for (int index = 0; index < (1 << RookMaskBits[square]); ++index)
                 {
-                    var occupancyMapping = GetOccupancyMapping(index, RookMaskBits[square], new Bitboard(RookMasks[square]));
-                    var magicIndex = (occupancyMapping.Board * RookMagics[square]) >> (64 - RookMaskBits[square]);
+                    Bitboard occupancyMapping = GetOccupancyMapping(index, RookMaskBits[square], new Bitboard(RookMasks[square]));
+                    ulong magicIndex = (occupancyMapping.Board * RookMagics[square]) >> (64 - RookMaskBits[square]);
                     RookAttacks[square, magicIndex] = GetRookAttacks((Square)square, occupancyMapping).Board;
                 }
             }
@@ -59,7 +59,7 @@ namespace Rudim
 
         public static Bitboard GetBishopAttacksFromTable(Square square, Bitboard occupancy)
         {
-            var index = occupancy.Board;
+            ulong index = occupancy.Board;
             index &= BishopMasks[(int)square];
             index *= BishopMagics[(int)square];
             index >>= 64 - BishopMaskBits[(int)square];
@@ -68,7 +68,7 @@ namespace Rudim
 
         public static Bitboard GetRookAttacksFromTable(Square square, Bitboard occupancy)
         {
-            var index = occupancy.Board;
+            ulong index = occupancy.Board;
             index &= RookMasks[(int)square];
             index *= RookMagics[(int)square];
             index >>= 64 - RookMaskBits[(int)square];

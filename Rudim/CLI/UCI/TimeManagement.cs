@@ -9,7 +9,7 @@ namespace Rudim.CLI.UCI
         private static double[] Ratios = { 0.1, 0.2, 0.25, 0.25, 0.2, 0.05 };
         public static int CalculateMoveTime(int moveNumber, int clock, int increment)
         {
-            var moveTime = clock * Ratios[Math.Min(moveNumber / 20, 5)] / 10 + increment - Constants.BufferTime;
+            double moveTime = clock * Ratios[Math.Min(moveNumber / 20, 5)] / 10 + increment - Constants.BufferTime;
             return (int)Math.Max(moveTime, 10);
         }
     }

@@ -9,10 +9,10 @@ namespace Rudim.Test.UnitTest.Board
         [Fact]
         public void ShouldOrderMovesByScore()
         {
-            var boardState = BoardState.ParseFEN(Helpers.KiwiPeteFEN);
+            BoardState boardState = BoardState.ParseFEN(Helpers.KiwiPeteFEN);
 
             boardState.GenerateMoves();
-            foreach (var move in boardState.Moves)
+            foreach (Move move in boardState.Moves)
             {
                 MoveOrdering.PopulateMoveScore(move, boardState);
             }

@@ -24,45 +24,45 @@ namespace Rudim.Test.UnitTest.Board
                            "h6f5 c3f6 f5h6 f6c3 h6f5 c3f6 f5e3 f6g7 e3d5 c5d6 d5b4 g7f8 b4d5 f8g7 d5b4 g7f8 b4d5 f8h6 d5b6 h6g7 b6c8 d6c5 c8e7 " +
                            "g7b2 e7g8 c5d6 g8h6 d6c6 h6g8 c6d7 g8h6 d7e6 h6f5 b2a1 f5h6 e6d6 h6f5 d6c5 f5h4 a1f6 h4f3 f6c3 f3e5 c5d6 e5f3 c3f6 " +
                            "f3d4 f6e5";
-            var moves = movesStr.Split(" ");
+            string[] moves = movesStr.Split(" ");
             BoardState boardState = BoardState.Default();
             foreach (string moveStr in moves)
             {
                 boardState.GenerateMoves();
-                var move = Move.ParseLongAlgebraic(moveStr);
+                Move move = Move.ParseLongAlgebraic(moveStr);
                 move = Helpers.FindMoveFromMoveList(boardState, move);
                 boardState.MakeMove(move);
             }
             Assert.False(boardState.IsDraw());
-            var fiftyMove = new Move(Square.d4, Square.c2, MoveTypes.Quiet);
+            Move fiftyMove = new Move(Square.d4, Square.c2, MoveTypes.Quiet);
             boardState.MakeMove(fiftyMove);
             Assert.True(boardState.IsDraw());
         }
         [Fact]
         public void ShouldDetectThreeFoldRepetition()
         {
-            var boardState = BoardState.Default();
+            BoardState boardState = BoardState.Default();
 
-            var whiteKnightOut = new Move(Square.g1, Square.f3, MoveTypes.Quiet);
-            var blackKnightOut = new Move(Square.g8, Square.f6, MoveTypes.Quiet);
-            var whiteKnightBack = new Move(Square.f3, Square.g1, MoveTypes.Quiet);
-            var blackKnightBack = new Move(Square.f6, Square.g8, MoveTypes.Quiet);
+            Move whiteKnightOut = new Move(Square.g1, Square.f3, MoveTypes.Quiet);
+            Move blackKnightOut = new Move(Square.g8, Square.f6, MoveTypes.Quiet);
+            Move whiteKnightBack = new Move(Square.f3, Square.g1, MoveTypes.Quiet);
+            Move blackKnightBack = new Move(Square.f6, Square.g8, MoveTypes.Quiet);
 
             MoveAndAssert(boardState, whiteKnightOut, blackKnightOut, whiteKnightBack, blackKnightBack, false);
             MoveAndAssert(boardState, whiteKnightOut, blackKnightOut, whiteKnightBack, blackKnightBack, true);
-         }
+        }
 
         [Fact]
         public void ShouldNotDetectThreeFoldRepetitionWhenMovesAreDifferent()
         {
-            var boardState = BoardState.Default();
+            BoardState boardState = BoardState.Default();
 
-            var whiteKnightF3 = new Move(Square.g1, Square.f3, MoveTypes.Quiet);
-            var blackKnightF6 = new Move(Square.g8, Square.f6, MoveTypes.Quiet);
-            var whiteKnightE5 = new Move(Square.f3, Square.e5, MoveTypes.Quiet);
-            var blackKnightE4 = new Move(Square.f6, Square.e4, MoveTypes.Quiet);
-            var whiteKnightBackF3 = new Move(Square.e5, Square.f3, MoveTypes.Quiet);
-            var blackKnightBackF6 = new Move(Square.e4, Square.f6, MoveTypes.Quiet);
+            Move whiteKnightF3 = new Move(Square.g1, Square.f3, MoveTypes.Quiet);
+            Move blackKnightF6 = new Move(Square.g8, Square.f6, MoveTypes.Quiet);
+            Move whiteKnightE5 = new Move(Square.f3, Square.e5, MoveTypes.Quiet);
+            Move blackKnightE4 = new Move(Square.f6, Square.e4, MoveTypes.Quiet);
+            Move whiteKnightBackF3 = new Move(Square.e5, Square.f3, MoveTypes.Quiet);
+            Move blackKnightBackF6 = new Move(Square.e4, Square.f6, MoveTypes.Quiet);
 
             boardState.MakeMove(whiteKnightF3);
             boardState.MakeMove(blackKnightF6);
@@ -77,12 +77,12 @@ namespace Rudim.Test.UnitTest.Board
         [Fact]
         public void ShouldResetRepetitionCountAfterPawnMove()
         {
-            var boardState = BoardState.Default();
-            var whiteKnightOut = new Move(Square.g1, Square.f3, MoveTypes.Quiet);
-            var blackKnightOut = new Move(Square.g8, Square.f6, MoveTypes.Quiet);
-            var whiteKnightBack = new Move(Square.f3, Square.g1, MoveTypes.Quiet);
-            var blackKnightBack = new Move(Square.f6, Square.g8, MoveTypes.Quiet);
-            var whitePawnMove = new Move(Square.e2, Square.e4, MoveTypes.DoublePush);
+            BoardState boardState = BoardState.Default();
+            Move whiteKnightOut = new Move(Square.g1, Square.f3, MoveTypes.Quiet);
+            Move blackKnightOut = new Move(Square.g8, Square.f6, MoveTypes.Quiet);
+            Move whiteKnightBack = new Move(Square.f3, Square.g1, MoveTypes.Quiet);
+            Move blackKnightBack = new Move(Square.f6, Square.g8, MoveTypes.Quiet);
+            Move whitePawnMove = new Move(Square.e2, Square.e4, MoveTypes.DoublePush);
 
             MoveAndAssert(boardState, whiteKnightOut, blackKnightOut, whiteKnightBack, blackKnightBack, false);
             MoveAndAssert(boardState, whiteKnightOut, blackKnightOut, whitePawnMove, blackKnightBack, false);
@@ -92,14 +92,14 @@ namespace Rudim.Test.UnitTest.Board
         [Fact]
         public void ShouldResetRepetitionCountAfterCapture()
         {
-            var boardState = BoardState.Default();
-            var whiteKnightOut = new Move(Square.g1, Square.f3, MoveTypes.Quiet);
-            var blackKnightOut = new Move(Square.g8, Square.f6, MoveTypes.Quiet);
-            var whiteKnightBack = new Move(Square.f3, Square.g1, MoveTypes.Quiet);
-            var blackKnightBack = new Move(Square.f6, Square.g8, MoveTypes.Quiet);
-            var whitePawnOut = new Move(Square.e2, Square.e4, MoveTypes.DoublePush);
-            var blackPawnOut = new Move(Square.d7, Square.d5, MoveTypes.DoublePush);
-            var pawnCapture = new Move(Square.e4, Square.d5, MoveTypes.Capture);
+            BoardState boardState = BoardState.Default();
+            Move whiteKnightOut = new Move(Square.g1, Square.f3, MoveTypes.Quiet);
+            Move blackKnightOut = new Move(Square.g8, Square.f6, MoveTypes.Quiet);
+            Move whiteKnightBack = new Move(Square.f3, Square.g1, MoveTypes.Quiet);
+            Move blackKnightBack = new Move(Square.f6, Square.g8, MoveTypes.Quiet);
+            Move whitePawnOut = new Move(Square.e2, Square.e4, MoveTypes.DoublePush);
+            Move blackPawnOut = new Move(Square.d7, Square.d5, MoveTypes.DoublePush);
+            Move pawnCapture = new Move(Square.e4, Square.d5, MoveTypes.Capture);
 
             boardState.MakeMove(whitePawnOut);
             boardState.MakeMove(blackPawnOut);

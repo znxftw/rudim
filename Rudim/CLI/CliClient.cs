@@ -21,9 +21,9 @@ namespace Rudim.CLI
         {
             while (true)
             {
-                var input = Console.ReadLine().Split(' ');
-                var command = input[0];
-                var parameters = input.Skip(1).ToArray();
+                string[] input = Console.ReadLine().Split(' ');
+                string command = input[0];
+                string[] parameters = input.Skip(1).ToArray();
 
                 if (command == "exit")
                 {

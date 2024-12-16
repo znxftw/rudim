@@ -7,7 +7,7 @@ namespace Rudim.Board
     public partial class BoardState
     {
         private static readonly Dictionary<ulong, string> CommonStateNames = new();
-        
+
         private static readonly int[] CastlingConstants =
         {
             7, 15, 15, 15, 3, 15, 15, 11,
@@ -29,7 +29,7 @@ namespace Rudim.Board
             CommonStateNames[Zobrist.GetBoardHash(ParseFEN(Helpers.KiwiPeteFEN))] = "Random State";
             CommonStateNames[Zobrist.GetBoardHash(ParseFEN(Helpers.AdvancedMoveFEN))] = "Advanced Move State";
         }
-        
+
         public static bool operator ==(BoardState left, BoardState right)
         {
             return Equals(left, right);

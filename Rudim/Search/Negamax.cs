@@ -19,21 +19,21 @@ namespace Rudim.Search
                 return Quiescent.Search(boardState, alpha, beta, cancellationToken);
 
             Nodes++;
-            var originalAlpha = alpha;
+            int originalAlpha = alpha;
             Move bestEvaluation = Move.NoMove;
 
             boardState.GenerateMoves();
-            var ply = _searchDepth - depth;
+            int ply = _searchDepth - depth;
             // TODO : Flag in GenerateMoves to avoid extra iteration?
-            foreach (var move in boardState.Moves)
+            foreach (Move move in boardState.Moves)
             {
                 MoveOrdering.PopulateMoveScore(move, boardState, ply);
             }
 
             MoveOrdering.SortMoves(boardState);
 
-            var numberOfLegalMoves = 0;
-            foreach (var move in boardState.Moves)
+            int numberOfLegalMoves = 0;
+            foreach (Move move in boardState.Moves)
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
@@ -43,7 +43,7 @@ namespace Rudim.Search
                     boardState.UnmakeMove(move);
                     continue;
                 }
-                var score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+                int score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
                 boardState.UnmakeMove(move);
                 numberOfLegalMoves++;
                 if (score >= beta)
@@ -78,8 +78,8 @@ namespace Rudim.Search
             Nodes = 0;
             BestMove = Move.NoMove;
             Quiescent.ResetNodes();
-            var score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
-            if(BestMove == Move.NoMove)
+            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
+            if (BestMove == Move.NoMove)
             {
                 boardState.GenerateMoves();
                 BestMove = boardState.Moves[0];

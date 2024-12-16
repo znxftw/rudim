@@ -33,9 +33,9 @@ namespace Rudim.Common
             ulong currentHash = 0;
 
             // Go through piece + loop Lsb() instead of squares?
-            for (var square = 0; square < 64; square++)
+            for (int square = 0; square < 64; square++)
             {
-                var piece = boardState.GetPieceOn((Square)square);
+                int piece = boardState.GetPieceOn((Square)square);
                 if (piece != -1)
                 {
                     currentHash ^= ZobristTable[piece, square];
@@ -43,7 +43,7 @@ namespace Rudim.Common
             }
 
             currentHash = HashSideToMove(boardState, currentHash);
-            
+
             currentHash = HashCastlingRights(boardState, currentHash);
 
             currentHash = HashEnPassant(boardState, currentHash);
@@ -62,7 +62,7 @@ namespace Rudim.Common
             currentHash ^= boardState.SideToMove == Side.White ? ZobristTable[13, 0] : ZobristTable[13, 1];
             return currentHash;
         }
-        
+
         public static ulong FlipSideToMoveHashes(BoardState boardState, ulong currentHash)
         {
             currentHash ^= ZobristTable[13, 0];

@@ -23,18 +23,18 @@ namespace Rudim.Board
 
         private static int ScorePosition(BoardState boardState)
         {
-            var positionalScore = 0;
-            var midGamePhase = GamePhase.Calculate(boardState);
-            var endGamePhase = GamePhase.TotalPhase - midGamePhase;
-            for (var piece = 0; piece < Constants.Pieces; ++piece)
+            int positionalScore = 0;
+            int midGamePhase = GamePhase.Calculate(boardState);
+            int endGamePhase = GamePhase.TotalPhase - midGamePhase;
+            for (int piece = 0; piece < Constants.Pieces; ++piece)
             {
-                var whiteBoard = new Bitboard(boardState.Pieces[(int)Side.White, piece].Board);
-                var blackBoard = new Bitboard(boardState.Pieces[(int)Side.Black, piece].Board);
+                Bitboard whiteBoard = new Bitboard(boardState.Pieces[(int)Side.White, piece].Board);
+                Bitboard blackBoard = new Bitboard(boardState.Pieces[(int)Side.Black, piece].Board);
 
                 if (piece == Constants.Pieces - 1)
                 {
-                    var whiteKing = whiteBoard.GetLsb();
-                    var blackKing = MirrorSquare(blackBoard.GetLsb());
+                    int whiteKing = whiteBoard.GetLsb();
+                    int blackKing = MirrorSquare(blackBoard.GetLsb());
 
                     positionalScore += (int)(((MidGameKingValues[whiteKing] * midGamePhase) + (EndGameKingValues[whiteKing] * endGamePhase)) * GamePhase.PhaseFactor);
                     positionalScore -= (int)(((MidGameKingValues[blackKing] * midGamePhase) + (EndGameKingValues[blackKing] * endGamePhase)) * GamePhase.PhaseFactor);
@@ -43,14 +43,14 @@ namespace Rudim.Board
 
                 while (whiteBoard.Board > 0)
                 {
-                    var square = whiteBoard.GetLsb();
+                    int square = whiteBoard.GetLsb();
                     whiteBoard.ClearBit(square);
                     positionalScore += PositionValues[piece, square];
                 }
 
                 while (blackBoard.Board > 0)
                 {
-                    var square = blackBoard.GetLsb();
+                    int square = blackBoard.GetLsb();
                     blackBoard.ClearBit(square);
                     square = MirrorSquare(square);
                     positionalScore -= PositionValues[piece, square];
@@ -69,8 +69,8 @@ namespace Rudim.Board
 
         private static int ScoreMaterial(BoardState boardState)
         {
-            var materialScore = 0;
-            for (var piece = 0; piece < Constants.Pieces; ++piece)
+            int materialScore = 0;
+            for (int piece = 0; piece < Constants.Pieces; ++piece)
             {
                 materialScore += PieceValues[piece] * BitOperations.PopCount(boardState.Pieces[(int)Side.White, piece].Board);
                 materialScore -= PieceValues[piece] * BitOperations.PopCount(boardState.Pieces[(int)Side.Black, piece].Board);

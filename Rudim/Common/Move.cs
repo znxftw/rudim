@@ -35,9 +35,9 @@ namespace Rudim.Common
 
         public static Move ParseLongAlgebraic(string moveString)
         {
-            var from = ParseFromString(moveString.Substring(0, 2));
-            var to = ParseFromString(moveString.Substring(2, 2));
-            var moveType = moveString.Length == 5 ? ParsePromotionType(moveString[4]) : MoveTypes.Quiet;
+            Square from = ParseFromString(moveString.Substring(0, 2));
+            Square to = ParseFromString(moveString.Substring(2, 2));
+            MoveType moveType = moveString.Length == 5 ? ParsePromotionType(moveString[4]) : MoveTypes.Quiet;
 
             return new Move(from, to, moveType);
         }

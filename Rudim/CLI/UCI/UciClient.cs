@@ -14,7 +14,7 @@ namespace Rudim.CLI.UCI
 
         public UciClient()
         {
-            var goCommand = new GoCommand(this);
+            GoCommand goCommand = new GoCommand(this);
             _commands = new Dictionary<string, IUciCommand>
             {
                 ["isready"] = new IsReadyCommand(this),
@@ -32,9 +32,9 @@ namespace Rudim.CLI.UCI
             WriteId();
             while (true)
             {
-                var input = Console.ReadLine().Split(' ');
-                var command = input[0];
-                var commandParameters = input.Skip(1).ToArray();
+                string[] input = Console.ReadLine().Split(' ');
+                string command = input[0];
+                string[] commandParameters = input.Skip(1).ToArray();
 
                 if (command == "quit")
                 {

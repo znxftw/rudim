@@ -9,7 +9,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetMaskForCentralBishop()
         {
-            var bishopMaskE5 = Rudim.Bitboard.GetBishopMask(Square.e5);
+            Rudim.Bitboard bishopMaskE5 = Rudim.Bitboard.GetBishopMask(Square.e5);
 
             Assert.Equal(1, bishopMaskE5.GetBit(Square.f4));
             Assert.Equal(1, bishopMaskE5.GetBit(Square.g3));
@@ -31,7 +31,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetMaskForCornerBishop()
         {
-            var bishopMaskA1 = Rudim.Bitboard.GetBishopMask(Square.a1);
+            Rudim.Bitboard bishopMaskA1 = Rudim.Bitboard.GetBishopMask(Square.a1);
 
             Assert.Equal(1, bishopMaskA1.GetBit(Square.b2));
             Assert.Equal(1, bishopMaskA1.GetBit(Square.c3));
@@ -45,7 +45,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetMaskForCentralRook()
         {
-            var rookMaskE5 = Rudim.Bitboard.GetRookMask(Square.e5);
+            Rudim.Bitboard rookMaskE5 = Rudim.Bitboard.GetRookMask(Square.e5);
 
             Assert.Equal(1, rookMaskE5.GetBit(Square.e2));
             Assert.Equal(1, rookMaskE5.GetBit(Square.e3));
@@ -65,7 +65,7 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetMaskForCornerRook()
         {
-            var rookMaskA1 = Rudim.Bitboard.GetRookMask(Square.a1);
+            Rudim.Bitboard rookMaskA1 = Rudim.Bitboard.GetRookMask(Square.a1);
 
             Assert.Equal(1, rookMaskA1.GetBit(Square.a2));
             Assert.Equal(1, rookMaskA1.GetBit(Square.a3));
@@ -87,10 +87,10 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetOccupancyMappingForBishop()
         {
-            var mask = Rudim.Bitboard.GetBishopMask(Square.e5);
+            Rudim.Bitboard mask = Rudim.Bitboard.GetBishopMask(Square.e5);
             const int index = 0b100100100;
-            var bitsInMask = BitOperations.PopCount(mask.Board);
-            var occupancyMapping = Rudim.Bitboard.GetOccupancyMapping(index, bitsInMask, mask);
+            int bitsInMask = BitOperations.PopCount(mask.Board);
+            Rudim.Bitboard occupancyMapping = Rudim.Bitboard.GetOccupancyMapping(index, bitsInMask, mask);
 
             Assert.Equal(1, occupancyMapping.GetBit(Square.d6));
             Assert.Equal(1, occupancyMapping.GetBit(Square.f4));
@@ -102,10 +102,10 @@ namespace Rudim.Test.UnitTest.Bitboard
         [Fact]
         public void ShouldGetOccupancyMappingForRook()
         {
-            var mask = Rudim.Bitboard.GetRookMask(Square.e5);
+            Rudim.Bitboard mask = Rudim.Bitboard.GetRookMask(Square.e5);
             const int index = 0b0100100100;
-            var bitsInMask = BitOperations.PopCount(mask.Board);
-            var occupancyMapping = Rudim.Bitboard.GetOccupancyMapping(index, bitsInMask, mask);
+            int bitsInMask = BitOperations.PopCount(mask.Board);
+            Rudim.Bitboard occupancyMapping = Rudim.Bitboard.GetOccupancyMapping(index, bitsInMask, mask);
 
             Assert.Equal(1, occupancyMapping.GetBit(Square.e3));
             Assert.Equal(1, occupancyMapping.GetBit(Square.f5));

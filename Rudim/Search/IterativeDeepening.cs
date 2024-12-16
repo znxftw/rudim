@@ -15,7 +15,7 @@ namespace Rudim.Search
 
         public static void Search(BoardState boardState, int depth, CancellationToken cancellationToken, ref bool debugMode)
         {
-            var timer = new Stopwatch();
+            Stopwatch timer = new Stopwatch();
             BestMove = Move.NoMove;
             Score = 0;
             Nodes = 0;
@@ -28,12 +28,12 @@ namespace Rudim.Search
                     break;
 
                 BestMove = Negamax.BestMove;
-                var nodesTraversed = Negamax.Nodes + Quiescent.Nodes;
+                int nodesTraversed = Negamax.Nodes + Quiescent.Nodes;
                 Nodes += nodesTraversed;
 
                 timer.Stop();
                 double time = Math.Max(timer.ElapsedMilliseconds, 1);
-                var nps = (int)(Nodes / time * 1000);
+                int nps = (int)(Nodes / time * 1000);
 
                 if (debugMode)
                 {

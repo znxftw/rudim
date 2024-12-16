@@ -12,7 +12,7 @@
 
         public static ulong NextULong()
         {
-            var randomNumber = _ulongState;
+            ulong randomNumber = _ulongState;
             randomNumber ^= randomNumber << 13;
             randomNumber ^= randomNumber >> 7;
             randomNumber ^= randomNumber << 17;
@@ -21,7 +21,7 @@
 
         public static int NextInt()
         {
-            var randomNumber = _intState;
+            int randomNumber = _intState;
             randomNumber ^= randomNumber << 13;
             randomNumber ^= randomNumber >> 17;
             randomNumber ^= randomNumber << 5;

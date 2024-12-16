@@ -21,7 +21,7 @@ namespace Rudim.Test.Perft
         {
             if (depth == 0) { Nodes++; return; }
             boardState.GenerateMoves();
-            foreach (var move in boardState.Moves)
+            foreach (Move move in boardState.Moves)
             {
                 boardState.MakeMove(move);
                 if (!boardState.IsInCheck(boardState.SideToMove.Other()))
