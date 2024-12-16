@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Rudim.CLI.UCI
 {
-    internal class PositionCommand(UciClient uciClient) : IUciCommand
+    public class PositionCommand(UciClient uciClient) : IUciCommand
     {
         public void Run(string[] parameters)
         {
