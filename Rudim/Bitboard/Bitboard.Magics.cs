@@ -1,4 +1,5 @@
 ﻿using Rudim.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 
@@ -6,6 +7,7 @@ namespace Rudim
 {
     public partial struct Bitboard
     {
+        [ExcludeFromCodeCoverage] // This is only used as a helper in the beginning to generate numbers - never used in runtime.
         public static ulong FindMagicNumber(Square square, int bitsInMask, bool isBishop)
         {
             int maxIndex = 1 << bitsInMask;
