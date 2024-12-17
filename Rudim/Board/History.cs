@@ -59,7 +59,7 @@ namespace Rudim.Board
         }
         public static bool IsHistoryEmpty()
         {
-            return  _historyIndex == 0;
+            return _historyIndex == 0;
         }
     }
 }

@@ -1,5 +1,5 @@
-using Rudim.CLI.UCI;
 using Rudim.Board;
+using Rudim.CLI.UCI;
 using Rudim.Common;
 using Xunit;
 using Helpers = Rudim.Test.Util.Helpers;
