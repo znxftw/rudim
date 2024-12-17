@@ -68,7 +68,7 @@ namespace Rudim.Search
                 }
                 if (score > alpha)
                 {
-                    AlphaUpdate(out alpha, score, move, out bestEvaluation, out foundPv);
+                    AlphaUpdate(out alpha, score, move, out bestEvaluation, out foundPv, boardState, depth);
                 }
             }
 
@@ -102,8 +102,10 @@ namespace Rudim.Search
             return score;
         }
 
-        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation, out bool foundPv)
+        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation, out bool foundPv, BoardState boardState, int depth)
         {
+            if(!move.IsCapture())
+                MoveOrdering.AddHistoryMove(boardState.GetPieceOn(move.Source), move, depth);
             alpha = score;
             bestEvaluation = move;
             foundPv = true;
