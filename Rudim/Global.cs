@@ -9,7 +9,7 @@ namespace Rudim
     {
         public static void Reset()
         {
-            MoveOrdering.ResetKillerMoves();
+            MoveOrdering.ResetMoveHeuristic();
             History.ClearBoardHistory();
             PerftDriver.ResetNodeCount();
 

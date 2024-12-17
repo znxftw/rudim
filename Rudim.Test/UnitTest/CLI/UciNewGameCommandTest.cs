@@ -18,13 +18,13 @@ namespace Rudim.Test.UnitTest.CLI
             History.SaveBoardHistory(Piece.None, Square.NoSquare, Castle.None, 0, 0);
 
             Assert.NotEqual(BoardState.Default(), uciClient.Board);
-            Assert.False(MoveOrdering.IsKillerMovesEmpty());
+            Assert.False(MoveOrdering.IsMoveHeuristicEmpty());
             Assert.False(History.IsHistoryEmpty());
 
             newGameCommand.Run([]);
 
             Assert.Equal(BoardState.Default(), uciClient.Board);
-            Assert.True(MoveOrdering.IsKillerMovesEmpty());
+            Assert.True(MoveOrdering.IsMoveHeuristicEmpty());
             Assert.True(History.IsHistoryEmpty());
         }
     }
