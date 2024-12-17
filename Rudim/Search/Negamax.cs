@@ -7,29 +7,41 @@ namespace Rudim.Search
     static class Negamax
     {
         public static Move BestMove;
-        public static int Nodes = 0;
-        private static int _searchDepth = 0;
+        public static int Nodes;
+        private static int _searchDepth;
+        
+        
+        public static int Search(BoardState boardState, int depth, CancellationToken cancellationToken)
+        {
+            _searchDepth = depth;
+            Nodes = 0;
+            BestMove = Move.NoMove;
+            Quiescent.ResetNodes();
+            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
+            if (BestMove == Move.NoMove)
+            {
+                boardState.GenerateMoves();
+                BestMove = boardState.Moves[0];
+            }
+            return score;
+        }
 
         private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
         {
+            
             if (boardState.IsDraw())
                 return 0;
 
             if (depth == 0)
                 return Quiescent.Search(boardState, alpha, beta, cancellationToken);
 
-            Nodes++;
             int originalAlpha = alpha;
-            Move bestEvaluation = Move.NoMove;
-
-            boardState.GenerateMoves();
             int ply = _searchDepth - depth;
-            // TODO : Flag in GenerateMoves to avoid extra iteration?
-            foreach (Move move in boardState.Moves)
-            {
-                MoveOrdering.PopulateMoveScore(move, boardState, ply);
-            }
-
+            Move bestEvaluation = Move.NoMove;
+            Nodes++;
+            
+            boardState.GenerateMoves();
+            PopulateMoveScores(boardState, ply);
             MoveOrdering.SortMoves(boardState);
 
             int numberOfLegalMoves = 0;
@@ -44,18 +56,16 @@ namespace Rudim.Search
                     continue;
                 }
                 int score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
-                boardState.UnmakeMove(move);
                 numberOfLegalMoves++;
+
+                boardState.UnmakeMove(move);
                 if (score >= beta)
                 {
-                    if (!move.IsCapture())
-                        MoveOrdering.AddKillerMove(move, ply);
-                    return beta;
+                    return BetaCutoff(beta, move, ply);
                 }
                 if (score > alpha)
                 {
-                    alpha = score;
-                    bestEvaluation = move;
+                    AlphaUpdate(out alpha, score, move, out bestEvaluation);
                 }
             }
 
@@ -72,19 +82,25 @@ namespace Rudim.Search
             return alpha;
         }
 
-        public static int Search(BoardState boardState, int depth, CancellationToken cancellationToken)
+        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation)
         {
-            _searchDepth = depth;
-            Nodes = 0;
-            BestMove = Move.NoMove;
-            Quiescent.ResetNodes();
-            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
-            if (BestMove == Move.NoMove)
+            alpha = score;
+            bestEvaluation = move;
+        }
+
+        private static int BetaCutoff(int beta, Move move, int ply)
+        {
+            if (!move.IsCapture())
+                MoveOrdering.AddKillerMove(move, ply);
+            return beta;
+        }
+
+        private static void PopulateMoveScores(BoardState boardState, int ply)
+        {
+            foreach (Move move in boardState.Moves)
             {
-                boardState.GenerateMoves();
-                BestMove = boardState.Moves[0];
+                MoveOrdering.PopulateMoveScore(move, boardState, ply);
             }
-            return score;
         }
     }
 }
