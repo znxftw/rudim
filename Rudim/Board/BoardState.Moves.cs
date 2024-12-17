@@ -261,15 +261,15 @@ namespace Rudim.Board
 
         private bool IsSquareAttacked(Square square, Side attackingSide)
         {
-            if ((Bitboard.PawnAttacks[(int)attackingSide.Other(), (int)square] & Pieces[(int)attackingSide, (int)Piece.Pawn].Board) != 0)
-                return true;
-            if ((Bitboard.KnightAttacks[(int)square] & Pieces[(int)attackingSide, (int)Piece.Knight].Board) != 0)
-                return true;
             if ((Bitboard.GetBishopAttacksFromTable(square, Occupancies[(int)Side.Both]).Board & Pieces[(int)attackingSide, (int)Piece.Bishop].Board) != 0)
                 return true;
             if ((Bitboard.GetRookAttacksFromTable(square, Occupancies[(int)Side.Both]).Board & Pieces[(int)attackingSide, (int)Piece.Rook].Board) != 0)
                 return true;
             if ((Bitboard.GetQueenAttacksFromTable(square, Occupancies[(int)Side.Both]).Board & Pieces[(int)attackingSide, (int)Piece.Queen].Board) != 0)
+                return true;
+            if ((Bitboard.KnightAttacks[(int)square] & Pieces[(int)attackingSide, (int)Piece.Knight].Board) != 0)
+                return true;
+            if ((Bitboard.PawnAttacks[(int)attackingSide.Other(), (int)square] & Pieces[(int)attackingSide, (int)Piece.Pawn].Board) != 0)
                 return true;
             if ((Bitboard.KingAttacks[(int)square] & Pieces[(int)attackingSide, (int)Piece.King].Board) != 0)
                 return true;
