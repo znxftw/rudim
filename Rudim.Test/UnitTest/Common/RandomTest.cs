@@ -4,6 +4,9 @@ using Xunit;
 
 namespace Rudim.Test.UnitTest.Common
 {
+    // This test being run before other tests causes a different expected output.
+    // Currently this is not a problem, just that this test always needs to be run, or values in 
+    // Traversal Test will need to be changed.
     public class RandomTest
     {
         [Fact]

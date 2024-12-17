@@ -28,7 +28,13 @@ namespace Rudim.Search
 
         private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
         {
-
+            (bool hasValue, int ttScore, Move bestEvaluation) = TranspositionTable.GetEntry(boardState.BoardHash, alpha, beta, depth);
+            if (hasValue)
+            {
+                BestMove = bestEvaluation;
+                return ttScore;
+            }
+            
             if (boardState.IsDraw())
                 return 0;
 
@@ -38,7 +44,7 @@ namespace Rudim.Search
             int originalAlpha = alpha;
             int ply = _searchDepth - depth;
             bool foundPv = false;
-            Move bestEvaluation = Move.NoMove;
+            TranspositionEntryType entryType = TranspositionEntryType.Alpha;
             Nodes++;
 
             boardState.GenerateMoves();
@@ -64,10 +70,12 @@ namespace Rudim.Search
                 boardState.UnmakeMove(move);
                 if (score >= beta)
                 {
+                    TranspositionTable.SubmitEntry(boardState.BoardHash, beta, depth, move, TranspositionEntryType.Beta);
                     return BetaCutoff(beta, move, ply);
                 }
                 if (score > alpha)
                 {
+                    entryType = TranspositionEntryType.Exact;
                     AlphaUpdate(out alpha, score, move, out bestEvaluation, out foundPv, boardState, depth);
                 }
             }
@@ -81,7 +89,9 @@ namespace Rudim.Search
 
             if (alpha != originalAlpha)
                 BestMove = bestEvaluation;
-
+            
+            TranspositionTable.SubmitEntry(boardState.BoardHash, alpha, depth, bestEvaluation, entryType);
+            
             return alpha;
         }
 
