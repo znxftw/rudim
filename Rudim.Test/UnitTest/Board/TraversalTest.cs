@@ -13,10 +13,10 @@ namespace Rudim.Test.UnitTest.Board
         // This helps keep track if certain optimizations are good enough to make up for the extra time spent
         // Compare time spent with and without the change before updating the keys
         [Theory]
-        [InlineData(Helpers.StartingFEN, 3916083,5, 8)]
-        [InlineData(Helpers.EndgameFEN, 2327956,45, 9)]
-        [InlineData(Helpers.AdvancedMoveFEN, 10012236,1520, 8)]
-        [InlineData(Helpers.KiwiPeteFEN, 11101517,-18, 8)]
+        [InlineData(Helpers.StartingFEN, 3804303,5, 8)]
+        [InlineData(Helpers.EndgameFEN, 1130154,45, 9)]
+        [InlineData(Helpers.AdvancedMoveFEN, 6689081,1520, 8)]
+        [InlineData(Helpers.KiwiPeteFEN, 10605420,-18, 8)]
         public void ShouldTraverseDeterministically(string position, int expectedNodes, int expectedScore, int depth)
         {
             Global.Reset();

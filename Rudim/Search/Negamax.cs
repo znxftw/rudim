@@ -37,6 +37,7 @@ namespace Rudim.Search
 
             int originalAlpha = alpha;
             int ply = _searchDepth - depth;
+            bool foundPv = false;
             Move bestEvaluation = Move.NoMove;
             Nodes++;
             
@@ -55,7 +56,9 @@ namespace Rudim.Search
                     boardState.UnmakeMove(move);
                     continue;
                 }
-                int score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+
+                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, foundPv);
+                
                 numberOfLegalMoves++;
 
                 boardState.UnmakeMove(move);
@@ -65,14 +68,14 @@ namespace Rudim.Search
                 }
                 if (score > alpha)
                 {
-                    AlphaUpdate(out alpha, score, move, out bestEvaluation);
+                    AlphaUpdate(out alpha, score, move, out bestEvaluation, out foundPv);
                 }
             }
 
             if (numberOfLegalMoves == 0)
             {
                 if (boardState.IsInCheck(boardState.SideToMove))
-                    return -Constants.MaxCentipawnEval + (_searchDepth - depth);
+                    return -Constants.MaxCentipawnEval + ply;
                 return 0;
             }
 
@@ -82,10 +85,28 @@ namespace Rudim.Search
             return alpha;
         }
 
-        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation)
+        private static int SearchDeeper(BoardState boardState, int depth, int alpha, int beta,
+            CancellationToken cancellationToken, bool foundPv)
+        {
+            int score;
+            if (foundPv)
+            {
+                score = -Search(boardState, depth - 1, -alpha - 1, -alpha, cancellationToken);
+                if (score > alpha && score < beta) 
+                    score = -Search(boardState,depth - 1, -beta, -alpha, cancellationToken);
+            }
+            else
+            {
+                score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+            }
+            return score;
+        }
+
+        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation, out bool foundPv)
         {
             alpha = score;
             bestEvaluation = move;
+            foundPv = true;
         }
 
         private static int BetaCutoff(int beta, Move move, int ply)
