@@ -6,6 +6,7 @@ using Helpers = Rudim.Test.Util.Helpers;
 
 namespace Rudim.Test.UnitTest.CLI
 {
+    [Collection("StateRace")]
     public class PositionCommandTest
     {
         [Fact]

@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Rudim.Test.UnitTest.CLI
 {
+    [Collection("StateRace")]
     public class UciNewGameCommandTest
     {
         [Fact]
