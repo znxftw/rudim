@@ -7,11 +7,11 @@ using System.Threading;
 
 namespace Rudim.Search
 {
-    static class IterativeDeepening
+    public static class IterativeDeepening
     {
         public static Move BestMove;
-        private static int Score;
-        private static int Nodes;
+        public static int Score;
+        public static int Nodes;
 
         public static void Search(BoardState boardState, int depth, CancellationToken cancellationToken, ref bool debugMode)
         {
