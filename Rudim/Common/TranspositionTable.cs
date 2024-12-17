@@ -7,8 +7,7 @@ namespace Rudim.Common
         // TODO : Calculate this based on a constant and in MiB, not hard numbers
         private const int Capacity = 4096 * 16;
         private static readonly TranspositionTableEntry[] Entries;
-        public static bool UseTranspositionTable = true;
-
+        
         static TranspositionTable()
         {
             Entries = new TranspositionTableEntry[Capacity];
@@ -21,9 +20,6 @@ namespace Rudim.Common
 
         public static (bool, int, Move) GetEntry(ulong hash, int alpha, int beta, int depth)
         {
-            if (!UseTranspositionTable)
-                return (false, 0, null);
-
             TranspositionTableEntry entry = Entries[hash & (Capacity - 1)];
 
             if (entry == null)
@@ -50,9 +46,6 @@ namespace Rudim.Common
 
         public static void SubmitEntry(ulong hash, int score, int depth, Move bestMove, TranspositionEntryType entryType)
         {
-            if (!UseTranspositionTable)
-                return;
-
             var index = hash & (Capacity - 1);
             if (Entries[index]?.Depth >= depth)
                 return;
