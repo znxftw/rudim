@@ -31,6 +31,7 @@ namespace Rudim.Board
         public static void ClearBoardHistory()
         {
             Array.Clear(BoardHistories);
+            _historyIndex = 0;
         }
 
         public class BoardHistory
