@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Rudim.Search
 {
-    static class Quiescent
+    static class Quiescence
     {
         public static int Nodes { get; private set; } = 0;
         public static int Search(BoardState boardState, int alpha, int beta, CancellationToken cancellationToken)

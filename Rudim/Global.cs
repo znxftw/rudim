@@ -20,7 +20,7 @@ namespace Rudim
             Negamax.Nodes = 0;
             Negamax.BestMove = Move.NoMove;
 
-            Quiescent.ResetNodes();
+            Quiescence.ResetNodes();
             TranspositionTable.ClearTable();
         }
     }

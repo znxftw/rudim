@@ -28,7 +28,7 @@ namespace Rudim.Search
                     break;
 
                 BestMove = Negamax.BestMove;
-                int nodesTraversed = Negamax.Nodes + Quiescent.Nodes;
+                int nodesTraversed = Negamax.Nodes + Quiescence.Nodes;
                 Nodes += nodesTraversed;
 
                 timer.Stop();

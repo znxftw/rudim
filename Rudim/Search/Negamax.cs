@@ -16,7 +16,7 @@ namespace Rudim.Search
             _searchDepth = depth;
             Nodes = 0;
             BestMove = Move.NoMove;
-            Quiescent.ResetNodes();
+            Quiescence.ResetNodes();
             int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
             if (BestMove == Move.NoMove)
             {
@@ -39,7 +39,7 @@ namespace Rudim.Search
                 return 0;
 
             if (depth == 0)
-                return Quiescent.Search(boardState, alpha, beta, cancellationToken);
+                return Quiescence.Search(boardState, alpha, beta, cancellationToken);
 
             int originalAlpha = alpha;
             int ply = _searchDepth - depth;
