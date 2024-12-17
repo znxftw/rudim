@@ -5,7 +5,7 @@ namespace Rudim.Common
     public static class TranspositionTable
     {
         // TODO : Calculate this based on a constant and in MiB, not hard numbers
-        private const int Capacity = 4096 * 64;
+        private const int Capacity = 4096 * 16;
         private static readonly TranspositionTableEntry[] Entries;
         public static bool UseTranspositionTable = true;
 
