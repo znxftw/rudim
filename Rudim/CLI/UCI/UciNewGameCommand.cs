@@ -7,9 +7,8 @@ namespace Rudim.CLI.UCI
     {
         public void Run(string[] parameters)
         {
+            Global.Reset();
             uciClient.Board = BoardState.Default();
-            MoveOrdering.ResetKillerMoves();
-            History.ClearBoardHistory();
         }
     }
 }

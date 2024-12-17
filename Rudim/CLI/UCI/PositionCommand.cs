@@ -28,14 +28,14 @@ namespace Rudim.CLI.UCI
 
         private void ParseFen(string fen, IList<string> moves)
         {
-            History.ClearBoardHistory();
+            Global.Reset();
             uciClient.Board = BoardState.ParseFEN(fen);
             ParseMoves(moves);
         }
 
         private void ParseStartPos(IList<string> moves)
         {
-            History.ClearBoardHistory();
+            Global.Reset();
             uciClient.Board = BoardState.Default();
             ParseMoves(moves);
         }

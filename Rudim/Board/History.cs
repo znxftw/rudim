@@ -1,4 +1,5 @@
 using Rudim.Common;
+using System;
 
 namespace Rudim.Board
 {
@@ -29,7 +30,7 @@ namespace Rudim.Board
 
         public static void ClearBoardHistory()
         {
-            _historyIndex = 0;
+            Array.Clear(BoardHistories);
         }
 
         public class BoardHistory

@@ -19,8 +19,7 @@ namespace Rudim.Test.UnitTest.Board
         [InlineData(Helpers.KiwiPeteFEN, 11101517,-18, 8)]
         public void ShouldTraverseDeterministically(string position, int expectedNodes, int expectedScore, int depth)
         {
-            History.ClearBoardHistory();
-            MoveOrdering.ResetKillerMoves();
+            Global.Reset();
             
             BoardState boardState = BoardState.ParseFEN(position);
             bool debugMode = false;
