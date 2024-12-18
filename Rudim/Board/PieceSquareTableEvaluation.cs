@@ -49,10 +49,10 @@ namespace Rudim.Board
 
         private static int MirrorSquare(int square)
         {
-            int row = square >> 3;
-            int col = square - ((square >> 3) << 3);
+            int row = square >> 3; // Square / 8
+            int col = square & (8 - 1); // Square % 8
 
-            return ((7 - row) << 3) + col;
+            return ((7 - row) << 3) + col; // (7 - Row) * 8 + col
         }
 
         static PieceSquareTableEvaluation()
