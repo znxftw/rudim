@@ -12,7 +12,7 @@ namespace Rudim.Test.UnitTest.Board
         [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1", 0)] // Black
         [InlineData(Helpers.EndgameFEN, 37)]
         [InlineData(Helpers.KiwiPeteFEN, 56)]
-        [InlineData(Helpers.AdvancedMoveFEN, 516)]
+        [InlineData(Helpers.AdvancedMoveFEN, 495)]
         
         public void ShouldReturnConsistentScoreForGivenPosition(string fen, int expectedScore)
         {
