@@ -5,7 +5,8 @@
 
 ## What does Rudim do?
 
-Rudim is a relatively simple engine (at the moment) trying to keep things simple and modular, to try to build the perfect bridge between a "strong" and an "easy to understand" chess engine
+Rudim is a relatively simple engine (at the moment) trying to keep things simple and modular, to try to build the perfect bridge between a "strong" and an "easy to understand" chess engine.
+
 Rudim has been hosted on lichess, you can [play with Rudim on Lichess](https://lichess.org/@/rudim-bot).  
 
 
