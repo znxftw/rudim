@@ -54,7 +54,7 @@ namespace Rudim.CLI.UCI
 
         private static void WriteId()
         {
-            CliClient.WriteLine("id name Rudim 1.3");
+            CliClient.WriteLine("id name Rudim 1.4");
             CliClient.WriteLine("id author Vishnu B");
             CliClient.WriteLine("uciok");
         }
