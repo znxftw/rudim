@@ -28,9 +28,5 @@ namespace Rudim.Test.UnitTest.Board
             Assert.Equal(expectedNodes, IterativeDeepening.Nodes);
             Assert.Equal(expectedScore, IterativeDeepening.Score);
         }
-
-        public void Dispose()
-        {
-        }
     }
 }
