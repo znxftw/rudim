@@ -80,6 +80,7 @@ namespace Rudim
         [ArgumentsSource(nameof(GenerateBenchmarks))]
         public void BenchmarkBestMove(BoardState boardState, int depth, CancellationToken cancellationToken)
         {
+            Global.Reset();
             bool debugMode = false;
             boardState.FindBestMove(depth, cancellationToken, ref debugMode);
         }
