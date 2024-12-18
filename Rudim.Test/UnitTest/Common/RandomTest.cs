@@ -1,13 +1,11 @@
-using Rudim.Common;
+using System;
 using System.Collections.Generic;
 using Xunit;
+using Random = Rudim.Common.Random;
 
 namespace Rudim.Test.UnitTest.Common
 {
-    // This test being run before other tests causes a different expected output.
-    // Currently this is not a problem, just that this test always needs to be run, or values in 
-    // Traversal Test will need to be changed.
-    public class RandomTest
+    public class RandomTest : IDisposable
     {
         [Fact]
         public void ShouldGenerateUniqueULongNumbers()
@@ -29,6 +27,11 @@ namespace Rudim.Test.UnitTest.Common
                 int number = Random.NextInt();
                 Assert.True(generatedNumbers.Add(number), $"Collision detected for int number: {number}");
             }
+        }
+
+        public void Dispose()
+        {
+            Random._RESET_SEED();
         }
     }
 }
