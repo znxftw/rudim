@@ -5,19 +5,17 @@
 
 ## What does Rudim do?
 
-Rudim is currently a work in progress but is in an MVP phase - you can [play with Rudim on Lichess](https://lichess.org/@/rudim-bot).  
+Rudim is a relatively simple engine (at the moment) trying to keep things simple and modular, to try to build the perfect bridge between a "strong" and an "easy to understand" chess engine
+Rudim has been hosted on lichess, you can [play with Rudim on Lichess](https://lichess.org/@/rudim-bot).  
 
-If you see Rudim as offline - the server might be down. If Rudim is online but not accepting your challenge, Rudim might either be playing someone else (currently can play only one person at a time) or the server might be restarting - try again later.
 
 ### What all does Rudim implement?
 
-- Bitboards & Magic Bitboards
-- UCI Protocol (Partial)
-- Simplified Evaluation (Piece Square Tables)
-- Tapered Evaluation
-- Iterative Deepening + Negamax with Alpha Beta Pruning
-- Quiescent Search
-- Move Ordering - MVV LVA, Killer Heuristic, History Heuristic
+- Bitboards & Magics
+- UCI Protocol (WIP - core functionality only)
+- Simplified Evaluation (Material & Piece Square Tables) with Tapered Evaluation
+- Iterative Deepening on Negamax (with Alpha Beta Pruning) & Quiescence Search
+- Move Ordering with MVV LVA, Killer Heuristic, History Heuristic
 - Transposition Tables, Zobrist Hashing
 
 ### What's next for Rudim?
