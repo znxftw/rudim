@@ -27,5 +27,12 @@
             randomNumber ^= randomNumber << 5;
             return _intState = randomNumber;
         }
+
+        // DO NOT USE FOR PROJECT - ONLY USED IN RandomTest.cs for determinism
+        public static void _RESET_SEED()
+        {
+            _ulongState = 1804289383;
+            _intState = 1804289383;
+        }
     }
 }
