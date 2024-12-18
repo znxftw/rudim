@@ -57,7 +57,8 @@ namespace Rudim.Board
 
         static PieceSquareTableEvaluation()
         {
-            int[] pieceValues = [100, 320, 330, 500, 900, 20000];
+            int[] midGamePieceValues = [82, 337, 365, 477, 1025,  0];
+            int[] endGamePieceValues = [94, 281, 297, 512,  936,  0];
 
             // Values borrowed from Rofchade 
             // http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19
@@ -205,8 +206,8 @@ namespace Rudim.Board
             {
                 for (int square = 0; square < Constants.Squares; ++square)
                 {
-                    MidGamePositions[piece, square] += pieceValues[piece];
-                    EndGamePositions[piece, square] += pieceValues[piece];
+                    MidGamePositions[piece, square] += midGamePieceValues[piece];
+                    EndGamePositions[piece, square] += endGamePieceValues[piece];
                 }
             }
         }
