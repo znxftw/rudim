@@ -14,7 +14,7 @@ Rudim has been hosted on lichess, you can [play with Rudim on Lichess](https://l
 
 - Bitboards & Magics
 - UCI Protocol (WIP - core functionality only)
-- Simplified Evaluation (Material & Piece Square Tables) with Tapered Evaluation
+- Piece Square Tables & Material Evaluation ( + Tapered )
 - Iterative Deepening on Negamax (with Alpha Beta Pruning) & Quiescence Search
 - Move Ordering with MVV LVA, Killer Heuristic, History Heuristic
 - Transposition Tables, Zobrist Hashing
