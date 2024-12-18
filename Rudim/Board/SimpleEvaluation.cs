@@ -1,11 +1,9 @@
 ﻿using Rudim.Common;
-using System.Numerics;
 
 namespace Rudim.Board
 {
     public static class SimpleEvaluation
     {
-        private static readonly int[] PieceValues;
         private static readonly int[,] MidGamePositions;
         private static readonly int[,] EndGamePositions;
 
@@ -14,7 +12,6 @@ namespace Rudim.Board
         {
             int score = 0;
 
-            score += ScoreMaterial(boardState);
             score += ScorePosition(boardState);
 
             return boardState.SideToMove == Side.White ? score : -score;
@@ -34,7 +31,7 @@ namespace Rudim.Board
                 {
                     int square = whiteBoard.GetLsb();
                     whiteBoard.ClearBit(square);
-                    positionalScore += (int)((( MidGamePositions[piece, square] * midGamePhase) + (EndGamePositions[piece, square] * endGamePhase)) * GamePhase.PhaseFactor);
+                    positionalScore += (MidGamePositions[piece, square] * midGamePhase) + (EndGamePositions[piece, square] * endGamePhase);
                 }
 
                 while (blackBoard.Board > 0)
@@ -42,9 +39,11 @@ namespace Rudim.Board
                     int square = blackBoard.GetLsb();
                     blackBoard.ClearBit(square);
                     square = MirrorSquare(square);
-                    positionalScore -= (int)((( MidGamePositions[piece, square] * midGamePhase) + (EndGamePositions[piece, square] * endGamePhase)) * GamePhase.PhaseFactor);
+                    positionalScore -=  (MidGamePositions[piece, square] * midGamePhase) + (EndGamePositions[piece, square] * endGamePhase);
                 }
             }
+
+            positionalScore = (int)(positionalScore * GamePhase.PhaseFactor);
             return positionalScore;
         }
 
@@ -56,21 +55,10 @@ namespace Rudim.Board
             return ((7 - row) << 3) + col;
         }
 
-        private static int ScoreMaterial(BoardState boardState)
-        {
-            int materialScore = 0;
-            for (int piece = 0; piece < Constants.Pieces; ++piece)
-            {
-                materialScore += PieceValues[piece] * BitOperations.PopCount(boardState.Pieces[(int)Side.White, piece].Board);
-                materialScore -= PieceValues[piece] * BitOperations.PopCount(boardState.Pieces[(int)Side.Black, piece].Board);
-            }
-            return materialScore;
-        }
-
         static SimpleEvaluation()
         {
-            PieceValues = [100, 320, 330, 500, 900, 20000];
-            
+            int[] pieceValues = [100, 320, 330, 500, 900, 20000];
+
             // Values borrowed from Rofchade 
             // http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19
             MidGamePositions = new[,]
@@ -213,14 +201,14 @@ namespace Rudim.Board
                }
             };
             
-            // for (int piece = 0; piece < Constants.Pieces; ++piece)
-            // {
-            //     for (int square = 0; square < Constants.Squares; ++square)
-            //     {
-            //         MidGamePositions[piece, square] += PieceValues[piece];
-            //         EndGamePositions[piece, square] += PieceValues[piece];
-            //     }
-            // }
+            for (int piece = 0; piece < Constants.Pieces; ++piece)
+            {
+                for (int square = 0; square < Constants.Squares; ++square)
+                {
+                    MidGamePositions[piece, square] += pieceValues[piece];
+                    EndGamePositions[piece, square] += pieceValues[piece];
+                }
+            }
         }
     }
 }

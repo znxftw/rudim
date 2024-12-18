@@ -1,14 +1,18 @@
 using Rudim.Board;
+using Rudim.Test.Util;
 using Xunit;
+using Helpers = Rudim.Common.Helpers;
 
 namespace Rudim.Test.UnitTest.Board
 {
     public class SimpleEvaluationTest
     {
         [Theory]
-        [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 0)]
-        [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1", 0)]
-        [InlineData("r4r2/pb4kp/1p4p1/1P6/2P1pRp1/P3B3/7P/5RK1 w - - 0 29", -200)]
+        [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 0)] // White
+        [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1", 0)] // Black
+        [InlineData(Helpers.EndgameFEN, 37)]
+        [InlineData(Helpers.KiwiPeteFEN, 56)]
+        [InlineData(Helpers.AdvancedMoveFEN, 516)]
         
         public void ShouldReturnConsistentScoreForGivenPosition(string fen, int expectedScore)
         {
