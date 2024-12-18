@@ -5,7 +5,7 @@ using Helpers = Rudim.Common.Helpers;
 
 namespace Rudim.Test.UnitTest.Board
 {
-    public class SimpleEvaluationTest
+    public class PieceSquareTableEvaluationTest
     {
         [Theory]
         [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 0)] // White
@@ -18,7 +18,7 @@ namespace Rudim.Test.UnitTest.Board
         {
             BoardState boardState = BoardState.ParseFEN(fen);
 
-            int actualScore = SimpleEvaluation.Evaluate(boardState);
+            int actualScore = PieceSquareTableEvaluation.Evaluate(boardState);
 
             Assert.Equal(expectedScore, actualScore);
         }

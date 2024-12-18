@@ -14,7 +14,7 @@ namespace Rudim.Search
             if (boardState.IsDraw())
                 return 0;
 
-            int eval = SimpleEvaluation.Evaluate(boardState);
+            int eval = PieceSquareTableEvaluation.Evaluate(boardState);
 
             if (eval >= beta)
                 return beta;

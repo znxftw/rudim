@@ -2,7 +2,7 @@
 
 namespace Rudim.Board
 {
-    public static class SimpleEvaluation
+    public static class PieceSquareTableEvaluation
     {
         private static readonly int[,] MidGamePositions;
         private static readonly int[,] EndGamePositions;
@@ -55,7 +55,7 @@ namespace Rudim.Board
             return ((7 - row) << 3) + col;
         }
 
-        static SimpleEvaluation()
+        static PieceSquareTableEvaluation()
         {
             int[] pieceValues = [100, 320, 330, 500, 900, 20000];
 
