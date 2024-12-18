@@ -17,8 +17,8 @@ If you see Rudim as offline - the server might be down. If Rudim is online but n
 - Tapered Evaluation
 - Iterative Deepening + Negamax with Alpha Beta Pruning
 - Quiescent Search
-- Move Ordering - MVV LVA, Killer Heuristic
-- Zobrist Hashing (not integrated with any caches)
+- Move Ordering - MVV LVA, Killer Heuristic, History Heuristic
+- Transposition Tables, Zobrist Hashing
 
 ### What's next for Rudim?
 
