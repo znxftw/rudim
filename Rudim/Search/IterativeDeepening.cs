@@ -2,7 +2,9 @@
 using Rudim.CLI;
 using Rudim.Common;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 
 namespace Rudim.Search
@@ -37,7 +39,10 @@ namespace Rudim.Search
 
                 if (debugMode)
                 {
-                    CliClient.WriteLine($"info depth {i} score cp {Score} nodes {nodesTraversed} time {time} nps {nps}");
+                    List<Move> pv = TranspositionTable.CollectPrincipalVariation(boardState);
+                    string pvString = string.Join(' ', pv.Select(move =>
+                        move.Source.ToString() + move.Target.ToString() + move.GetPromotionChar()));
+                    CliClient.WriteLine($"info depth {i} score cp {Score} nodes {nodesTraversed} time {time} nps {nps} pv {pvString}");
                 }
             }
         }

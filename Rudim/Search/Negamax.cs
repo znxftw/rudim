@@ -28,11 +28,14 @@ namespace Rudim.Search
 
         private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
         {
+            int ply = _searchDepth - depth;
+            Nodes++;
+            
             (bool hasValue, int ttScore, Move bestEvaluation) = TranspositionTable.GetEntry(boardState.BoardHash, alpha, beta, depth);
             if (hasValue)
             {
                 BestMove = bestEvaluation;
-                return ttScore;
+                return TranspositionTable.RetrieveScore(ttScore, ply);
             }
             
             if (boardState.IsDraw())
@@ -42,10 +45,8 @@ namespace Rudim.Search
                 return Quiescence.Search(boardState, alpha, beta, cancellationToken);
 
             int originalAlpha = alpha;
-            int ply = _searchDepth - depth;
             bool foundPv = false;
             TranspositionEntryType entryType = TranspositionEntryType.Alpha;
-            Nodes++;
 
             boardState.GenerateMoves();
             PopulateMoveScores(boardState, ply);
@@ -70,7 +71,7 @@ namespace Rudim.Search
                 boardState.UnmakeMove(move);
                 if (score >= beta)
                 {
-                    TranspositionTable.SubmitEntry(boardState.BoardHash, beta, depth, move, TranspositionEntryType.Beta);
+                    TranspositionTable.SubmitEntry(boardState.BoardHash, TranspositionTable.AdjustScore(beta, ply), depth, move, TranspositionEntryType.Beta);
                     return BetaCutoff(beta, move, ply);
                 }
                 if (score > alpha)
@@ -90,7 +91,7 @@ namespace Rudim.Search
             if (alpha != originalAlpha)
                 BestMove = bestEvaluation;
             
-            TranspositionTable.SubmitEntry(boardState.BoardHash, alpha, depth, bestEvaluation, entryType);
+            TranspositionTable.SubmitEntry(boardState.BoardHash, TranspositionTable.AdjustScore(alpha, ply), depth, bestEvaluation, entryType);
             
             return alpha;
         }

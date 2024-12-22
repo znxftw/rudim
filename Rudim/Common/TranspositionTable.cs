@@ -1,4 +1,6 @@
+using Rudim.Board;
 using System;
+using System.Collections.Generic;
 
 namespace Rudim.Common
 {
@@ -50,6 +52,52 @@ namespace Rudim.Common
             if (Entries[index]?.Depth >= depth)
                 return;
             Entries[index] = new TranspositionTableEntry { Hash = hash, Score = score, Depth = depth, BestMove = bestMove, Type = entryType };
+        }
+
+        public static List<Move> CollectPrincipalVariation(BoardState boardState)
+        {
+            List<Move> pv = new();
+            while (true)
+            {
+                TranspositionTableEntry entry = Entries[boardState.BoardHash & (Capacity - 1)];
+                if (entry == null || entry.Hash != boardState.BoardHash || entry.Type != TranspositionEntryType.Exact)
+                {
+                    break;
+                }
+                pv.Add(entry.BestMove);
+                boardState.MakeMove(entry.BestMove);
+            }
+
+            for (int i = pv.Count - 1; i >= 0; i--)
+            {
+                boardState.UnmakeMove(pv[i]);
+            }
+            return pv;
+        }
+        
+        public static int AdjustScore(int score, int ply)
+        {
+            if (!IsCloseToCheckmate(score))
+            {
+                return score;
+            }
+
+            return score + (score > 0 ? +ply :  -ply);
+        }
+        
+        public static int RetrieveScore(int score, int ply)
+        {
+            if (!IsCloseToCheckmate(score))
+            {
+                return score;
+            }
+
+            return score + (score > 0 ? -ply : +ply);
+        }
+
+        private static bool IsCloseToCheckmate(int score)
+        {
+            return Constants.MaxCentipawnEval - Math.Abs(score) <= Constants.MaxPly;
         }
     }
 
