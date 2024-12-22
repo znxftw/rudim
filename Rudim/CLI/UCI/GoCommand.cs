@@ -25,14 +25,7 @@ namespace Rudim.CLI.UCI
 
         private void OutputBestMove(Move move)
         {
-            if (move.IsPromotion())
-            {
-                CliClient.WriteLine("bestmove " + move.Source + move.Target + move.GetPromotionChar());
-            }
-            else
-            {
-                CliClient.WriteLine("bestmove " + move.Source + move.Target);
-            }
+            CliClient.WriteLine("bestmove " + move.Source + move.Target + move.GetPromotionChar());
         }
 
         public async void Run(string[] parameters)
