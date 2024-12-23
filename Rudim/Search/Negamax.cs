@@ -131,9 +131,17 @@ namespace Rudim.Search
 
         private static void PopulateMoveScores(BoardState boardState, int ply)
         {
+            Move hashMove = TranspositionTable.GetHashMove(boardState.BoardHash);
             foreach (Move move in boardState.Moves)
             {
-                MoveOrdering.PopulateMoveScore(move, boardState, ply);
+                if (move == hashMove)
+                {
+                    MoveOrdering.PopulateHashMove(move);
+                }
+                else
+                {
+                    MoveOrdering.PopulateMoveScore(move, boardState, ply);
+                }
             }
         }
     }

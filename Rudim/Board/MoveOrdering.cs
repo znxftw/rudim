@@ -79,5 +79,10 @@ namespace Rudim.Board
         {
             return _killerMoves.Cast<Move>().All(move => move == null) && _historyMoves.Cast<int>().All(move => move == 0);
         }
+
+        public static void PopulateHashMove(Move move)
+        {
+            move.Score = 10000;
+        }
     }
 }

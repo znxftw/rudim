@@ -36,12 +36,13 @@ namespace Rudim.Search
                 timer.Stop();
                 double time = Math.Max(timer.ElapsedMilliseconds, 1);
                 int nps = (int)(Nodes / time * 1000);
+                
+                List<Move> pv = TranspositionTable.CollectPrincipalVariation(boardState);
+                string pvString = string.Join(' ', pv.Select(move =>
+                    move.Source.ToString() + move.Target.ToString() + move.GetPromotionChar()));
 
                 if (debugMode)
                 {
-                    List<Move> pv = TranspositionTable.CollectPrincipalVariation(boardState);
-                    string pvString = string.Join(' ', pv.Select(move =>
-                        move.Source.ToString() + move.Target.ToString() + move.GetPromotionChar()));
                     CliClient.WriteLine($"info depth {i} score cp {Score} nodes {nodesTraversed} time {time} nps {nps} pv {pvString}");
                 }
             }
