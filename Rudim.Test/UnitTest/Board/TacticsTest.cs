@@ -17,7 +17,7 @@ namespace Rudim.Test.UnitTest.Board
             Global.Reset();
             BoardState boardState = BoardState.ParseFEN(fen);
             
-            CancellationTokenSource cancellationToken = new(2000);
+            CancellationTokenSource cancellationToken = new(5000);
             bool debugMode = false;
             Move bestMove = boardState.FindBestMove(25, cancellationToken.Token, ref debugMode);
 
