@@ -64,6 +64,9 @@ namespace Rudim.Common
                 {
                     break;
                 }
+
+                if (pv.Contains(entry.BestMove))
+                    break;
                 pv.Add(entry.BestMove);
                 boardState.MakeMove(entry.BestMove);
             }

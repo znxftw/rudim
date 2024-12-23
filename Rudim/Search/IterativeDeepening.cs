@@ -39,7 +39,10 @@ namespace Rudim.Search
 
                 if (debugMode)
                 {
-                    CliClient.WriteLine($"info depth {i} score cp {Score} nodes {nodesTraversed} time {time} nps {nps}");
+                    List<Move> pv = TranspositionTable.CollectPrincipalVariation(boardState);
+                    string pvString = string.Join(' ', pv.Select(move =>
+                        move.Source.ToString() + move.Target.ToString() + move.GetPromotionChar()));
+                    CliClient.WriteLine($"info depth {i} score cp {Score} nodes {nodesTraversed} time {time} nps {nps} pv {pvString}");
                 }
             }
         }
