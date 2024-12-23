@@ -40,7 +40,6 @@ namespace Rudim.Search
                 List<Move> pv = TranspositionTable.CollectPrincipalVariation(boardState);
                 string pvString = string.Join(' ', pv.Select(move =>
                     move.Source.ToString() + move.Target.ToString() + move.GetPromotionChar()));
-                MoveOrdering.RepopulatePrincipalVariationScores(pv);
 
                 if (debugMode)
                 {

@@ -9,7 +9,6 @@ namespace Rudim.Board
         private static readonly int[,] MostValuableVictimLeastValuableAttacker;
         private static Move[,] _killerMoves;
         private static int[,] _historyMoves;
-        private static List<Move> _principalVariation;
 
         static MoveOrdering()
         {
@@ -74,7 +73,6 @@ namespace Rudim.Board
         {
             _killerMoves = new Move[Constants.Sides, Constants.MaxPly];
             _historyMoves = new int[Constants.Pieces * 2, Constants.Squares];
-            _principalVariation = [];
         }
 
         public static bool IsMoveHeuristicEmpty()
@@ -85,11 +83,6 @@ namespace Rudim.Board
         public static void PopulateHashMove(Move move)
         {
             move.Score = 10000;
-        }
-
-        public static void RepopulatePrincipalVariationScores(List<Move> moves)
-        {
-            _principalVariation = moves;
         }
     }
 }
