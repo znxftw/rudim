@@ -45,7 +45,7 @@ namespace Rudim.Search
                 return Quiescence.Search(boardState, alpha, beta, cancellationToken);
 
             int originalAlpha = alpha;
-            bool firstMove = true;
+            bool foundPv = false;
             TranspositionEntryType entryType = TranspositionEntryType.Alpha;
 
             boardState.GenerateMoves();
@@ -64,12 +64,11 @@ namespace Rudim.Search
                     continue;
                 }
 
-                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, firstMove, followPv);
+                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, foundPv, followPv);
 
                 numberOfLegalMoves++;
 
                 boardState.UnmakeMove(move);
-                firstMove = false;
                 
                 if (score >= beta)
                 {
@@ -79,7 +78,7 @@ namespace Rudim.Search
                 if (score > alpha)
                 {
                     entryType = TranspositionEntryType.Exact;
-                    AlphaUpdate(out alpha, score, move, out bestEvaluation, boardState, depth);
+                    AlphaUpdate(out alpha, score, move, out bestEvaluation, out foundPv, boardState, depth);
                 }
             }
 
@@ -99,10 +98,10 @@ namespace Rudim.Search
         }
 
         private static int SearchDeeper(BoardState boardState, int depth, int alpha, int beta,
-            CancellationToken cancellationToken, bool firstMove, bool followPv)
+            CancellationToken cancellationToken, bool foundPv, bool followPv)
         {
             int score;
-            if (!firstMove)
+            if (foundPv)
             {
                 score = -Search(boardState, depth - 1, -alpha - 1, -alpha, cancellationToken);
                 if (score > alpha && score < beta)
@@ -116,12 +115,13 @@ namespace Rudim.Search
         }
 
         private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation,
-            BoardState boardState, int depth)
+            out bool foundPv, BoardState boardState, int depth)
         {
             if(!move.IsCapture())
                 MoveOrdering.AddHistoryMove(boardState.GetPieceOn(move.Source), move, depth);
             alpha = score;
             bestEvaluation = move;
+            foundPv = true;
         }
 
         private static int BetaCutoff(int beta, Move move, int ply)
