@@ -35,7 +35,7 @@ namespace Rudim.CLI.UCI
             _currentSearch = new CancellationTokenSource();
             _bestMove = Move.NoMove;
 
-            int depth = GetParameter("depth", parameters, 5);
+            int depth = GetParameter("depth", parameters, 8);
             int winc = GetParameter("winc", parameters, -1);
             int binc = GetParameter("binc", parameters, -1);
             int wtime = GetParameter("wtime", parameters, -1);
