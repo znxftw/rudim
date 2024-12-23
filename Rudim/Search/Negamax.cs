@@ -113,8 +113,7 @@ namespace Rudim.Search
             return score;
         }
 
-        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation,
-            out bool foundPv, BoardState boardState, int depth)
+        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation, out bool foundPv, BoardState boardState, int depth)
         {
             if(!move.IsCapture())
                 MoveOrdering.AddHistoryMove(boardState.GetPieceOn(move.Source), move, depth);
