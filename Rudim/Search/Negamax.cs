@@ -17,7 +17,7 @@ namespace Rudim.Search
             Nodes = 0;
             BestMove = Move.NoMove;
             Quiescence.ResetNodes();
-            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
+            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken, true);
             if (BestMove == Move.NoMove)
             {
                 boardState.GenerateMoves();
@@ -26,7 +26,7 @@ namespace Rudim.Search
             return score;
         }
 
-        private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
+        private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken, bool followPv = false)
         {
             int ply = _searchDepth - depth;
             Nodes++;
@@ -45,11 +45,11 @@ namespace Rudim.Search
                 return Quiescence.Search(boardState, alpha, beta, cancellationToken);
 
             int originalAlpha = alpha;
-            bool foundPv = false;
+            bool firstMove = true;
             TranspositionEntryType entryType = TranspositionEntryType.Alpha;
 
             boardState.GenerateMoves();
-            PopulateMoveScores(boardState, ply);
+            PopulateMoveScores(boardState, ply, followPv);
             MoveOrdering.SortMoves(boardState);
 
             int numberOfLegalMoves = 0;
@@ -64,11 +64,13 @@ namespace Rudim.Search
                     continue;
                 }
 
-                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, foundPv);
+                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, firstMove, followPv);
 
                 numberOfLegalMoves++;
 
                 boardState.UnmakeMove(move);
+                firstMove = false;
+                
                 if (score >= beta)
                 {
                     TranspositionTable.SubmitEntry(boardState.BoardHash, TranspositionTable.AdjustScore(beta, ply), depth, move, TranspositionEntryType.Beta);
@@ -77,7 +79,7 @@ namespace Rudim.Search
                 if (score > alpha)
                 {
                     entryType = TranspositionEntryType.Exact;
-                    AlphaUpdate(out alpha, score, move, out bestEvaluation, out foundPv, boardState, depth);
+                    AlphaUpdate(out alpha, score, move, out bestEvaluation, boardState, depth);
                 }
             }
 
@@ -97,10 +99,10 @@ namespace Rudim.Search
         }
 
         private static int SearchDeeper(BoardState boardState, int depth, int alpha, int beta,
-            CancellationToken cancellationToken, bool foundPv)
+            CancellationToken cancellationToken, bool firstMove, bool followPv)
         {
             int score;
-            if (foundPv)
+            if (!firstMove)
             {
                 score = -Search(boardState, depth - 1, -alpha - 1, -alpha, cancellationToken);
                 if (score > alpha && score < beta)
@@ -108,18 +110,18 @@ namespace Rudim.Search
             }
             else
             {
-                score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+                score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken, followPv);
             }
             return score;
         }
 
-        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation, out bool foundPv, BoardState boardState, int depth)
+        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation,
+            BoardState boardState, int depth)
         {
             if(!move.IsCapture())
                 MoveOrdering.AddHistoryMove(boardState.GetPieceOn(move.Source), move, depth);
             alpha = score;
             bestEvaluation = move;
-            foundPv = true;
         }
 
         private static int BetaCutoff(int beta, Move move, int ply)
@@ -129,11 +131,11 @@ namespace Rudim.Search
             return beta;
         }
 
-        private static void PopulateMoveScores(BoardState boardState, int ply)
+        private static void PopulateMoveScores(BoardState boardState, int ply, bool followPv)
         {
             foreach (Move move in boardState.Moves)
             {
-                MoveOrdering.PopulateMoveScore(move, boardState, ply);
+                MoveOrdering.PopulateMoveScore(move, boardState, followPv, ply);
             }
         }
     }
