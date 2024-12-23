@@ -20,6 +20,12 @@ namespace Rudim.Common
             Array.Clear(Entries);
         }
 
+        public static Move GetHashMove(ulong hash)
+        {
+            TranspositionTableEntry entry = Entries[hash & (Capacity - 1)];
+            return entry?.Hash == hash && entry.Type == TranspositionEntryType.Exact ? entry.BestMove : null;
+        }
+
         public static (bool, int, Move) GetEntry(ulong hash, int alpha, int beta, int depth)
         {
             TranspositionTableEntry entry = Entries[hash & (Capacity - 1)];

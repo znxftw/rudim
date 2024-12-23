@@ -17,7 +17,7 @@ namespace Rudim.Search
             Nodes = 0;
             BestMove = Move.NoMove;
             Quiescence.ResetNodes();
-            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken, true);
+            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
             if (BestMove == Move.NoMove)
             {
                 boardState.GenerateMoves();
@@ -26,7 +26,7 @@ namespace Rudim.Search
             return score;
         }
 
-        private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken, bool followPv = false)
+        private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
         {
             int ply = _searchDepth - depth;
             Nodes++;
@@ -49,7 +49,7 @@ namespace Rudim.Search
             TranspositionEntryType entryType = TranspositionEntryType.Alpha;
 
             boardState.GenerateMoves();
-            PopulateMoveScores(boardState, ply, followPv);
+            PopulateMoveScores(boardState, ply);
             MoveOrdering.SortMoves(boardState);
 
             int numberOfLegalMoves = 0;
@@ -64,12 +64,11 @@ namespace Rudim.Search
                     continue;
                 }
 
-                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, foundPv, followPv);
+                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, foundPv);
 
                 numberOfLegalMoves++;
 
                 boardState.UnmakeMove(move);
-                
                 if (score >= beta)
                 {
                     TranspositionTable.SubmitEntry(boardState.BoardHash, TranspositionTable.AdjustScore(beta, ply), depth, move, TranspositionEntryType.Beta);
@@ -98,7 +97,7 @@ namespace Rudim.Search
         }
 
         private static int SearchDeeper(BoardState boardState, int depth, int alpha, int beta,
-            CancellationToken cancellationToken, bool foundPv, bool followPv)
+            CancellationToken cancellationToken, bool foundPv)
         {
             int score;
             if (foundPv)
@@ -109,7 +108,7 @@ namespace Rudim.Search
             }
             else
             {
-                score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken, followPv);
+                score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
             }
             return score;
         }
@@ -131,11 +130,19 @@ namespace Rudim.Search
             return beta;
         }
 
-        private static void PopulateMoveScores(BoardState boardState, int ply, bool followPv)
+        private static void PopulateMoveScores(BoardState boardState, int ply)
         {
+            Move hashMove = TranspositionTable.GetHashMove(boardState.BoardHash);
             foreach (Move move in boardState.Moves)
             {
-                MoveOrdering.PopulateMoveScore(move, boardState, followPv, ply);
+                if (move == hashMove)
+                {
+                    MoveOrdering.PopulateHashMove(move);
+                }
+                else
+                {
+                    MoveOrdering.PopulateMoveScore(move, boardState, ply);
+                }
             }
         }
     }

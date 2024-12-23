@@ -14,9 +14,9 @@ namespace Rudim.Test.UnitTest.Board
         // Compare time spent with and without the change before updating the keys
         [Theory]
         [InlineData(Helpers.StartingFEN, 2938703, 7, 8)]
-        [InlineData(Helpers.EndgameFEN, 525653, 36, 9)]
-        [InlineData(Helpers.AdvancedMoveFEN, 8610450, 1750, 8)]
-        [InlineData(Helpers.KiwiPeteFEN, 24597735, -42, 8)]
+        [InlineData(Helpers.EndgameFEN, 525630, 36, 9)]
+        [InlineData(Helpers.AdvancedMoveFEN, 8610756, 1750, 8)]
+        [InlineData(Helpers.KiwiPeteFEN, 25369977, -42, 8)]
         public void ShouldTraverseDeterministically(string position, int expectedNodes, int expectedScore, int depth)
         {
             Global.Reset();
