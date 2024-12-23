@@ -67,8 +67,14 @@ namespace Rudim.Common
 
                 if (pv.Contains(entry.BestMove))
                     break;
-                pv.Add(entry.BestMove);
+                
                 boardState.MakeMove(entry.BestMove);
+                if (boardState.IsInCheck(boardState.SideToMove.Other()))
+                {
+                    boardState.UnmakeMove(entry.BestMove);
+                    break;
+                }
+                pv.Add(entry.BestMove);
             }
 
             for (int i = pv.Count - 1; i >= 0; i--)
