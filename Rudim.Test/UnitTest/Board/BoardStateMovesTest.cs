@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Rudim.Test.UnitTest.Board
 {
+    [Collection("StateRace")]
     public class BoardStateMovesTest
     {
         [Fact]
