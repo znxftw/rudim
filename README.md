@@ -36,3 +36,5 @@ Tests - `dotnet test`
 Benchmark  - `dotnet run --project Rudim -c Release --benchmark`
 
 CLI - `dotnet run --project Rudim`
+
+Perft - `dotnet run -c Release --perft --project Rudim` (Currently run at fixed positions and depths, in future can be made configurable)
