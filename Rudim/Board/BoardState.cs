@@ -37,12 +37,23 @@ namespace Rudim.Board
         private int LastDrawKiller { get; set; }
         public int MoveCount { get; set; }
 
+        private int _phase;
+        public int Phase
+        {
+            get => _phase;
+            set => _phase = value;
+        }
+        
+        public int ClippedPhase => Math.Min(_phase, GamePhase.TotalPhase);
+
+
         private void AddPiece(Square square, Side side, Piece piece)
         {
             Pieces[(int)side, (int)piece] = Pieces[(int)side, (int)piece].SetBit(square);
             Occupancies[(int)side] = Occupancies[(int)side].SetBit(square);
             Occupancies[(int)Side.Both] = Occupancies[(int)Side.Both].SetBit(square);
             PieceMapping[(int)square] = piece;
+            Phase = GamePhase.AddPhase(Phase, piece);
         }
 
         private Piece RemovePiece(Square square)
@@ -54,6 +65,7 @@ namespace Rudim.Board
             Occupancies[(int)Side.White] = Occupancies[(int)Side.White].ClearBit(square);
             Occupancies[(int)Side.Both] = Occupancies[(int)Side.Both].ClearBit(square);
             PieceMapping[(int)square] = Piece.None;
+            Phase = GamePhase.RemovePhase(Phase, pieceOnSquare);
             return pieceOnSquare;
         }
 

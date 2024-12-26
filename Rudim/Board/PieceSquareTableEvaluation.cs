@@ -20,7 +20,7 @@ namespace Rudim.Board
         private static int ScorePosition(BoardState boardState)
         {
             int positionalScore = 0;
-            int midGamePhase = GamePhase.Calculate(boardState);
+            int midGamePhase = boardState.ClippedPhase;
             int endGamePhase = GamePhase.TotalPhase - midGamePhase;
             for (int piece = 0; piece < Constants.Pieces; ++piece)
             {
