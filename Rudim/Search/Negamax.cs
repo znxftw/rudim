@@ -35,16 +35,16 @@ namespace Rudim.Search
             if (boardState.IsDraw())
                 return 0;
             
-            if (depth <= 0)
-                return Quiescence.Search(boardState, alpha, beta, cancellationToken);
-            
             (bool hasValue, int ttScore, Move bestEvaluation) = TranspositionTable.GetEntry(boardState.BoardHash, alpha, beta, depth);
             if (hasValue)
             {
                 BestMove = bestEvaluation;
                 return TranspositionTable.RetrieveScore(ttScore, ply);
             }
-
+            
+            if (depth <= 0)
+                return Quiescence.Search(boardState, alpha, beta, cancellationToken);
+            
             if (CanPruneNullMove(isPvNode, boardState, allowNullMove, depth))
             {
                 boardState.MakeNullMove();
