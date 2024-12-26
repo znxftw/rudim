@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Rudim.Search
 {
-    static class Negamax
+    public static partial class Negamax
     {
         public static Move BestMove;
         public static int Nodes;
@@ -71,13 +71,11 @@ namespace Rudim.Search
                 boardState.UnmakeMove(move);
                 if (score >= beta)
                 {
-                    TranspositionTable.SubmitEntry(boardState.BoardHash, TranspositionTable.AdjustScore(beta, ply), depth, move, TranspositionEntryType.Beta);
-                    return BetaCutoff(beta, move, ply);
+                    return BetaCutoff(beta, move, ply, boardState, depth);
                 }
                 if (score > alpha)
                 {
-                    entryType = TranspositionEntryType.Exact;
-                    AlphaUpdate(out alpha, score, move, out bestEvaluation, out foundPv, boardState, depth);
+                    AlphaUpdate(score, move, boardState, depth, out alpha, out bestEvaluation, out foundPv, out entryType);
                 }
             }
 
@@ -102,47 +100,13 @@ namespace Rudim.Search
             int score;
             if (foundPv)
             {
-                score = -Search(boardState, depth - 1, -alpha - 1, -alpha, cancellationToken);
-                if (score > alpha && score < beta)
-                    score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+                score = PrincipalVariationSearch(boardState, depth, alpha, beta, cancellationToken);
             }
             else
             {
                 score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
             }
             return score;
-        }
-
-        private static void AlphaUpdate(out int alpha, int score, Move move, out Move bestEvaluation, out bool foundPv, BoardState boardState, int depth)
-        {
-            if(!move.IsCapture())
-                MoveOrdering.AddHistoryMove(boardState.GetPieceOn(move.Source), move, depth);
-            alpha = score;
-            bestEvaluation = move;
-            foundPv = true;
-        }
-
-        private static int BetaCutoff(int beta, Move move, int ply)
-        {
-            if (!move.IsCapture())
-                MoveOrdering.AddKillerMove(move, ply);
-            return beta;
-        }
-
-        private static void PopulateMoveScores(BoardState boardState, int ply)
-        {
-            Move hashMove = TranspositionTable.GetHashMove(boardState.BoardHash);
-            foreach (Move move in boardState.Moves)
-            {
-                if (move == hashMove)
-                {
-                    MoveOrdering.PopulateHashMove(move);
-                }
-                else
-                {
-                    MoveOrdering.PopulateMoveScore(move, boardState, ply);
-                }
-            }
         }
     }
 }
