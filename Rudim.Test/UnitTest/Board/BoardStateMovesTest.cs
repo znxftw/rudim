@@ -42,14 +42,13 @@ namespace Rudim.Test.UnitTest.Board
             Assert.Equal(Square.NoSquare, boardState.EnPassantSquare);
 
             // Make one legal move for each side
-            Move whiteMove = new(Square.e2, Square.e4, MoveTypes.DoublePush);
-            boardState.MakeMove(whiteMove);
             Move blackMove = new(Square.e7, Square.e5, MoveTypes.DoublePush);
             boardState.MakeMove(blackMove);
+            Move whiteMove = new(Square.e2, Square.e4, MoveTypes.DoublePush);
+            boardState.MakeMove(whiteMove);
 
-            boardState.UnmakeMove(blackMove);
             boardState.UnmakeMove(whiteMove);
-            
+            boardState.UnmakeMove(blackMove);
 
             boardState.UndoNullMove();
 
