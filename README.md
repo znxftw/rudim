@@ -5,9 +5,9 @@
 
 ## What does Rudim do?
 
-Rudim is a relatively simple engine (at the moment) trying to keep things simple and modular, to try to build the perfect bridge between a "strong" and an "easy to understand" chess engine.
+Rudim is a chess engine written in .NET (C#) with the goal of one day being the strongest C# engine.
 
-Rudim has been hosted on lichess, you can [play with Rudim on Lichess](https://lichess.org/@/rudim-bot).  
+Rudim has been hosted on lichess, you can [play with Rudim there](https://lichess.org/@/rudim-bot).  
 
 
 ### What all does Rudim implement?
@@ -18,6 +18,7 @@ Rudim has been hosted on lichess, you can [play with Rudim on Lichess](https://l
 - Iterative Deepening on Negamax (with Alpha Beta Pruning & PVS) & Quiescence Search
 - Move Ordering with Hash Move, MVV LVA, Killer Heuristic, History Heuristic
 - Transposition Tables using Zobrist Hashing
+- Null Move Pruning
 
 ### What's next for Rudim?
 
