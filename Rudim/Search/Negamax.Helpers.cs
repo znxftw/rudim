@@ -36,17 +36,18 @@ namespace Rudim.Search
 
         private static void PopulateMoveScores(BoardState boardState, int ply)
         {
-            Move hashMove = TranspositionTable.GetHashMove(boardState.BoardHash);
+            // Move hashMove = TranspositionTable.GetHashMove(boardState.BoardHash);
             foreach (Move move in boardState.Moves)
             {
-                if (move == hashMove)
-                {
-                    MoveOrdering.PopulateHashMove(move);
-                }
-                else
-                {
-                    MoveOrdering.PopulateMoveScore(move, boardState, ply);
-                }
+                // TODO: Revisit Hash Move once TT impl is more clear, this doesn't seem to be gaining as much ELO
+                // if (move == hashMove)
+                // {
+                //     MoveOrdering.PopulateHashMove(move);
+                // }
+                // else
+                // {
+                MoveOrdering.PopulateMoveScore(move, boardState, ply);
+                // }
             }
         }
 
