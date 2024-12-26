@@ -29,7 +29,7 @@ namespace Rudim.Search
                 if (cancellationToken.IsCancellationRequested)
                     break;
 
-                BestMove = Negamax.BestMove;
+                BestMove = boardState.BestMove;
                 int nodesTraversed = Negamax.Nodes + Quiescence.Nodes;
                 Nodes += nodesTraversed;
 

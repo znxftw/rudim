@@ -312,7 +312,7 @@ namespace Rudim.Board
 
         public void MakeNullMove()
         {
-            History.SaveBoardHistory(Piece.None, EnPassantSquare, Castle, BoardHash, LastDrawKiller);
+            History.SaveBoardHistory(Piece.None, EnPassantSquare, Castle, BoardHash, LastDrawKiller, BestMove);
             UpdateEnPassant(Move.NoMove);
             FlipSideToMove();
         }

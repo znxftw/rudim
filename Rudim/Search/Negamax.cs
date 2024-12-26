@@ -6,23 +6,15 @@ namespace Rudim.Search
 {
     public static partial class Negamax
     {
-        public static Move BestMove;
         public static int Nodes;
         private static int _searchDepth;
-
-
+        
         public static int Search(BoardState boardState, int depth, CancellationToken cancellationToken)
         {
             _searchDepth = depth;
             Nodes = 0;
-            BestMove = Move.NoMove;
             Quiescence.ResetNodes();
             int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, true, cancellationToken);
-            if (BestMove == Move.NoMove)
-            {
-                boardState.GenerateMoves();
-                BestMove = boardState.Moves[0];
-            }
             return score;
         }
 
@@ -35,11 +27,11 @@ namespace Rudim.Search
             if (boardState.IsDraw())
                 return 0;
             
-            (bool hasValue, int ttScore, Move bestEvaluation) = TranspositionTable.GetEntry(boardState.BoardHash, alpha, beta, depth);
+            (bool hasValue, int ttScore, Move ttBest) = TranspositionTable.GetEntry(boardState.BoardHash, alpha, beta, depth);
             if (hasValue)
             {
                 // TODO: This doesn't seem right - revisit TT impl 
-                BestMove = bestEvaluation;
+                boardState.BestMove = ttBest;
                 return TranspositionTable.RetrieveScore(ttScore, ply);
             }
             
@@ -86,7 +78,7 @@ namespace Rudim.Search
                 }
                 if (score > alpha)
                 {
-                    AlphaUpdate(score, move, boardState, depth, out alpha, out bestEvaluation, out foundPv, out entryType);
+                    AlphaUpdate(score, move, boardState, depth, out alpha, out foundPv, out entryType);
                 }
             }
 
@@ -96,11 +88,8 @@ namespace Rudim.Search
                     return -Constants.MaxCentipawnEval + ply;
                 return 0;
             }
-
-            if (alpha != originalAlpha)
-                BestMove = bestEvaluation;
             
-            TranspositionTable.SubmitEntry(boardState.BoardHash, TranspositionTable.AdjustScore(alpha, ply), depth, bestEvaluation, entryType);
+            TranspositionTable.SubmitEntry(boardState.BoardHash, TranspositionTable.AdjustScore(alpha, ply), depth, boardState.BestMove, entryType);
             
             return alpha;
         }

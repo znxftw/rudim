@@ -11,7 +11,7 @@ namespace Rudim.Board
 
 
         public static void SaveBoardHistory(Piece capturedPiece, Square enPassant, Castle originalCastlingRights,
-            ulong boardHash, int lastDrawKiller)
+            ulong boardHash, int lastDrawKiller, Move bestMove)
         {
             BoardHistories[_historyIndex++] = new BoardHistory
             {
@@ -19,7 +19,8 @@ namespace Rudim.Board
                 EnPassantSquare = enPassant,
                 CastlingRights = originalCastlingRights,
                 BoardHash = boardHash,
-                LastDrawKiller = lastDrawKiller
+                LastDrawKiller = lastDrawKiller,
+                BestMove = bestMove
             };
         }
 
@@ -41,6 +42,7 @@ namespace Rudim.Board
             public Castle CastlingRights { get; internal set; }
             public ulong BoardHash { get; set; }
             public int LastDrawKiller { get; set; }
+            public Move BestMove { get; set; }
         }
 
         public static bool HasHashAppearedTwice(ulong boardHash, int startingIndex)

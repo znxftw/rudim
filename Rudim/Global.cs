@@ -18,7 +18,6 @@ namespace Rudim
             IterativeDeepening.Nodes = 0;
 
             Negamax.Nodes = 0;
-            Negamax.BestMove = Move.NoMove;
 
             Quiescence.ResetNodes();
             TranspositionTable.ClearTable();

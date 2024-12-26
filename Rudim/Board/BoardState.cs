@@ -19,6 +19,7 @@ namespace Rudim.Board
             MoveCount = 0;
             for (int square = 0; square < Constants.Squares; ++square)
                 PieceMapping[square] = Piece.None;
+            BestMove = Move.NoMove;
         }
 
         public static BoardState Default()
@@ -36,6 +37,7 @@ namespace Rudim.Board
         public List<Move> Moves { get; set; }
         private int LastDrawKiller { get; set; }
         public int MoveCount { get; set; }
+        public Move BestMove { get; set; }
 
         private int _phase;
         public int Phase
@@ -124,8 +126,9 @@ namespace Rudim.Board
             UpdateEnPassant(move);
             FlipSideToMove();
 
-            History.SaveBoardHistory(capturedPiece, originalEnPassantSquare, originalCastlingRights, originalBoardHash, originalLastDrawKiller);
+            History.SaveBoardHistory(capturedPiece, originalEnPassantSquare, originalCastlingRights, originalBoardHash, originalLastDrawKiller, BestMove);
             Moves = new List<Move>(32);
+            BestMove = Move.NoMove;
             MoveCount++;
         }
 
@@ -244,6 +247,7 @@ namespace Rudim.Board
             BoardHash = history.BoardHash;
             Castle = history.CastlingRights;
             EnPassantSquare = history.EnPassantSquare;
+            BestMove = history.BestMove;
             MoveCount--;
         }
         private Square EnPassantSquareFor(Move move)

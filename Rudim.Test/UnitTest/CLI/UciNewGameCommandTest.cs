@@ -15,7 +15,7 @@ namespace Rudim.Test.UnitTest.CLI
             UciNewGameCommand newGameCommand = new(uciClient);
             uciClient.Board = BoardState.ParseFEN("rnbqkb1r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
             MoveOrdering.AddKillerMove(new Move(Square.e2, Square.e3, MoveTypes.Quiet), 0);
-            History.SaveBoardHistory(Piece.None, Square.NoSquare, Castle.None, 0, 0);
+            History.SaveBoardHistory(Piece.None, Square.NoSquare, Castle.None, 0, 0, Move.NoMove);
 
             Assert.NotEqual(BoardState.Default(), uciClient.Board);
             Assert.False(MoveOrdering.IsMoveHeuristicEmpty());

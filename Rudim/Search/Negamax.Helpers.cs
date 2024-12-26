@@ -15,14 +15,13 @@ namespace Rudim.Search
             return score;
         }
 
-        private static void AlphaUpdate(int score, Move move, BoardState boardState, int depth, out int alpha,
-            out Move bestEvaluation, out bool foundPv, out TranspositionEntryType entryType)
+        private static void AlphaUpdate(int score, Move move, BoardState boardState, int depth, out int alpha, out bool foundPv, out TranspositionEntryType entryType)
         {
             entryType = TranspositionEntryType.Exact;
             if (!move.IsCapture())
                 MoveOrdering.AddHistoryMove(boardState.GetPieceOn(move.Source), move, depth);
             alpha = score;
-            bestEvaluation = move;
+            boardState.BestMove = move;
             foundPv = true;
         }
 
