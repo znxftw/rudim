@@ -17,7 +17,7 @@ namespace Rudim.Search
             Nodes = 0;
             BestMove = Move.NoMove;
             Quiescence.ResetNodes();
-            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, cancellationToken);
+            int score = Search(boardState, depth, int.MinValue + 1, int.MaxValue - 1, true, cancellationToken);
             if (BestMove == Move.NoMove)
             {
                 boardState.GenerateMoves();
@@ -26,10 +26,14 @@ namespace Rudim.Search
             return score;
         }
 
-        private static int Search(BoardState boardState, int depth, int alpha, int beta, CancellationToken cancellationToken)
+        private static int Search(BoardState boardState, int depth, int alpha, int beta, bool allowNullMove,CancellationToken cancellationToken)
         {
             int ply = _searchDepth - depth;
+            bool isPvNode = beta - alpha > 1;
             Nodes++;
+            
+            if (boardState.IsDraw())
+                return 0;
             
             (bool hasValue, int ttScore, Move bestEvaluation) = TranspositionTable.GetEntry(boardState.BoardHash, alpha, beta, depth);
             if (hasValue)
@@ -38,11 +42,17 @@ namespace Rudim.Search
                 return TranspositionTable.RetrieveScore(ttScore, ply);
             }
             
-            if (boardState.IsDraw())
-                return 0;
-
-            if (depth == 0)
+            if (depth <= 0)
                 return Quiescence.Search(boardState, alpha, beta, cancellationToken);
+            
+            if (CanPruneNullMove(isPvNode, boardState, allowNullMove, depth))
+            {
+                boardState.MakeNullMove();
+                int score = -Search(boardState, depth - 1 - 2, -beta, -beta + 1, false, cancellationToken);
+                boardState.UndoNullMove();
+                if (score >= beta)
+                    return score;
+            }
 
             int originalAlpha = alpha;
             bool foundPv = false;
@@ -64,7 +74,7 @@ namespace Rudim.Search
                     continue;
                 }
 
-                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, foundPv);
+                int score = SearchDeeper(boardState, depth, alpha, beta, cancellationToken, foundPv, allowNullMove);
 
                 numberOfLegalMoves++;
 
@@ -95,16 +105,16 @@ namespace Rudim.Search
         }
 
         private static int SearchDeeper(BoardState boardState, int depth, int alpha, int beta,
-            CancellationToken cancellationToken, bool foundPv)
+            CancellationToken cancellationToken, bool foundPv, bool allowNullMove)
         {
             int score;
             if (foundPv)
             {
-                score = PrincipalVariationSearch(boardState, depth, alpha, beta, cancellationToken);
+                score = PrincipalVariationSearch(boardState, depth, alpha, beta, allowNullMove, cancellationToken);
             }
             else
             {
-                score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+                score = -Search(boardState, depth - 1, -beta, -alpha, allowNullMove, cancellationToken);
             }
             return score;
         }
