@@ -38,3 +38,12 @@ Benchmark  - `dotnet run --project Rudim -c Release --benchmark`
 CLI - `dotnet run --project Rudim`
 
 Perft - `dotnet run -c Release --perft --project Rudim` (Currently run at fixed positions and depths, in future can be made configurable)
+
+## Contributing
+
+Feel free to raise a PR for one of the open issues on the repo - there are not many contributing guidelines in place yet, if contributing increases, this project can have some more strict guidelines.
+
+Some basic things to keep in mind when contributing
+- Run all tests and make sure they pass
+- Write test scenarios for any new logic you are adding or modify existing tests to cover logic you are modifiying
+- Run a tournament with the latest commit on master (usually 5+0, 200 games is what I do as a quick check). If there is a significant loss in ELO something might be wrong or can be improved. PRs would be merged only if ELO improvement >= 10 for a new feature.
