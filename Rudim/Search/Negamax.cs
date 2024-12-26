@@ -51,7 +51,7 @@ namespace Rudim.Search
                 int score = -Search(boardState, depth - 1 - 2, -beta, -beta + 1, false, cancellationToken);
                 boardState.UndoNullMove();
                 if (score >= beta)
-                    return score;
+                    return beta; // TODO : Store in TT
             }
 
             int originalAlpha = alpha;
