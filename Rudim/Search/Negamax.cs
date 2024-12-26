@@ -38,6 +38,7 @@ namespace Rudim.Search
             (bool hasValue, int ttScore, Move bestEvaluation) = TranspositionTable.GetEntry(boardState.BoardHash, alpha, beta, depth);
             if (hasValue)
             {
+                // TODO: This doesn't seem right - revisit TT impl 
                 BestMove = bestEvaluation;
                 return TranspositionTable.RetrieveScore(ttScore, ply);
             }
