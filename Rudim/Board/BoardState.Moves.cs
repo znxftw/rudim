@@ -309,5 +309,22 @@ namespace Rudim.Board
         {
             return Occupancies[(int)SideToMove.Other()].GetBit(target) == 1;
         }
+
+        public void MakeNullMove()
+        {
+            History.SaveBoardHistory(Piece.None, EnPassantSquare, Castle, BoardHash, LastDrawKiller);
+            UpdateEnPassant(Move.NoMove);
+            FlipSideToMove();
+        }
+
+        public void UndoNullMove()
+        {
+            History.BoardHistory history = History.RestoreBoardHistory();
+            FlipSideToMove();
+            LastDrawKiller = history.LastDrawKiller;
+            BoardHash = history.BoardHash;
+            Castle = history.CastlingRights;
+            EnPassantSquare = history.EnPassantSquare;
+        }
     }
 }

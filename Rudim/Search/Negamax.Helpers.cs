@@ -7,11 +7,11 @@ namespace Rudim.Search
     public static partial class Negamax
     {
         private static int PrincipalVariationSearch(BoardState boardState, int depth, int alpha, int beta,
-            CancellationToken cancellationToken)
+            bool allowNullMove, CancellationToken cancellationToken)
         {
-            int score = -Search(boardState, depth - 1, -alpha - 1, -alpha, cancellationToken);
+            int score = -Search(boardState, depth - 1, -alpha - 1, -alpha, allowNullMove, cancellationToken);
             if (score > alpha && score < beta)
-                score = -Search(boardState, depth - 1, -beta, -alpha, cancellationToken);
+                score = -Search(boardState, depth - 1, -beta, -alpha, allowNullMove, cancellationToken);
             return score;
         }
 
@@ -49,6 +49,12 @@ namespace Rudim.Search
                     MoveOrdering.PopulateMoveScore(move, boardState, ply);
                 }
             }
+        }
+
+        private static bool CanPruneNullMove(bool isPvNode, BoardState boardState, bool allowNullMove, int depth)
+        {
+            return allowNullMove && !isPvNode && !boardState.IsInCheck(boardState.SideToMove) && depth >= 2  &&
+                   boardState.Phase > GamePhase.OnlyPawns;
         }
     }
 }
