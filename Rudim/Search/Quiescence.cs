@@ -29,11 +29,10 @@ namespace Rudim.Search
             MoveOrdering.SortMoves(boardState);
 
 
-            foreach (var t in boardState.Moves)
+            foreach (var move in boardState.Moves)
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
-                Move move = t;
                 if (!move.IsCapture())
                     break; // If sorted, once a quiet move is reached we won't need to visit the remaining nodes
 
