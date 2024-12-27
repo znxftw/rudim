@@ -63,12 +63,6 @@ namespace Rudim.Board
             _historyMoves[piece, (int)move.Target] += depth * depth;
         }
 
-        public static void SortMoves(BoardState boardState)
-        {
-            // TODO : Partially sort within the loop only to avoid sorting elements that are not going to be queried after beta cutoff?
-            boardState.Moves.Sort((a, b) => b.Score.CompareTo(a.Score));
-        }
-
         public static void ResetMoveHeuristic()
         {
             _killerMoves = new Move[Constants.Sides, Constants.MaxPly];
@@ -83,6 +77,19 @@ namespace Rudim.Board
         public static void PopulateHashMove(Move move)
         {
             move.Score = 10_500;
+        }
+
+        public static void SortNextBestMove(List<Move> moves, int startingIndex)
+        {
+            int bestIndex = startingIndex;
+            for (int i = startingIndex + 1; i < moves.Count; ++i)
+            {
+                if (moves[i].Score >= moves[bestIndex].Score) 
+                    bestIndex = i;
+            }
+
+            if(bestIndex != startingIndex)
+                (moves[bestIndex], moves[startingIndex]) = (moves[startingIndex], moves[bestIndex]);
         }
     }
 }

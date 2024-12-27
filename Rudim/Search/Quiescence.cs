@@ -1,5 +1,6 @@
 ﻿using Rudim.Board;
 using Rudim.Common;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Rudim.Search
@@ -26,11 +27,12 @@ namespace Rudim.Search
             {
                 MoveOrdering.PopulateMoveScore(move, boardState);
             }
-            MoveOrdering.SortMoves(boardState);
-
-
-            foreach (var move in boardState.Moves)
+            List<Move> moves = boardState.Moves;
+            
+            for(int i = 0; i < moves.Count; ++i)
             {
+                MoveOrdering.SortNextBestMove(moves, i);
+                Move move = moves[i];
                 if (cancellationToken.IsCancellationRequested)
                     break;
                 if (!move.IsCapture())

@@ -1,5 +1,6 @@
 using Rudim.Board;
 using Rudim.Common;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Rudim.Test.UnitTest.Board
@@ -7,19 +8,35 @@ namespace Rudim.Test.UnitTest.Board
     public class MoveOrderingTest
     {
         [Fact]
-        public void ShouldOrderMovesByScore()
+        public void ShouldSortMovesByScore()
         {
-            BoardState boardState = BoardState.ParseFEN(Helpers.KiwiPeteFEN);
-
-            boardState.GenerateMoves();
-            foreach (Move move in boardState.Moves)
+            List<Move> moves = new()
             {
-                MoveOrdering.PopulateMoveScore(move, boardState);
-            }
-            MoveOrdering.SortMoves(boardState);
+                new Move(Square.e2, Square.e4, MoveTypes.Quiet) { Score = 100 },
+                new Move(Square.d2, Square.d4, MoveTypes.Quiet) { Score = 300 },
+                new Move(Square.g1, Square.f3, MoveTypes.Quiet) { Score = 200 }
+            };
 
-            // TODO: Improve assertions, verify proper order as per MVV LVA
-            Assert.True(boardState.Moves[0].IsCapture());
+            MoveOrdering.SortNextBestMove(moves, 0);
+
+            Assert.Equal(300, moves[0].Score);
+        }
+
+        [Fact]
+        public void ShouldNotChangeOrderIfAlreadySorted()
+        {
+            List<Move> moves = new()
+            {
+                new Move(Square.d2, Square.d4, MoveTypes.Quiet) { Score = 300 },
+                new Move(Square.g1, Square.f3, MoveTypes.Quiet) { Score = 200 },
+                new Move(Square.e2, Square.e4, MoveTypes.Quiet) { Score = 100 }
+            };
+
+            MoveOrdering.SortNextBestMove(moves, 1);
+
+            Assert.Equal(300, moves[0].Score);
+            Assert.Equal(200, moves[1].Score);
+            Assert.Equal(100, moves[2].Score);
         }
     }
 }
