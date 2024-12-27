@@ -127,7 +127,6 @@ namespace Rudim.Board
             FlipSideToMove();
 
             History.SaveBoardHistory(capturedPiece, originalEnPassantSquare, originalCastlingRights, originalBoardHash, originalLastDrawKiller, BestMove);
-            Moves = new List<Move>(32);
             BestMove = Move.NoMove;
             MoveCount++;
         }

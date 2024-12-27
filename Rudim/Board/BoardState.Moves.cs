@@ -1,5 +1,6 @@
 ﻿using Rudim.Common;
 using Rudim.Search;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Rudim.Board
@@ -8,7 +9,7 @@ namespace Rudim.Board
     {
         public void GenerateMoves()
         {
-            Moves.Clear();
+            Moves = new List<Move>();
 
             GeneratePawnMoves();
             GenerateBishopMoves();
