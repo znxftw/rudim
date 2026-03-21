@@ -14,18 +14,24 @@ namespace Rudim.Test.UnitTest.CLI
         [InlineData(30000, 0)]
         [InlineData(15000, 100)]
         [InlineData(30000, 100)]
+        [InlineData(10000, 10000)]  // 10s+10s
+        [InlineData(5000, 20000)]   // 5s+20s (high increment)
+        [InlineData(60000, 60000)]  // 60s+60s (very high increment)
+        [InlineData(0, 10000)]      // 0+10s (increment-only, extreme edge case)
         public void ShouldManageTimeWithoutExhausting(int startingTime, int increment)
         {
-            const int maxMoves = 400; // Max possible should be ~6000 moves, but we don't need to account for that much
+            // Without increment, pure blitz games realistically last ~75 half-moves per player.
+            // With increment, the clock can grow so we test a much longer game.
+            int maxMoves = increment > 0 ? 400 : 75;
             const int positionParseDelay = 5;
-            const int networkDelay = 0; // These should be accounted for by the orchestrators? I'll add this back later if needed
+            const int networkDelay = 20; // Simulate network latency; BufferTime (50ms) ensures the formula absorbs it
             const int engineCancelDelay = 1;
 
             int remainingTime = startingTime;
 
             for (int moveNumber = 1; moveNumber <= maxMoves; moveNumber++)
             {
-                int moveTime = TimeManagement.CalculateMoveTime(moveNumber, remainingTime, increment);
+                int moveTime = TimeManagement.CalculateMoveTime(remainingTime, increment);
                 testOutputHelper.WriteLine(moveTime.ToString());
                 Assert.True(moveTime >= 10, $"Move {moveNumber}: Allocated time {moveTime}ms is less than minimum 10ms");
 
