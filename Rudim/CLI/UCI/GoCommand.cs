@@ -45,7 +45,7 @@ namespace Rudim.CLI.UCI
 
             int clock = uciClient.Board.SideToMove == Side.White ? wtime : btime;
             int increment = uciClient.Board.SideToMove == Side.White ? winc : binc;
-            int allottedTime = movetime == -1 ? (clock == -1 ? -1 : TimeManagement.CalculateMoveTime(uciClient.Board.MoveCount, clock, increment)) : movetime;
+            int allottedTime = movetime == -1 ? (clock == -1 ? -1 : TimeManagement.CalculateMoveTime(clock, increment)) : movetime;
 
 
             if (!infinite)
