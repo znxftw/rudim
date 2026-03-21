@@ -70,8 +70,7 @@ namespace Rudim.Board
 
             int score = 0;
             score += ScoreDoubledPawns(whitePawns, blackPawns);
-            score += ScoreIsolatedPawns(whitePawns, blackPawns);
-            score += ScorePassedPawns(whitePawns, blackPawns);
+            score += ScorePawnFeatures(whitePawns, blackPawns);
             return score;
         }
 
@@ -88,7 +87,7 @@ namespace Rudim.Board
             return score;
         }
 
-        private static int ScoreIsolatedPawns(ulong whitePawns, ulong blackPawns)
+        private static int ScorePawnFeatures(ulong whitePawns, ulong blackPawns)
         {
             int score = 0;
             ulong wp = whitePawns;
@@ -98,27 +97,6 @@ namespace Rudim.Board
                 wp &= wp - 1;
                 if ((whitePawns & AdjacentFileMasks[sq & 7]) == 0)
                     score -= IsolatedPawnPenalty;
-            }
-
-            ulong bp = blackPawns;
-            while (bp != 0)
-            {
-                int sq = BitOperations.TrailingZeroCount(bp);
-                bp &= bp - 1;
-                if ((blackPawns & AdjacentFileMasks[sq & 7]) == 0)
-                    score += IsolatedPawnPenalty;
-            }
-            return score;
-        }
-
-        private static int ScorePassedPawns(ulong whitePawns, ulong blackPawns)
-        {
-            int score = 0;
-            ulong wp = whitePawns;
-            while (wp != 0)
-            {
-                int sq = BitOperations.TrailingZeroCount(wp);
-                wp &= wp - 1;
                 if ((blackPawns & PassedPawnMasks[(int)Side.White, sq]) == 0)
                     score += PassedPawnBonus[sq >> 3];
             }
@@ -128,6 +106,8 @@ namespace Rudim.Board
             {
                 int sq = BitOperations.TrailingZeroCount(bp);
                 bp &= bp - 1;
+                if ((blackPawns & AdjacentFileMasks[sq & 7]) == 0)
+                    score += IsolatedPawnPenalty;
                 if ((whitePawns & PassedPawnMasks[(int)Side.Black, sq]) == 0)
                     score -= PassedPawnBonus[7 - (sq >> 3)];
             }
