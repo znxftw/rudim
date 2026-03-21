@@ -49,7 +49,7 @@ jobs:
           path: Rudim/bin/Release/net9.0/publish/
 
   osx-x64:
-    runs-on: macos-13
+    runs-on: macos-latest
     permissions:
       contents: read
     steps:
