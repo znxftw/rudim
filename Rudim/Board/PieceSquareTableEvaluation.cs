@@ -13,6 +13,7 @@ namespace Rudim.Board
             int score = 0;
 
             score += ScorePosition(boardState);
+            score += PawnStructureEvaluation.Evaluate(boardState);
 
             return boardState.SideToMove == Side.White ? score : -score;
         }
