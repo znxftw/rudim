@@ -31,6 +31,7 @@ namespace Rudim.CLI.UCI
             Global.Reset();
             uciClient.Board = BoardState.ParseFEN(fen);
             ParseMoves(moves);
+            Global.SetReady();
         }
 
         private void ParseStartPos(IList<string> moves)
@@ -38,6 +39,7 @@ namespace Rudim.CLI.UCI
             Global.Reset();
             uciClient.Board = BoardState.Default();
             ParseMoves(moves);
+            Global.SetReady();
         }
 
         private void ParseMoves(IList<string> moves)

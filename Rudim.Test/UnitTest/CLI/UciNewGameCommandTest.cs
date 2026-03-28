@@ -27,5 +27,30 @@ namespace Rudim.Test.UnitTest.CLI
             Assert.True(MoveOrdering.IsMoveHeuristicEmpty());
             Assert.True(History.IsHistoryEmpty());
         }
+
+        [Fact]
+        public void ShouldBeReadyAfterReset()
+        {
+            UciClient uciClient = new();
+            UciNewGameCommand newGameCommand = new(uciClient);
+
+            newGameCommand.Run([]);
+
+            Assert.True(Global.IsReady);
+        }
+
+        [Fact]
+        public void ShouldRestoreReadyStateAfterReset()
+        {
+            UciClient uciClient = new();
+            UciNewGameCommand newGameCommand = new(uciClient);
+            Global.SetReady();
+
+            Assert.True(Global.IsReady);
+
+            newGameCommand.Run([]);
+
+            Assert.True(Global.IsReady);
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace Rudim.CLI.UCI
         {
             Global.Reset();
             uciClient.Board = BoardState.Default();
+            Global.SetReady();
         }
     }
 }
