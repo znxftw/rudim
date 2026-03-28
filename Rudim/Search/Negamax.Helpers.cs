@@ -53,8 +53,8 @@ namespace Rudim.Search
 
         private static bool CanPruneNullMove(bool isPvNode, BoardState boardState, bool allowNullMove, int depth)
         {
-            return allowNullMove && !isPvNode && !boardState.IsInCheck(boardState.SideToMove) && depth >= 2  &&
-                   boardState.Phase > GamePhase.OnlyPawns;
+            return allowNullMove && !isPvNode && !boardState.IsInCheck(boardState.SideToMove) && depth >= 2 &&
+                   boardState.HasNonPawnMaterial(boardState.SideToMove);
         }
     }
 }

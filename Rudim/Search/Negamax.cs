@@ -41,11 +41,15 @@ namespace Rudim.Search
             
             if (CanPruneNullMove(isPvNode, boardState, allowNullMove, depth))
             {
-                boardState.MakeNullMove();
-                int score = -Search(boardState, depth - 1 - 2, -beta, -beta + 1, false, cancellationToken);
-                boardState.UndoNullMove();
-                if (score >= beta)
-                    return beta; // TODO : Store in TT
+                int staticEval = PieceSquareTableEvaluation.Evaluate(boardState);
+                if (staticEval >= beta)
+                {
+                    boardState.MakeNullMove();
+                    int score = -Search(boardState, depth - 1 - 2, -beta, -beta + 1, false, cancellationToken);
+                    boardState.UndoNullMove();
+                    if (score >= beta)
+                        return beta; // TODO : Store in TT
+                }
             }
 
             int originalAlpha = alpha;

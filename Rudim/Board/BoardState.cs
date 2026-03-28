@@ -88,6 +88,14 @@ namespace Rudim.Board
         {
             return IsSquareAttacked((Square)Pieces[(int)side, (int)Piece.King].GetLsb(), side.Other());
         }
+
+        public bool HasNonPawnMaterial(Side side)
+        {
+            return Pieces[(int)side, (int)Piece.Knight].Board != 0 ||
+                   Pieces[(int)side, (int)Piece.Bishop].Board != 0 ||
+                   Pieces[(int)side, (int)Piece.Rook].Board != 0 ||
+                   Pieces[(int)side, (int)Piece.Queen].Board != 0;
+        }
         public void MakeMove(Move move)
         {
             Piece capturedPiece = Piece.None;
