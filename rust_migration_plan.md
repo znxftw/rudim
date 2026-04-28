@@ -40,12 +40,12 @@ graph TD
 ---
 
 ## Phase 0: Project Scaffold
-- [ ] Run `cargo init` inside `d:\Code\rudim` (creates `src/main.rs`, `Cargo.toml`)
-- [ ] Configure `Cargo.toml`: name = `rudim`, edition = `2024`
-- [ ] Add dev-dependency: `criterion` (benchmarks)
-- [ ] Create module skeleton: `src/lib.rs`, `src/common/mod.rs`, `src/bitboard/mod.rs`, `src/board/mod.rs`, `src/eval/mod.rs`, `src/search/mod.rs`, `src/uci/mod.rs`, `src/perft/mod.rs`, `src/engine.rs`
-- [ ] Verify `cargo build` and `cargo test` pass (empty)
-- [ ] **Gate**: `cargo build` succeeds, `cargo test` reports 0 tests passed
+- [x] Run `cargo init` inside `d:\Code\rudim` (creates `src/main.rs`, `Cargo.toml`)
+- [x] Configure `Cargo.toml`: name = `rudim`, edition = `2024`
+- [x] Add dev-dependency: `criterion` (benchmarks)
+- [x] Create module skeleton: `src/lib.rs`, `src/common/mod.rs`, `src/bitboard/mod.rs`, `src/board/mod.rs`, `src/eval/mod.rs`, `src/search/mod.rs`, `src/uci/mod.rs`, `src/perft/mod.rs`, `src/engine.rs`
+- [x] Verify `cargo build` and `cargo test` pass (empty)
+- [x] **Gate**: `cargo build` succeeds, `cargo test` reports 0 tests passed
 
 ---
 

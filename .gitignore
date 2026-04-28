@@ -46,3 +46,8 @@ Rudim.csproj.DotSettings
 
 # Extra
 **/TestResults
+
+
+# TODO : RUST BELOW THIS LINE
+
+/target
