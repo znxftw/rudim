@@ -56,7 +56,7 @@ Migrate all leaf-level types that have zero internal dependencies.
 ### 1.1 Enums & Constants
 - [x] `src/common/square.rs` — `Square` enum (a8=0..h1=63, NoSquare=64), with `From<usize>` / `Into<usize>` impls
 - [x] `src/common/piece.rs` — `Piece` enum (Pawn..King, None)
-- [ ] `src/common/side.rs` — `Side` enum (White, Black, Both) + `Side::other()` method
+- [x] `src/common/side.rs` — `Side` enum (White, Black, Both) + `Side::other()` method
 - [ ] `src/common/castle.rs` — `Castle` as a bitflags type (`WhiteShort=1, WhiteLong=2, BlackShort=4, BlackLong=8`)
 - [ ] `src/common/constants.rs` — all constants (SIDES=2, SQUARES=64, PIECES=6, MAX_PLY=64, etc.)
 - [ ] `src/common/helpers.rs` — FEN string constants (STARTING_FEN, KIWI_PETE_FEN, ENDGAME_FEN, ADVANCED_MOVE_FEN)
