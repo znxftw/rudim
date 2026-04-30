@@ -62,8 +62,8 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] `src/common/helpers.rs` — FEN string constants (STARTING_FEN, KIWI_PETE_FEN, ENDGAME_FEN, ADVANCED_MOVE_FEN)
 
 ### 1.2 Random Number Generator
-- [ ] `src/common/random.rs` — Xorshift PRNG with identical seed `1804289383`, `next_u64()`, `next_i32()`, `reset_seed()`
-- [ ] **Tests**: Port `RandomTest.cs` — verify 500 unique u64s and 500 unique i32s from deterministic seed
+- [x] `src/common/random.rs` — Xorshift PRNG with identical seed `1804289383`, `next_u64()`, `next_i32()`, `reset_seed()`
+- [x] **Tests**: Port `RandomTest.cs` — verify 500 unique u64s and 500 unique i32s from deterministic seed
 
 ### 1.3 Move & MoveType
 - [ ] `src/common/move_type.rs` — `MoveType` struct/enum encoding (Value, Piece, PromotionChar, IsCapture) matching C# values exactly
