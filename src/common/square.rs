@@ -3,6 +3,7 @@ use std::fmt;
 // TODO: Relook at optimizations here if reqd.
 #[rustfmt::skip]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[repr(u8)]
 pub enum Square {
     A8 = 0, B8, C8, D8, E8, F8, G8, H8,
     A7, B7, C7, D7, E7, F7, G7, H7,
