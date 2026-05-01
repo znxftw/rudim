@@ -97,9 +97,9 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Tests**: Port `BitboardMagicsTest.cs` — central/corner bishop/rook masks, occupancy mappings
 
 ### 2.4 Lookup Tables
-- [ ] `src/bitboard/lookups.rs` — Static lookup tables initialized via `lazy_static!` or `std::sync::OnceLock`: `PAWN_ATTACKS[2][64]`, `KNIGHT_ATTACKS[64]`, `KING_ATTACKS[64]`, `BISHOP_ATTACKS[64][512]`, `ROOK_ATTACKS[64][4096]`
-- [ ] `get_bishop_attacks_from_table()`, `get_rook_attacks_from_table()`, `get_queen_attacks_from_table()`
-- [ ] **Validation**: Compare all 64 squares × piece type lookup values against C# output
+- [x] `src/bitboard/lookups.rs` — Static lookup tables initialized via `std::sync::LazyLock`: `PAWN_ATTACKS[2][64]`, `KNIGHT_ATTACKS[64]`, `KING_ATTACKS[64]`, `BISHOP_ATTACKS[64][512]`, `ROOK_ATTACKS[64][4096]`
+- [x] `get_bishop_attacks_from_table()`, `get_rook_attacks_from_table()`, `get_queen_attacks_from_table()`
+- [x] **Validation**: Compare all 64 squares × piece type lookup values against C# output
 
 ### 2.5 Wire Up
 - [ ] **Gate**: `cargo test` — all Phase 2 tests pass. Bitboard module is self-contained.

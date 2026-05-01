@@ -1,4 +1,5 @@
 pub mod attacks;
+pub mod lookups;
 pub mod magics;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
