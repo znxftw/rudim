@@ -67,8 +67,8 @@ Migrate all leaf-level types that have zero internal dependencies.
 
 ### 1.3 Move & MoveType
 - [x] `src/common/move_type.rs` — `MoveType` struct/enum encoding (Value, Piece, PromotionChar, IsCapture) matching C# values exactly
-- [ ] `src/common/moves.rs` — `Move` struct (source: Square, target: Square, move_type: MoveType, score: i32), `Move::NO_MOVE`, `Eq`/`Hash` impls, `parse_long_algebraic()`, `is_capture()`, `is_promotion()`, `is_castle()`, `promotion_char()`
-- [ ] **Tests**: Port `MoveEqualityTest.cs` — equal moves, different source/target/type, null comparison, NoMove identity
+- [x] `src/common/moves.rs` — `Move` struct (source: Square, target: Square, move_type: MoveType, score: i32), `Move::NO_MOVE`, `Eq`/`Hash` impls, `parse_long_algebraic()`, `is_capture()`, `is_promotion()`, `is_castle()`, `promotion_char()`
+- [x] **Tests**: Port `MoveEqualityTest.cs` — equal moves, different source/target/type, null comparison, NoMove identity
 
 ### 1.4 GamePhase
 - [ ] `src/common/game_phase.rs` — `PIECE_CONSTANTS`, `TOTAL_PHASE`, `PHASE_FACTOR`, `ONLY_PAWNS`, `add_phase()`, `remove_phase()`
