@@ -1,6 +1,7 @@
 pub mod castle;
 pub mod constants;
 pub mod helpers;
+pub mod move_type;
 pub mod piece;
 pub mod random;
 pub mod side;

@@ -66,7 +66,7 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Tests**: Port `RandomTest.cs` — verify 500 unique u64s and 500 unique i32s from deterministic seed
 
 ### 1.3 Move & MoveType
-- [ ] `src/common/move_type.rs` — `MoveType` struct/enum encoding (Value, Piece, PromotionChar, IsCapture) matching C# values exactly
+- [x] `src/common/move_type.rs` — `MoveType` struct/enum encoding (Value, Piece, PromotionChar, IsCapture) matching C# values exactly
 - [ ] `src/common/moves.rs` — `Move` struct (source: Square, target: Square, move_type: MoveType, score: i32), `Move::NO_MOVE`, `Eq`/`Hash` impls, `parse_long_algebraic()`, `is_capture()`, `is_promotion()`, `is_castle()`, `promotion_char()`
 - [ ] **Tests**: Port `MoveEqualityTest.cs` — equal moves, different source/target/type, null comparison, NoMove identity
 
