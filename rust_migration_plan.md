@@ -71,8 +71,8 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Tests**: Port `MoveEqualityTest.cs` — equal moves, different source/target/type, null comparison, NoMove identity
 
 ### 1.4 GamePhase
-- [ ] `src/common/game_phase.rs` — `PIECE_CONSTANTS`, `TOTAL_PHASE`, `PHASE_FACTOR`, `ONLY_PAWNS`, `add_phase()`, `remove_phase()`
-- [ ] **Tests**: Port `GamePhaseTest.cs` — max phase at start, zero with only kings, clipped above max
+- [x] `src/common/game_phase.rs` — `PIECE_CONSTANTS`, `TOTAL_PHASE`, `PHASE_FACTOR`, `ONLY_PAWNS`, `add_phase()`, `remove_phase()`, `get_clipped_phase()`
+- [x] **Tests**: Port `GamePhaseTest.cs` — max phase at start, zero with only kings, clipped above max
 
 ### 1.5 Wire Up
 - [ ] `src/common/mod.rs` — re-export all submodules
@@ -109,7 +109,7 @@ Migrate all leaf-level types that have zero internal dependencies.
 ## Phase 3: Board State & FEN Parsing
 
 ### 3.1 BoardState Core
-- [ ] `src/board/state.rs` — `BoardState` struct: `pieces: [[Bitboard; 6]; 2]`, `occupancies: [Bitboard; 3]`, `piece_mapping: [Piece; 64]`, `side_to_move`, `en_passant_square`, `castle`, `moves: Vec<Move>`, `move_count`, `best_move`, `phase`, `board_hash`, `last_draw_killer`
+- [ ] `src/board/state.rs` — `BoardState` struct: `pieces: [[Bitboard; 6]; 2]`, `occupancies: [Bitboard; 3]`, `piece_mapping: [Piece; 64]`, `side_to_move`, `en_passant_square`, `castle`, `moves: Vec<Move>`, `move_count`, `best_move`, `phase`, `board_hash`, `last_draw_killer` (Note: `ClippedPhase` property is moved to `get_clipped_phase()` in `game_phase.rs`)
 - [ ] `add_piece()`, `remove_piece()`, `get_piece_on()` (both variants), `is_in_check()`, `Default::default()` → starting position
 - [ ] Castling constants array (64-entry table)
 
