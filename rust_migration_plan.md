@@ -109,9 +109,9 @@ Migrate all leaf-level types that have zero internal dependencies.
 ## Phase 3: Board State & FEN Parsing
 
 ### 3.1 BoardState Core
-- [ ] `src/board/state.rs` — `BoardState` struct: `pieces: [[Bitboard; 6]; 2]`, `occupancies: [Bitboard; 3]`, `piece_mapping: [Piece; 64]`, `side_to_move`, `en_passant_square`, `castle`, `moves: Vec<Move>`, `move_count`, `best_move`, `phase`, `board_hash`, `last_draw_killer` (Note: `ClippedPhase` property is moved to `get_clipped_phase()` in `game_phase.rs`)
-- [ ] `add_piece()`, `remove_piece()`, `get_piece_on()` (both variants), `is_in_check()`, `Default::default()` → starting position
-- [ ] Castling constants array (64-entry table)
+- [x] `src/board/state.rs` — `BoardState` struct: `pieces: [[Bitboard; 6]; 2]`, `occupancies: [Bitboard; 3]`, `piece_mapping: [Piece; 64]`, `side_to_move`, `en_passant_square`, `castle`, `moves: Vec<Move>`, `move_count`, `best_move`, `phase`, `board_hash`, `last_draw_killer` (Note: `ClippedPhase` property is moved to `get_clipped_phase()` in `game_phase.rs`)
+- [x] `add_piece()`, `remove_piece()`, `get_piece_on()` (both variants), `is_in_check()`, `Default::default()` → starting position
+- [x] Castling constants array (64-entry table)
 
 ### 3.2 FEN Parser
 - [ ] `src/board/fen.rs` — `BoardState::parse_fen()`: parse pieces, side to move, castling, en passant
