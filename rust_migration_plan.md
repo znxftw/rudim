@@ -87,9 +87,9 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Tests**: Port `BitboardTest.cs` — set/clear/get bits, idempotency, LSB
 
 ### 2.2 Attack Generation
-- [ ] `src/bitboard/attacks.rs` — `get_pawn_attacks()`, `get_knight_attacks()`, `get_king_attacks()`, `get_bishop_attacks()`, `get_rook_attacks()`, `get_queen_attacks()`
-- [ ] File masks: `FILE_A`, `FILE_B`, `FILE_G`, `FILE_H`, `FILE_AB`, `FILE_GH` as constants
-- [ ] **Tests**: Port all 14 tests from `BitboardAttacksTest.cs` — central/corner pawn, knight, king, bishop ±blockers, rook ±blockers, queen
+- [x] `src/bitboard/attacks.rs` — `get_pawn_attacks()`, `get_knight_attacks()`, `get_king_attacks()`, `get_bishop_attacks()`, `get_rook_attacks()`, `get_queen_attacks()`
+- [x] File masks: `FILE_A`, `FILE_B`, `FILE_G`, `FILE_H`, `FILE_AB`, `FILE_GH` as constants
+- [x] **Tests**: Port all 14 tests from `BitboardAttacksTest.cs` — central/corner pawn, knight, king, bishop ±blockers, rook ±blockers, queen
 
 ### 2.3 Magic Bitboards
 - [ ] `src/bitboard/magics.rs` — `get_bishop_mask()`, `get_rook_mask()`, `get_occupancy_mapping()`, `find_magic_number()` (dev-only)
