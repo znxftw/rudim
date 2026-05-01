@@ -83,8 +83,8 @@ Migrate all leaf-level types that have zero internal dependencies.
 ## Phase 2: Bitboard
 
 ### 2.1 Core Bitboard
-- [ ] `src/bitboard/mod.rs` — `Bitboard` struct wrapping `u64`, with `get_bit()`, `set_bit()`, `clear_bit()`, `get_lsb()` (trailing zeros), `Eq`/`Hash`
-- [ ] **Tests**: Port `BitboardTest.cs` — set/clear/get bits, idempotency, LSB
+- [x] `src/bitboard/mod.rs` — `Bitboard` struct wrapping `u64`, with `get_bit()`, `set_bit()`, `clear_bit()`, `get_lsb()` (trailing zeros), `Eq`/`Hash`
+- [x] **Tests**: Port `BitboardTest.cs` — set/clear/get bits, idempotency, LSB
 
 ### 2.2 Attack Generation
 - [ ] `src/bitboard/attacks.rs` — `get_pawn_attacks()`, `get_knight_attacks()`, `get_king_attacks()`, `get_bishop_attacks()`, `get_rook_attacks()`, `get_queen_attacks()`
