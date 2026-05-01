@@ -23,7 +23,7 @@ impl MoveType {
         self as u8
     }
 
-    pub const fn piece(self) -> Piece {
+    pub const fn promotion_piece(self) -> Piece {
         match self {
             Self::KnightPromotion | Self::KnightPromotionCapture => Piece::Knight,
             Self::BishopPromotion | Self::BishopPromotionCapture => Piece::Bishop,
@@ -102,67 +102,79 @@ mod tests {
     #[test]
     fn test_move_type_properties() {
         assert_eq!(MoveType::Quiet.value(), 0);
-        assert_eq!(MoveType::Quiet.piece(), Piece::None);
+        assert_eq!(MoveType::Quiet.promotion_piece(), Piece::None);
         assert_eq!(MoveType::Quiet.promotion_char(), None);
         assert_eq!(MoveType::Quiet.is_capture(), false);
 
         assert_eq!(MoveType::Capture.value(), 1);
-        assert_eq!(MoveType::Capture.piece(), Piece::None);
+        assert_eq!(MoveType::Capture.promotion_piece(), Piece::None);
         assert_eq!(MoveType::Capture.promotion_char(), None);
         assert_eq!(MoveType::Capture.is_capture(), true);
 
         assert_eq!(MoveType::EnPassant.value(), 2);
-        assert_eq!(MoveType::EnPassant.piece(), Piece::None);
+        assert_eq!(MoveType::EnPassant.promotion_piece(), Piece::None);
         assert_eq!(MoveType::EnPassant.promotion_char(), None);
         assert_eq!(MoveType::EnPassant.is_capture(), true);
 
         assert_eq!(MoveType::DoublePush.value(), 3);
-        assert_eq!(MoveType::DoublePush.piece(), Piece::None);
+        assert_eq!(MoveType::DoublePush.promotion_piece(), Piece::None);
         assert_eq!(MoveType::DoublePush.promotion_char(), None);
         assert_eq!(MoveType::DoublePush.is_capture(), false);
 
         assert_eq!(MoveType::KnightPromotion.value(), 4);
-        assert_eq!(MoveType::KnightPromotion.piece(), Piece::Knight);
+        assert_eq!(MoveType::KnightPromotion.promotion_piece(), Piece::Knight);
         assert_eq!(MoveType::KnightPromotion.promotion_char(), Some('n'));
         assert_eq!(MoveType::KnightPromotion.is_capture(), false);
 
         assert_eq!(MoveType::BishopPromotion.value(), 5);
-        assert_eq!(MoveType::BishopPromotion.piece(), Piece::Bishop);
+        assert_eq!(MoveType::BishopPromotion.promotion_piece(), Piece::Bishop);
         assert_eq!(MoveType::BishopPromotion.promotion_char(), Some('b'));
         assert_eq!(MoveType::BishopPromotion.is_capture(), false);
 
         assert_eq!(MoveType::RookPromotion.value(), 6);
-        assert_eq!(MoveType::RookPromotion.piece(), Piece::Rook);
+        assert_eq!(MoveType::RookPromotion.promotion_piece(), Piece::Rook);
         assert_eq!(MoveType::RookPromotion.promotion_char(), Some('r'));
         assert_eq!(MoveType::RookPromotion.is_capture(), false);
 
         assert_eq!(MoveType::QueenPromotion.value(), 7);
-        assert_eq!(MoveType::QueenPromotion.piece(), Piece::Queen);
+        assert_eq!(MoveType::QueenPromotion.promotion_piece(), Piece::Queen);
         assert_eq!(MoveType::QueenPromotion.promotion_char(), Some('q'));
         assert_eq!(MoveType::QueenPromotion.is_capture(), false);
 
         assert_eq!(MoveType::KnightPromotionCapture.value(), 12);
-        assert_eq!(MoveType::KnightPromotionCapture.piece(), Piece::Knight);
+        assert_eq!(
+            MoveType::KnightPromotionCapture.promotion_piece(),
+            Piece::Knight
+        );
         assert_eq!(MoveType::KnightPromotionCapture.promotion_char(), Some('n'));
         assert_eq!(MoveType::KnightPromotionCapture.is_capture(), true);
 
         assert_eq!(MoveType::BishopPromotionCapture.value(), 13);
-        assert_eq!(MoveType::BishopPromotionCapture.piece(), Piece::Bishop);
+        assert_eq!(
+            MoveType::BishopPromotionCapture.promotion_piece(),
+            Piece::Bishop
+        );
         assert_eq!(MoveType::BishopPromotionCapture.promotion_char(), Some('b'));
         assert_eq!(MoveType::BishopPromotionCapture.is_capture(), true);
 
         assert_eq!(MoveType::RookPromotionCapture.value(), 14);
-        assert_eq!(MoveType::RookPromotionCapture.piece(), Piece::Rook);
+        assert_eq!(
+            MoveType::RookPromotionCapture.promotion_piece(),
+            Piece::Rook
+        );
         assert_eq!(MoveType::RookPromotionCapture.promotion_char(), Some('r'));
         assert_eq!(MoveType::RookPromotionCapture.is_capture(), true);
 
         assert_eq!(MoveType::QueenPromotionCapture.value(), 15);
-        assert_eq!(MoveType::QueenPromotionCapture.piece(), Piece::Queen);
+        assert_eq!(
+            MoveType::QueenPromotionCapture.promotion_piece(),
+            Piece::Queen
+        );
         assert_eq!(MoveType::QueenPromotionCapture.promotion_char(), Some('q'));
         assert_eq!(MoveType::QueenPromotionCapture.is_capture(), true);
 
         assert_eq!(MoveType::Castle.value(), 16);
-        assert_eq!(MoveType::Castle.piece(), Piece::None);
+        assert_eq!(MoveType::Castle.promotion_piece(), Piece::None);
         assert_eq!(MoveType::Castle.promotion_char(), None);
         assert_eq!(MoveType::Castle.is_capture(), false);
     }
