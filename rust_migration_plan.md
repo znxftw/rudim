@@ -114,10 +114,10 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] Castling constants array (64-entry table)
 
 ### 3.2 FEN Parser
-- [ ] `src/board/fen.rs` — `BoardState::parse_fen()`: parse pieces, side to move, castling, en passant
-- [ ] `symbol_to_piece()`, `symbol_to_side()`
-- [ ] **Tests**: Port `BoardStateFENTest.cs` — verify all 12 piece bitboards, 3 occupancies, side, castle, en passant for starting position
-- [ ] Additional FEN tests: KiwiPete, Endgame, AdvancedMove positions
+- [x] `src/board/fen.rs` — `BoardState::parse_fen()`: parse pieces, side to move, castling, en passant
+- [x] `symbol_to_piece()`, `symbol_to_side()`
+- [x] **Tests**: Port `BoardStateFENTest.cs` — verify all 12 piece bitboards, 3 occupancies, side, castle, en passant for starting position
+- [x] Additional FEN tests: KiwiPete, Endgame, AdvancedMove positions
 
 ### 3.3 Equality & Display
 - [ ] `PartialEq`/`Eq` for `BoardState` (compare pieces, occupancies, side, en passant, castle, moves)

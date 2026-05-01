@@ -152,13 +152,9 @@ impl BoardState {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Default — blank board (will be wired to STARTING_FEN in Phase 3.2)
-// ---------------------------------------------------------------------------
-
 impl Default for BoardState {
     fn default() -> Self {
-        Self::new()
+        Self::starting_position()
     }
 }
 
