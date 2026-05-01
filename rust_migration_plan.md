@@ -92,9 +92,9 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Tests**: Port all 14 tests from `BitboardAttacksTest.cs` — central/corner pawn, knight, king, bishop ±blockers, rook ±blockers, queen
 
 ### 2.3 Magic Bitboards
-- [ ] `src/bitboard/magics.rs` — `get_bishop_mask()`, `get_rook_mask()`, `get_occupancy_mapping()`, `find_magic_number()` (dev-only)
-- [ ] Hard-coded `BISHOP_MAGICS` and `ROOK_MAGICS` arrays (copy exact values from C#)
-- [ ] **Tests**: Port `BitboardMagicsTest.cs` — central/corner bishop/rook masks, occupancy mappings
+- [x] `src/bitboard/magics.rs` — `get_bishop_mask()`, `get_rook_mask()`, `get_occupancy_mapping()`, `find_magic_number()` (dev-only)
+- [x] Hard-coded `BISHOP_MAGICS` and `ROOK_MAGICS` arrays (copy exact values from C#)
+- [x] **Tests**: Port `BitboardMagicsTest.cs` — central/corner bishop/rook masks, occupancy mappings
 
 ### 2.4 Lookup Tables
 - [ ] `src/bitboard/lookups.rs` — Static lookup tables initialized via `lazy_static!` or `std::sync::OnceLock`: `PAWN_ATTACKS[2][64]`, `KNIGHT_ATTACKS[64]`, `KING_ATTACKS[64]`, `BISHOP_ATTACKS[64][512]`, `ROOK_ATTACKS[64][4096]`

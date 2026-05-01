@@ -58,7 +58,7 @@ pub fn get_king_attacks(square: Square) -> Bitboard {
     Bitboard(result_board)
 }
 
-fn add_square_to_board_and_stop_at_occupied_square(
+pub(crate) fn add_square_to_board_and_stop_at_occupied_square(
     result_board: &mut u64,
     rank: i32,
     file: i32,

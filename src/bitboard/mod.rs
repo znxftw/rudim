@@ -1,4 +1,5 @@
 pub mod attacks;
+pub mod magics;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Bitboard(pub u64);
