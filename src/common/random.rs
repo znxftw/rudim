@@ -1,6 +1,6 @@
-use std::sync::atomic::{AtomicI32, AtomicU64, Ordering};
 #[cfg(test)]
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicI32, AtomicU64, Ordering};
 
 static ULONG_STATE: AtomicU64 = AtomicU64::new(1804289383);
 static INT_STATE: AtomicI32 = AtomicI32::new(1804289383);
@@ -16,7 +16,8 @@ pub fn next_u64() -> u64 {
         next ^= next << 13;
         next ^= next >> 7;
         next ^= next << 17;
-        match ULONG_STATE.compare_exchange_weak(current, next, Ordering::Relaxed, Ordering::Relaxed) {
+        match ULONG_STATE.compare_exchange_weak(current, next, Ordering::Relaxed, Ordering::Relaxed)
+        {
             Ok(_) => return next,
             Err(v) => current = v,
         }
@@ -54,7 +55,11 @@ mod tests {
         let mut generated = HashSet::new();
         for _ in 0..500 {
             let num = next_u64();
-            assert!(generated.insert(num), "Collision detected for ulong number: {}", num);
+            assert!(
+                generated.insert(num),
+                "Collision detected for ulong number: {}",
+                num
+            );
         }
     }
 
@@ -65,7 +70,11 @@ mod tests {
         let mut generated = HashSet::new();
         for _ in 0..500 {
             let num = next_i32();
-            assert!(generated.insert(num), "Collision detected for int number: {}", num);
+            assert!(
+                generated.insert(num),
+                "Collision detected for int number: {}",
+                num
+            );
         }
     }
 }

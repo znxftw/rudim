@@ -2,7 +2,7 @@ pub mod attacks;
 pub mod lookups;
 pub mod magics;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Bitboard(pub u64);
 
 impl Bitboard {
@@ -24,12 +24,6 @@ impl Bitboard {
     #[inline]
     pub fn get_lsb(&self) -> u32 {
         self.0.trailing_zeros()
-    }
-}
-
-impl Default for Bitboard {
-    fn default() -> Self {
-        Self(0)
     }
 }
 

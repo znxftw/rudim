@@ -13,41 +13,43 @@ use crate::common::square::Square;
 
 static BISHOP_MASK_BITS: LazyLock<[u32; SQUARES]> = LazyLock::new(|| {
     let mut bits = [0u32; SQUARES];
-    for sq in 0..SQUARES {
-        bits[sq] = get_bishop_mask(Square::from(sq)).0.count_ones();
+    for (sq, entry) in bits.iter_mut().enumerate() {
+        *entry = get_bishop_mask(Square::from(sq)).0.count_ones();
     }
     bits
 });
 
 static ROOK_MASK_BITS: LazyLock<[u32; SQUARES]> = LazyLock::new(|| {
     let mut bits = [0u32; SQUARES];
-    for sq in 0..SQUARES {
-        bits[sq] = get_rook_mask(Square::from(sq)).0.count_ones();
+    for (sq, entry) in bits.iter_mut().enumerate() {
+        *entry = get_rook_mask(Square::from(sq)).0.count_ones();
     }
     bits
 });
 
 pub static PAWN_ATTACKS: LazyLock<[[u64; SQUARES]; 2]> = LazyLock::new(|| {
     let mut table = [[0u64; SQUARES]; 2];
-    for sq in 0..SQUARES {
-        table[Side::White as usize][sq] = get_pawn_attacks(Square::from(sq), Side::White).0;
-        table[Side::Black as usize][sq] = get_pawn_attacks(Square::from(sq), Side::Black).0;
+    for (sq, entry) in table[Side::White as usize].iter_mut().enumerate() {
+        *entry = get_pawn_attacks(Square::from(sq), Side::White).0;
+    }
+    for (sq, entry) in table[Side::Black as usize].iter_mut().enumerate() {
+        *entry = get_pawn_attacks(Square::from(sq), Side::Black).0;
     }
     table
 });
 
 pub static KNIGHT_ATTACKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
     let mut table = [0u64; SQUARES];
-    for sq in 0..SQUARES {
-        table[sq] = get_knight_attacks(Square::from(sq)).0;
+    for (sq, entry) in table.iter_mut().enumerate() {
+        *entry = get_knight_attacks(Square::from(sq)).0;
     }
     table
 });
 
 pub static KING_ATTACKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
     let mut table = [0u64; SQUARES];
-    for sq in 0..SQUARES {
-        table[sq] = get_king_attacks(Square::from(sq)).0;
+    for (sq, entry) in table.iter_mut().enumerate() {
+        *entry = get_king_attacks(Square::from(sq)).0;
     }
     table
 });

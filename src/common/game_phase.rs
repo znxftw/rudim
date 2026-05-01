@@ -59,7 +59,7 @@ mod tests {
     #[test]
     fn should_not_go_above_max_phase_for_promotions() {
         let mut phase = TOTAL_PHASE;
-        
+
         phase = remove_phase(phase, Piece::Pawn);
         phase = add_phase(phase, Piece::Queen);
 

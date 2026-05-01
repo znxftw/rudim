@@ -75,25 +75,29 @@ pub fn get_bishop_attacks(square: Square, occupancy: Bitboard) -> Bitboard {
     let bishop_file = sq & (8 - 1);
 
     for (rank, file) in ((bishop_rank + 1)..8).zip((bishop_file + 1)..8) {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy) {
+        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy)
+        {
             break;
         }
     }
 
     for (rank, file) in (0..bishop_rank).rev().zip((bishop_file + 1)..8) {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy) {
+        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy)
+        {
             break;
         }
     }
 
     for (rank, file) in (0..bishop_rank).rev().zip((0..bishop_file).rev()) {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy) {
+        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy)
+        {
             break;
         }
     }
 
     for (rank, file) in ((bishop_rank + 1)..8).zip((0..bishop_file).rev()) {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy) {
+        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy)
+        {
             break;
         }
     }
@@ -108,25 +112,45 @@ pub fn get_rook_attacks(square: Square, occupancy: Bitboard) -> Bitboard {
     let rook_file = sq & (8 - 1);
 
     for rank in (rook_rank + 1)..8 {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, rook_file, occupancy) {
+        if add_square_to_board_and_stop_at_occupied_square(
+            &mut result_board,
+            rank,
+            rook_file,
+            occupancy,
+        ) {
             break;
         }
     }
 
     for rank in (0..rook_rank).rev() {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, rook_file, occupancy) {
+        if add_square_to_board_and_stop_at_occupied_square(
+            &mut result_board,
+            rank,
+            rook_file,
+            occupancy,
+        ) {
             break;
         }
     }
 
     for file in (rook_file + 1)..8 {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rook_rank, file, occupancy) {
+        if add_square_to_board_and_stop_at_occupied_square(
+            &mut result_board,
+            rook_rank,
+            file,
+            occupancy,
+        ) {
             break;
         }
     }
 
     for file in (0..rook_file).rev() {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rook_rank, file, occupancy) {
+        if add_square_to_board_and_stop_at_occupied_square(
+            &mut result_board,
+            rook_rank,
+            file,
+            occupancy,
+        ) {
             break;
         }
     }

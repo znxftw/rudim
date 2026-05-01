@@ -102,7 +102,7 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Validation**: Compare all 64 squares × piece type lookup values against C# output
 
 ### 2.5 Wire Up
-- [ ] **Gate**: `cargo test` — all Phase 2 tests pass. Bitboard module is self-contained.
+- [x] **Gate**: `cargo test` — all Phase 2 tests pass. Bitboard module is self-contained.
 
 ---
 
