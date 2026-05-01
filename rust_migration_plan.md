@@ -75,8 +75,8 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Tests**: Port `GamePhaseTest.cs` — max phase at start, zero with only kings, clipped above max
 
 ### 1.5 Wire Up
-- [ ] `src/common/mod.rs` — re-export all submodules
-- [ ] **Gate**: `cargo test` — all Phase 1 tests pass, module compiles independently
+- [x] `src/common/mod.rs` — re-export all submodules
+- [x] **Gate**: `cargo test` — all Phase 1 tests pass, module compiles independently
 
 ---
 
