@@ -22,10 +22,11 @@ namespace Rudim.Common
             ZobristTable[13, 0] = Random.NextULong(); // White to move
             ZobristTable[13, 1] = Random.NextULong(); // Black to move
 
-            ZobristTable[13, 2] = Random.NextULong();
-            ZobristTable[13, 3] = Random.NextULong();
-            ZobristTable[13, 4] = Random.NextULong();
-            ZobristTable[13, 5] = Random.NextULong();
+            // 16 possible castling states (4 bits)
+            for (int i = 2; i < 18; i++)
+            {
+                ZobristTable[13, i] = Random.NextULong();
+            }
         }
 
         public static ulong GetBoardHash(BoardState boardState)
@@ -53,7 +54,8 @@ namespace Rudim.Common
 
         public static ulong HashCastlingRights(BoardState boardState, ulong currentHash)
         {
-            currentHash ^= ZobristTable[13, (int)boardState.Castle];
+            // Offset by 2 to avoid collision with side-to-move keys (which use [13, 0] and [13, 1])
+            currentHash ^= ZobristTable[13, 2 + (int)boardState.Castle];
             return currentHash;
         }
 
