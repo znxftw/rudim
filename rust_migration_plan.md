@@ -120,27 +120,27 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] Additional FEN tests: KiwiPete, Endgame, AdvancedMove positions
 
 ### 3.3 Equality & Display
-- [ ] `PartialEq`/`Eq` for `BoardState` (compare pieces, occupancies, side, en passant, castle, moves)
-- [ ] `Display` trait — common state names via hash lookup
+- [x] `PartialEq`/`Eq` for `BoardState` (compare pieces, occupancies, side, en passant, castle, moves)
+- [x] `Display` trait
 
 ### 3.4 Wire Up
-- [ ] **Gate**: `cargo test` — FEN parsing produces identical bitboard values to C#
+- [x] **Gate**: `cargo test` — FEN parsing produces identical bitboard values to C#
 
 ---
 
 ## Phase 4: Move Generation
 
-- [ ] `src/board/movegen.rs` — `BoardState::generate_moves()`
-- [ ] `generate_pawn_moves()` — pushes (single + double), attacks, en passant, promotions (4 types × capture/quiet)
-- [ ] `generate_knight_moves()`, `generate_bishop_moves()`, `generate_rook_moves()`, `generate_queen_moves()` — from lookup tables
-- [ ] `generate_king_moves()` + `generate_castle_moves()` — all castling conditions
-- [ ] `is_square_attacked()` — check all piece types
-- [ ] Helper: `add_pawn_move()`, `add_move_to_moves_list()`, `is_square_capture()`
-- [ ] **Tests**: Port `BoardStateMovesTest.cs` — starting=20, KiwiPete=48, AdvancedMove=42
-- [ ] **Cross-validation**: For each of the 4 standard FEN positions, assert that the set of generated moves matches C# output exactly (sorted by source+target+type)
+- [x] `src/board/movegen.rs` — `BoardState::generate_moves()`
+- [x] `generate_pawn_moves()` — pushes (single + double), attacks, en passant, promotions (4 types × capture/quiet)
+- [x] `generate_knight_moves()`, `generate_bishop_moves()`, `generate_rook_moves()`, `generate_queen_moves()` — from lookup tables
+- [x] `generate_king_moves()` + `generate_castle_moves()` — all castling conditions
+- [x] `is_square_attacked()` — check all piece types
+- [x] Helper: `add_pawn_move()`, `add_move_to_moves_list()`, `is_square_capture()`
+- [x] **Tests**: Port `BoardStateMovesTest.cs` — starting=20, KiwiPete=48, AdvancedMove=42
+- [x] **Cross-validation**: For each of the 4 standard FEN positions, assert that the set of generated moves matches C# output exactly (sorted by source+target+type)
 
 ### Gate
-- [ ] `cargo test` — move generation counts match C# for all standard positions
+- [x] `cargo test` — move generation counts match C# for all standard positions
 
 ---
 
@@ -276,7 +276,7 @@ Migrate all leaf-level types that have zero internal dependencies.
 
 ## Phase 11: CI/CD, Benchmarks & Cleanup
 
-- [ ] GitHub Actions workflow: `cargo build`, `cargo test`, `cargo clippy`, `cargo fmt --check`
+- [ ] GitHub Actions workflow: `cargo build`, `cargo test`, `cargo clippy`, `cargo fmt --check`, rewrite dependabot to scan for rust
 - [ ] Criterion benchmarks: `find_best_move` at depth 6-7 for all 4 standard positions
 - [ ] Remove C# project files (`.sln`, `.csproj`, `Rudim/`, `Rudim.Test/`) or move to `legacy/` branch
 - [ ] Update `README.md` — Rust build instructions, architecture overview
