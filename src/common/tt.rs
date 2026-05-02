@@ -103,10 +103,10 @@ impl TranspositionTable {
         entry_type: TranspositionEntryType,
     ) {
         let index = (hash as usize) & (self.capacity - 1);
-        if let Some(existing) = self.entries[index] {
-            if existing.depth >= depth {
-                return;
-            }
+        if let Some(existing) = self.entries[index]
+            && existing.depth >= depth
+        {
+            return;
         }
 
         self.entries[index] = Some(TranspositionTableEntry {

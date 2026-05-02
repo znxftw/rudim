@@ -9,19 +9,13 @@ pub static ZOBRIST_TABLE: LazyLock<[[u64; 64]; 14]> = LazyLock::new(|| {
     random::reset_seed();
 
     // 12 piece types (6 for each color) and 64 squares, and extra - en passant, + edge cases below
-    for piece in 0..13 {
-        for square in 0..64 {
-            table[piece][square] = random::next_u64();
+    // [13][0] == white to move
+    // [13][1] == black to move
+    // [13][2..18] == castling rights
+    for entry in table.iter_mut() {
+        for square in entry.iter_mut() {
+            *square = random::next_u64();
         }
-    }
-
-    // Both not needed?
-    table[13][0] = random::next_u64(); // White to move
-    table[13][1] = random::next_u64(); // Black to move
-
-    // 16 possible castling states (4 bits)
-    for i in 2..18 {
-        table[13][i] = random::next_u64();
     }
 
     table

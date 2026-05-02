@@ -54,7 +54,7 @@ impl Move {
             let f = chars.next()?.to_ascii_lowercase();
             let r = chars.next()?;
 
-            if f < 'a' || f > 'h' || r < '1' || r > '8' {
+            if !('a'..='h').contains(&f) || !('1'..='8').contains(&r) {
                 return None;
             }
 

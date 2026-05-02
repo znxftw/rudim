@@ -157,48 +157,44 @@ impl BoardState {
         let occ = self.occupancies[Side::Both as usize];
 
         if self.side_to_move == Side::White {
-            if self.castle.contains(Castle::WHITE_SHORT) {
-                if occ.get_bit(Square::F1 as usize) == 0
-                    && occ.get_bit(Square::G1 as usize) == 0
-                    && !self.is_square_attacked(Square::E1, Side::Black)
-                    && !self.is_square_attacked(Square::F1, Side::Black)
-                {
-                    self.moves
-                        .push(Move::new(Square::E1, Square::G1, MoveType::Castle));
-                }
+            if self.castle.contains(Castle::WHITE_SHORT)
+                && occ.get_bit(Square::F1 as usize) == 0
+                && occ.get_bit(Square::G1 as usize) == 0
+                && !self.is_square_attacked(Square::E1, Side::Black)
+                && !self.is_square_attacked(Square::F1, Side::Black)
+            {
+                self.moves
+                    .push(Move::new(Square::E1, Square::G1, MoveType::Castle));
             }
-            if self.castle.contains(Castle::WHITE_LONG) {
-                if occ.get_bit(Square::D1 as usize) == 0
-                    && occ.get_bit(Square::C1 as usize) == 0
-                    && occ.get_bit(Square::B1 as usize) == 0
-                    && !self.is_square_attacked(Square::E1, Side::Black)
-                    && !self.is_square_attacked(Square::D1, Side::Black)
-                {
-                    self.moves
-                        .push(Move::new(Square::E1, Square::C1, MoveType::Castle));
-                }
+            if self.castle.contains(Castle::WHITE_LONG)
+                && occ.get_bit(Square::D1 as usize) == 0
+                && occ.get_bit(Square::C1 as usize) == 0
+                && occ.get_bit(Square::B1 as usize) == 0
+                && !self.is_square_attacked(Square::E1, Side::Black)
+                && !self.is_square_attacked(Square::D1, Side::Black)
+            {
+                self.moves
+                    .push(Move::new(Square::E1, Square::C1, MoveType::Castle));
             }
         } else {
-            if self.castle.contains(Castle::BLACK_SHORT) {
-                if occ.get_bit(Square::F8 as usize) == 0
-                    && occ.get_bit(Square::G8 as usize) == 0
-                    && !self.is_square_attacked(Square::E8, Side::White)
-                    && !self.is_square_attacked(Square::F8, Side::White)
-                {
-                    self.moves
-                        .push(Move::new(Square::E8, Square::G8, MoveType::Castle));
-                }
+            if self.castle.contains(Castle::BLACK_SHORT)
+                && occ.get_bit(Square::F8 as usize) == 0
+                && occ.get_bit(Square::G8 as usize) == 0
+                && !self.is_square_attacked(Square::E8, Side::White)
+                && !self.is_square_attacked(Square::F8, Side::White)
+            {
+                self.moves
+                    .push(Move::new(Square::E8, Square::G8, MoveType::Castle));
             }
-            if self.castle.contains(Castle::BLACK_LONG) {
-                if occ.get_bit(Square::D8 as usize) == 0
-                    && occ.get_bit(Square::C8 as usize) == 0
-                    && occ.get_bit(Square::B8 as usize) == 0
-                    && !self.is_square_attacked(Square::E8, Side::White)
-                    && !self.is_square_attacked(Square::D8, Side::White)
-                {
-                    self.moves
-                        .push(Move::new(Square::E8, Square::C8, MoveType::Castle));
-                }
+            if self.castle.contains(Castle::BLACK_LONG)
+                && occ.get_bit(Square::D8 as usize) == 0
+                && occ.get_bit(Square::C8 as usize) == 0
+                && occ.get_bit(Square::B8 as usize) == 0
+                && !self.is_square_attacked(Square::E8, Side::White)
+                && !self.is_square_attacked(Square::D8, Side::White)
+            {
+                self.moves
+                    .push(Move::new(Square::E8, Square::C8, MoveType::Castle));
             }
         }
     }
