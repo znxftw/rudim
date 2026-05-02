@@ -195,15 +195,15 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Tests**: Port `MoveOrderingTest.cs` — sort by score, idempotent sort
 
 ### 7.2 Piece-Square Table Evaluation
-- [ ] `src/eval/pst.rs` — Midgame + Endgame PST tables (copy exact values from Rofchade), `evaluate()` with tapered eval using game phase, `mirror_square()`
-- [ ] **Tests**: Port `PieceSquareTableEvaluationTest.cs` — starting=0 (both sides), endgame=-3, kiwipete=56, advanced=605
+- [x] `src/eval/pst.rs` — Midgame + Endgame PST tables (copy exact values from Rofchade), `evaluate()` with tapered eval using game phase, `mirror_square()`
+- [x] **Tests**: Port `PieceSquareTableEvaluationTest.cs` — starting=0 (both sides), endgame=-3, kiwipete=56, advanced=605
 
 ### 7.3 Pawn Structure Evaluation
-- [ ] `src/eval/pawns.rs` — File masks, adjacent file masks, passed pawn masks. `evaluate()`: doubled pawn penalty, isolated pawn penalty, passed pawn bonus
-- [ ] **Tests**: Port all 8 `PawnStructureEvaluationTest.cs` tests — no pawns, symmetric, doubled white/black, isolated, passed white/black, adjacent file blocking
+- [x] `src/eval/pawns.rs` — File masks, adjacent file masks, passed pawn masks. `evaluate()`: doubled pawn penalty, isolated pawn penalty, passed pawn bonus
+- [x] **Tests**: Port all 8 `PawnStructureEvaluationTest.cs` tests — no pawns, symmetric, doubled white/black, isolated, passed white/black, adjacent file blocking
 
 ### Gate
-- [ ] `cargo test` — all evaluation scores match C# exactly for standard positions
+- [x] `cargo test` — all evaluation scores match C# exactly for standard positions
 
 ---
 
