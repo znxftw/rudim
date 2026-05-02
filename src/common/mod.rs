@@ -8,4 +8,5 @@ pub mod piece;
 pub mod random;
 pub mod side;
 pub mod square;
+pub mod tt;
 pub mod zobrist;

@@ -175,16 +175,16 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] **Critical**: PRNG seed and call order must exactly match C# to produce identical hash values
 
 ### 6.2 Transposition Table
-- [ ] `src/common/tt.rs` — `TranspositionTable` with capacity 65536, `clear()`, `get_hash_move()`, `get_entry()`, `submit_entry()`, `collect_principal_variation()`, `adjust_score()`, `retrieve_score()`
-- [ ] `TranspositionTableEntry` struct, `TranspositionEntryType` enum (Exact, Alpha, Beta)
+- [x] `src/common/tt.rs` — `TranspositionTable` with capacity 65536, `clear()`, `get_hash_move()`, `get_entry()`, `submit_entry()`, `collect_principal_variation()`, `adjust_score()`, `retrieve_score()`
+- [x] `TranspositionTableEntry` struct, `TranspositionEntryType` enum (Exact, Alpha, Beta)
 
 ### 6.3 Tests
 - [x] Verify Zobrist hash for starting position matches C# value exactly
-- [ ] Verify TT store/retrieve round-trip
-- [ ] Score adjustment near checkmate boundaries
+- [x] Verify TT store/retrieve round-trip
+- [x] Score adjustment near checkmate boundaries
 
 ### Gate
-- [ ] `cargo test` — Zobrist produces bit-identical hashes to C#, TT operations correct
+- [x] `cargo test` — Zobrist produces bit-identical hashes to C#, TT operations correct
 
 ---
 
