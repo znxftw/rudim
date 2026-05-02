@@ -202,14 +202,14 @@ mod tests {
         let original_state_pieces = board_state.pieces.clone();
         let original_state_side = board_state.side_to_move;
         let original_board_hash = board_state.board_hash;
-        
+
         let move_e2e4 = Move::new(Square::E2, Square::E4, MoveType::Quiet);
 
         board_state.make_move(move_e2e4);
 
         assert_ne!(board_state.pieces, original_state_pieces);
         assert_ne!(board_state.side_to_move, original_state_side);
-        // assert_ne!(board_state.board_hash, original_board_hash); // TODO: Phase 6 Zobrist
+        assert_ne!(board_state.board_hash, original_board_hash);
 
         board_state.unmake_move(move_e2e4);
 

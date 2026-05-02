@@ -157,29 +157,29 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] `is_draw()` — 50-move rule + threefold repetition via history
 
 ### 5.3 Tests
-- [ ] Port `HistoryTest.cs` — make then unmake restores identical state
-- [ ] Port `BoardStateMovesTest.ShouldMakeAndUndoNullMoveCorrectly`
-- [ ] Port `DrawTest.cs` — 50-move rule detection, threefold repetition (4 tests), reset after pawn move, reset after capture
-- [ ] Port `ZobristTest.cs` — hash restoration for quiet, capture, en passant, promotion, castling (11 inline data cases)
-- [ ] **Bit-exact validation**: After make+unmake of every legal move from starting position, board hash must match original
+- [x] Port `HistoryTest.cs` — make then unmake restores identical state
+- [x] Port `BoardStateMovesTest.ShouldMakeAndUndoNullMoveCorrectly`
+- [x] Port `DrawTest.cs` — 50-move rule detection, threefold repetition (4 tests), reset after pawn move, reset after capture
+- [x] Port `ZobristTest.cs` — hash restoration for quiet, capture, en passant, promotion, castling (11 inline data cases)
+- [x] **Bit-exact validation**: After make+unmake of every legal move from starting position, board hash must match original
 
 ### Gate
-- [ ] `cargo test` — all make/unmake and draw detection tests pass
+- [x] `cargo test` — all make/unmake and draw detection tests pass
 
 ---
 
 ## Phase 6: Zobrist Hashing & Transposition Table
 
 ### 6.1 Zobrist
-- [ ] `src/common/zobrist.rs` — Zobrist table `[14][64]` initialized from deterministic PRNG (same seed as C#), `get_board_hash()`, `hash_castling_rights()`, `flip_side_to_move_hashes()`, `hash_en_passant()`
-- [ ] **Critical**: PRNG seed and call order must exactly match C# to produce identical hash values
+- [x] `src/common/zobrist.rs` — Zobrist table `[14][64]` initialized from deterministic PRNG (same seed as C#), `get_board_hash()`, `hash_castling_rights()`, `flip_side_to_move_hashes()`, `hash_en_passant()`
+- [x] **Critical**: PRNG seed and call order must exactly match C# to produce identical hash values
 
 ### 6.2 Transposition Table
 - [ ] `src/common/tt.rs` — `TranspositionTable` with capacity 65536, `clear()`, `get_hash_move()`, `get_entry()`, `submit_entry()`, `collect_principal_variation()`, `adjust_score()`, `retrieve_score()`
 - [ ] `TranspositionTableEntry` struct, `TranspositionEntryType` enum (Exact, Alpha, Beta)
 
 ### 6.3 Tests
-- [ ] Verify Zobrist hash for starting position matches C# value exactly
+- [x] Verify Zobrist hash for starting position matches C# value exactly
 - [ ] Verify TT store/retrieve round-trip
 - [ ] Score adjustment near checkmate boundaries
 

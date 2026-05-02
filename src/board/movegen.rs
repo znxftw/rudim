@@ -326,7 +326,10 @@ mod tests {
         let mut board = BoardState::parse_fen(KIWI_PETE_FEN);
         board.generate_moves();
         let castle_count = board.moves.iter().filter(|m| m.is_castle()).count();
-        assert_eq!(castle_count, 2, "KiwiPete should have exactly 2 castling options");
+        assert_eq!(
+            castle_count, 2,
+            "KiwiPete should have exactly 2 castling options"
+        );
     }
 
     #[test]
@@ -334,7 +337,10 @@ mod tests {
         let mut board = BoardState::parse_fen(ADVANCED_MOVE_FEN);
         board.generate_moves();
         let promo_count = board.moves.iter().filter(|m| m.is_promotion()).count();
-        assert_eq!(promo_count, 12, "AdvancedMove FEN should have exactly 12 promotions");
+        assert_eq!(
+            promo_count, 12,
+            "AdvancedMove FEN should have exactly 12 promotions"
+        );
     }
 
     #[test]

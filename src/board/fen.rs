@@ -17,6 +17,7 @@ impl BoardState {
         // parse_ply(&mut board, sections[4]); // TODO: pending ply
         // board.board_hash = zobrist::get_board_hash(&board); // TODO: Phase 6
 
+        board.board_hash = crate::common::zobrist::get_board_hash(&board);
         board
     }
 
