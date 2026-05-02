@@ -42,17 +42,13 @@ impl MoveOrdering {
                 }
             }
             return;
-        }
-
-        let target_piece: usize;
+        };
         let source_piece = board_state.get_piece_on_side(move_obj.source, board_state.side_to_move);
-
-        if move_obj.move_type == MoveType::EnPassant {
-            target_piece = Piece::Pawn as usize;
+        let target_piece: usize = if move_obj.move_type == MoveType::EnPassant {
+            Piece::Pawn as usize
         } else {
-            target_piece =
-                board_state.get_piece_on_side(move_obj.target, board_state.side_to_move.other());
-        }
+            board_state.get_piece_on_side(move_obj.target, board_state.side_to_move.other())
+        };
 
         move_obj.score = MVV_LVA[target_piece][source_piece];
     }

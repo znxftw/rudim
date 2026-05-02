@@ -70,6 +70,7 @@ impl PawnStructureEvaluation {
 
 static FILE_MASKS: LazyLock<[u64; 8]> = LazyLock::new(|| {
     let mut masks = [0u64; 8];
+    #[allow(clippy::needless_range_loop)]
     for file in 0..8 {
         let mut mask = 0;
         for row in 0..8 {
@@ -97,6 +98,7 @@ static ADJACENT_FILE_MASKS: LazyLock<[u64; 8]> = LazyLock::new(|| {
 
 static PASSED_PAWN_MASKS: LazyLock<[[u64; 64]; 2]> = LazyLock::new(|| {
     let mut masks = [[0u64; 64]; 2];
+    #[allow(clippy::needless_range_loop)]
     for sq in 0..constants::SQUARES {
         let file = sq & 7;
         let row = sq >> 3;

@@ -105,9 +105,9 @@ static MID_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
         ],
     ];
 
-    for piece in 0..6 {
-        for square in 0..64 {
-            tables[piece][square] += piece_values[piece];
+    for (piece, table) in tables.iter_mut().enumerate() {
+        for val in table.iter_mut() {
+            *val += piece_values[piece];
         }
     }
     tables
@@ -157,9 +157,9 @@ static END_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
         ],
     ];
 
-    for piece in 0..6 {
-        for square in 0..64 {
-            tables[piece][square] += piece_values[piece];
+    for (piece, table) in tables.iter_mut().enumerate() {
+        for val in table.iter_mut() {
+            *val += piece_values[piece];
         }
     }
     tables
