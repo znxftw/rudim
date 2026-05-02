@@ -54,6 +54,14 @@ impl MoveType {
                 | Self::QueenPromotionCapture
         )
     }
+
+    pub const fn is_en_passant(self) -> bool {
+        matches!(self, Self::EnPassant)
+    }
+
+    pub const fn is_double_push(self) -> bool {
+        matches!(self, Self::DoublePush)
+    }
 }
 
 impl From<u8> for MoveType {

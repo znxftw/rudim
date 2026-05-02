@@ -3,6 +3,7 @@ use crate::bitboard::lookups::{
     KING_ATTACKS, KNIGHT_ATTACKS, PAWN_ATTACKS, get_bishop_attacks_from_table,
     get_queen_attacks_from_table, get_rook_attacks_from_table,
 };
+use crate::board::history::History;
 use crate::common::castle::Castle;
 use crate::common::constants::{PIECES, SIDES, SIDES_WITH_BOTH, SQUARES};
 use crate::common::game_phase::{add_phase, remove_phase};
@@ -38,6 +39,7 @@ pub struct BoardState {
     pub phase: i32,
     pub board_hash: u64,
     pub last_draw_killer: i32,
+    pub history: History,
 }
 
 impl BoardState {
@@ -55,6 +57,7 @@ impl BoardState {
             phase: 0,
             board_hash: 0,
             last_draw_killer: 0,
+            history: History::new(),
         }
     }
 

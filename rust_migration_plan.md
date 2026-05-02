@@ -151,10 +151,10 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] `BoardHistory` struct: captured_piece, en_passant, castle, board_hash, last_draw_killer, best_move
 
 ### 5.2 Make/Unmake
-- [ ] `src/board/make_move.rs` — `BoardState::make_move()`: remove piece from source, handle captures, promotions, castling (rook movement), update castling rights, en passant, flip side, save history, increment Zobrist hash
-- [ ] `BoardState::unmake_move()`: restore from history stack
-- [ ] `make_null_move()` / `undo_null_move()`
-- [ ] `is_draw()` — 50-move rule + threefold repetition via history
+- [x] `src/board/make_move.rs` — `BoardState::make_move()`: remove piece from source, handle captures, promotions, castling (rook movement), update castling rights, en passant, flip side, save history, increment Zobrist hash
+- [x] `BoardState::unmake_move()`: restore from history stack
+- [x] `make_null_move()` / `undo_null_move()`
+- [x] `is_draw()` — 50-move rule + threefold repetition via history
 
 ### 5.3 Tests
 - [ ] Port `HistoryTest.cs` — make then unmake restores identical state
