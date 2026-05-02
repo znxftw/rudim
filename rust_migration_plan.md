@@ -191,8 +191,8 @@ Migrate all leaf-level types that have zero internal dependencies.
 ## Phase 7: Evaluation
 
 ### 7.1 Move Ordering
-- [ ] `src/eval/move_ordering.rs` — MVV-LVA table (7×7), killer moves `[2][MAX_PLY]`, history moves `[12][64]`, `populate_move_score()`, `add_killer_move()`, `add_history_move()`, `reset()`, `sort_next_best_move()`, `populate_hash_move()`
-- [ ] **Tests**: Port `MoveOrderingTest.cs` — sort by score, idempotent sort
+- [x] `src/eval/move_ordering.rs` — MVV-LVA table (7×7), killer moves `[2][MAX_PLY]`, history moves `[12][64]`, `populate_move_score()`, `add_killer_move()`, `add_history_move()`, `reset()`, `sort_next_best_move()`, `populate_hash_move()`
+- [x] **Tests**: Port `MoveOrderingTest.cs` — sort by score, idempotent sort
 
 ### 7.2 Piece-Square Table Evaluation
 - [ ] `src/eval/pst.rs` — Midgame + Endgame PST tables (copy exact values from Rofchade), `evaluate()` with tapered eval using game phase, `mirror_square()`
