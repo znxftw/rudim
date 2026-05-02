@@ -19,10 +19,10 @@ pub static ZOBRIST_TABLE: LazyLock<[[u64; 64]; 14]> = LazyLock::new(|| {
     table[13][0] = random::next_u64(); // White to move
     table[13][1] = random::next_u64(); // Black to move
 
-    table[13][2] = random::next_u64();
-    table[13][3] = random::next_u64();
-    table[13][4] = random::next_u64();
-    table[13][5] = random::next_u64();
+    // 16 possible castling states (4 bits)
+    for i in 2..18 {
+        table[13][i] = random::next_u64();
+    }
 
     table
 });
@@ -45,7 +45,8 @@ pub fn get_board_hash(board_state: &BoardState) -> u64 {
 }
 
 pub fn hash_castling_rights(board_state: &BoardState, current_hash: u64) -> u64 {
-    current_hash ^ ZOBRIST_TABLE[13][board_state.castle.bits() as usize]
+    // Offset by 2 to avoid collision with side-to-move keys (which use [13][0] and [13][1])
+    current_hash ^ ZOBRIST_TABLE[13][2 + board_state.castle.bits() as usize]
 }
 
 fn hash_side_to_move(board_state: &BoardState, current_hash: u64) -> u64 {
@@ -78,6 +79,6 @@ mod tests {
     fn test_starting_hash_is_deterministic() {
         let board = BoardState::parse_fen(STARTING_FEN);
         let hash = get_board_hash(&board);
-        assert_eq!(hash, 6951217332832793834);
+        assert_eq!(hash, 17316932686648747093);
     }
 }
