@@ -17,7 +17,7 @@ graph TD
     G --> H["Phase 7: Evaluation"]
     H --> I["Phase 8: Search"]
     I --> J["Phase 9: UCI / CLI"]
-    J --> K["Phase 10: Perft & Integration"]
+    J --> K["Phase 10: CLI Perft & Integration"]
     K --> L["Phase 11: CI/CD & Cleanup"]
 ```
 
@@ -35,7 +35,7 @@ graph TD
 | `Board/MoveOrdering.cs`, `PieceSquareTableEvaluation.cs`, `PawnStructureEvaluation.cs` | `src/eval/` | 7 |
 | `Search/Negamax.cs`, `.Helpers.cs`, `Quiescence.cs`, `IterativeDeepening.cs` | `src/search/` | 8 |
 | `CLI/`, `CLI/UCI/` | `src/uci/` | 9 |
-| `Perft/`, `Program.cs`, `Global.cs` | `src/perft/`, `src/main.rs`, `src/engine.rs` | 10 |
+| `Perft/`, `Program.cs`, `Global.cs` | `src/perft/` (CLI), `src/main.rs`, `src/engine.rs` | 10 |
 
 ---
 
@@ -252,10 +252,10 @@ Migrate all leaf-level types that have zero internal dependencies.
 
 ---
 
-## Phase 10: Perft & End-to-End Integration
+## Phase 10: CLI Perft & End-to-End Integration
 
-### 10.1 Perft Driver
-- [ ] `src/perft/mod.rs` — `traverse()` recursive node counter, `perft_test()` with timing
+### 10.1 Perft Driver (CLI)
+- [ ] `src/perft/mod.rs` — Reimplement as a CLI tool: `traverse()` recursive node counter, `--perft` should run `perft_test()` logic
 - [ ] Perft data: Starting (depths 0-6), KiwiPete (1-5), Endgame (1-7)
 
 ### 10.2 Engine State
