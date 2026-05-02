@@ -147,8 +147,8 @@ Migrate all leaf-level types that have zero internal dependencies.
 ## Phase 5: Make/Unmake Move & History
 
 ### 5.1 History Stack
-- [ ] `src/board/history.rs` — `History` struct with fixed-size array of `BoardHistory` entries (4096), push/pop index, `has_hash_appeared_twice()`, `clear()`, `is_empty()`
-- [ ] `BoardHistory` struct: captured_piece, en_passant, castle, board_hash, last_draw_killer, best_move
+- [x] `src/board/history.rs` — `History` struct with fixed-size array of `BoardHistory` entries (4096), push/pop index, `has_hash_appeared_twice()`, `clear()`, `is_empty()`
+- [x] `BoardHistory` struct: captured_piece, en_passant, castle, board_hash, last_draw_killer, best_move
 
 ### 5.2 Make/Unmake
 - [ ] `src/board/make_move.rs` — `BoardState::make_move()`: remove piece from source, handle captures, promotions, castling (rook movement), update castling rights, en passant, flip side, save history, increment Zobrist hash
