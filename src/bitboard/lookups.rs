@@ -27,6 +27,22 @@ static ROOK_MASK_BITS: LazyLock<[u32; SQUARES]> = LazyLock::new(|| {
     bits
 });
 
+pub static BISHOP_MASKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
+    let mut masks = [0u64; SQUARES];
+    for (sq, entry) in masks.iter_mut().enumerate() {
+        *entry = get_bishop_mask(Square::from(sq)).0;
+    }
+    masks
+});
+
+pub static ROOK_MASKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
+    let mut masks = [0u64; SQUARES];
+    for (sq, entry) in masks.iter_mut().enumerate() {
+        *entry = get_rook_mask(Square::from(sq)).0;
+    }
+    masks
+});
+
 pub static PAWN_ATTACKS: LazyLock<[[u64; SQUARES]; 2]> = LazyLock::new(|| {
     let mut table = [[0u64; SQUARES]; 2];
     for (sq, entry) in table[Side::White as usize].iter_mut().enumerate() {
@@ -99,6 +115,8 @@ pub static ROOK_ATTACKS: LazyLock<Vec<[u64; MAX_ROOK_MASK]>> = LazyLock::new(|| 
 pub fn init() {
     let _ = &*BISHOP_MASK_BITS;
     let _ = &*ROOK_MASK_BITS;
+    let _ = &*BISHOP_MASKS;
+    let _ = &*ROOK_MASKS;
     let _ = &*PAWN_ATTACKS;
     let _ = &*KNIGHT_ATTACKS;
     let _ = &*KING_ATTACKS;
@@ -110,8 +128,8 @@ pub fn init() {
 pub fn get_bishop_attacks_from_table(square: Square, occupancy: Bitboard) -> Bitboard {
     let sq = square as usize;
     let bits = BISHOP_MASK_BITS[sq];
-    let mask = get_bishop_mask(square);
-    let index = (occupancy.0 & mask.0)
+    let mask = BISHOP_MASKS[sq];
+    let index = (occupancy.0 & mask)
         .wrapping_mul(BISHOP_MAGICS[sq])
         .wrapping_shr(64 - bits) as usize;
     Bitboard(BISHOP_ATTACKS[sq][index])
@@ -121,8 +139,8 @@ pub fn get_bishop_attacks_from_table(square: Square, occupancy: Bitboard) -> Bit
 pub fn get_rook_attacks_from_table(square: Square, occupancy: Bitboard) -> Bitboard {
     let sq = square as usize;
     let bits = ROOK_MASK_BITS[sq];
-    let mask = get_rook_mask(square);
-    let index = (occupancy.0 & mask.0)
+    let mask = ROOK_MASKS[sq];
+    let index = (occupancy.0 & mask)
         .wrapping_mul(ROOK_MAGICS[sq])
         .wrapping_shr(64 - bits) as usize;
     Bitboard(ROOK_ATTACKS[sq][index])
