@@ -277,7 +277,7 @@ Migrate all leaf-level types that have zero internal dependencies.
 
 - [x] GitHub Actions workflow: `cargo build`, `cargo test`, `cargo clippy`, `cargo fmt --check`, rewrite dependabot to scan for rust
 - [x] Criterion benchmarks: `find_best_move` at depth 6-7 for all 4 standard positions
-- [ ] Remove C# project files (`.sln`, `.csproj`, `Rudim/`, `Rudim.Test/`) or move to `legacy/` branch
+- [x] Remove C# project files (`.sln`, `.csproj`, `Rudim/`, `Rudim.Test/`) or move to `legacy/` branch
 - [x] Update `README.md` — Rust build instructions, architecture overview
 - [x] Cross-compilation targets: Windows, Linux, macOS
 - [x] Publish workflow for tagged releases
