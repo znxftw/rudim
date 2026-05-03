@@ -1,0 +1,192 @@
+use crate::board::state::BoardState;
+use crate::common::constants;
+use crate::common::piece::Piece;
+use crate::common::side::Side;
+use std::sync::LazyLock;
+
+const DOUBLED_PAWN_PENALTY: i32 = 10;
+const ISOLATED_PAWN_PENALTY: i32 = 20;
+
+// Passed pawn bonus indexed by row (0 = rank 8, 7 = rank 1).
+const PASSED_PAWN_BONUS: [i32; 8] = [0, 100, 70, 50, 30, 20, 10, 0];
+
+pub struct PawnStructureEvaluation;
+
+impl PawnStructureEvaluation {
+    // Returns score from white's perspective (positive = good for white)
+    pub fn evaluate(board_state: &BoardState) -> i32 {
+        let white_pawns = board_state.pieces[Side::White as usize][Piece::Pawn as usize].0;
+        let black_pawns = board_state.pieces[Side::Black as usize][Piece::Pawn as usize].0;
+
+        let mut score = 0;
+        score += Self::score_doubled_pawns(white_pawns, black_pawns);
+        score += Self::score_pawn_features(white_pawns, black_pawns);
+        score
+    }
+
+    fn score_doubled_pawns(white_pawns: u64, black_pawns: u64) -> i32 {
+        let mut score = 0;
+        for file in 0..8 {
+            let white_count = (white_pawns & FILE_MASKS[file]).count_ones() as i32;
+            let black_count = (black_pawns & FILE_MASKS[file]).count_ones() as i32;
+            if white_count > 1 {
+                score -= (white_count - 1) * DOUBLED_PAWN_PENALTY;
+            }
+            if black_count > 1 {
+                score += (black_count - 1) * DOUBLED_PAWN_PENALTY;
+            }
+        }
+        score
+    }
+
+    fn score_pawn_features(white_pawns: u64, black_pawns: u64) -> i32 {
+        let mut score = 0;
+        let mut wp = white_pawns;
+        while wp != 0 {
+            let sq = wp.trailing_zeros() as usize;
+            wp &= wp - 1;
+            if (white_pawns & ADJACENT_FILE_MASKS[sq & 7]) == 0 {
+                score -= ISOLATED_PAWN_PENALTY;
+            }
+            if (black_pawns & PASSED_PAWN_MASKS[Side::White as usize][sq]) == 0 {
+                score += PASSED_PAWN_BONUS[sq >> 3];
+            }
+        }
+
+        let mut bp = black_pawns;
+        while bp != 0 {
+            let sq = bp.trailing_zeros() as usize;
+            bp &= bp - 1;
+            if (black_pawns & ADJACENT_FILE_MASKS[sq & 7]) == 0 {
+                score += ISOLATED_PAWN_PENALTY;
+            }
+            if (white_pawns & PASSED_PAWN_MASKS[Side::Black as usize][sq]) == 0 {
+                score -= PASSED_PAWN_BONUS[7 - (sq >> 3)];
+            }
+        }
+        score
+    }
+}
+
+static FILE_MASKS: LazyLock<[u64; 8]> = LazyLock::new(|| {
+    let mut masks = [0u64; 8];
+    #[allow(clippy::needless_range_loop)]
+    for file in 0..8 {
+        let mut mask = 0;
+        for row in 0..8 {
+            mask |= 1u64 << (row * 8 + file);
+        }
+        masks[file] = mask;
+    }
+    masks
+});
+
+static ADJACENT_FILE_MASKS: LazyLock<[u64; 8]> = LazyLock::new(|| {
+    let mut masks = [0u64; 8];
+    for file in 0..8 {
+        let mut mask = 0;
+        if file > 0 {
+            mask |= FILE_MASKS[file - 1];
+        }
+        if file < 7 {
+            mask |= FILE_MASKS[file + 1];
+        }
+        masks[file] = mask;
+    }
+    masks
+});
+
+static PASSED_PAWN_MASKS: LazyLock<[[u64; 64]; 2]> = LazyLock::new(|| {
+    let mut masks = [[0u64; 64]; 2];
+    #[allow(clippy::needless_range_loop)]
+    for sq in 0..constants::SQUARES {
+        let file = sq & 7;
+        let row = sq >> 3;
+
+        let mut white_mask = 0;
+        for r in 0..row {
+            white_mask |= 1u64 << (r * 8 + file);
+            if file > 0 {
+                white_mask |= 1u64 << (r * 8 + file - 1);
+            }
+            if file < 7 {
+                white_mask |= 1u64 << (r * 8 + file + 1);
+            }
+        }
+        masks[Side::White as usize][sq] = white_mask;
+
+        let mut black_mask = 0;
+        for r in row + 1..8 {
+            black_mask |= 1u64 << (r * 8 + file);
+            if file > 0 {
+                black_mask |= 1u64 << (r * 8 + file - 1);
+            }
+            if file < 7 {
+                black_mask |= 1u64 << (r * 8 + file + 1);
+            }
+        }
+        masks[Side::Black as usize][sq] = black_mask;
+    }
+    masks
+});
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_score_zero_for_position_with_no_pawns() {
+        let board_state = BoardState::parse_fen("8/8/8/8/8/8/8/K6k w - - 0 1");
+        let score = PawnStructureEvaluation::evaluate(&board_state);
+        assert_eq!(0, score);
+    }
+
+    #[test]
+    fn should_score_zero_for_symmetric_pawn_structure() {
+        let board_state = BoardState::parse_fen("8/4p3/8/8/8/8/4P3/8 w - - 0 1");
+        let score = PawnStructureEvaluation::evaluate(&board_state);
+        assert_eq!(0, score);
+    }
+
+    #[test]
+    fn should_penalise_white_doubled_pawns() {
+        let board_state = BoardState::parse_fen("8/8/8/4P3/4P3/8/8/K6k w - - 0 1");
+        let score = PawnStructureEvaluation::evaluate(&board_state);
+        assert_eq!(30, score);
+    }
+
+    #[test]
+    fn should_penalise_black_doubled_pawns() {
+        let board_state = BoardState::parse_fen("K6k/8/8/4p3/4p3/8/8/8 w - - 0 1");
+        let score = PawnStructureEvaluation::evaluate(&board_state);
+        assert_eq!(-30, score);
+    }
+
+    #[test]
+    fn should_penalise_white_isolated_pawn() {
+        let board_state = BoardState::parse_fen("8/8/8/4p3/4P3/8/8/K6k w - - 0 1");
+        let score = PawnStructureEvaluation::evaluate(&board_state);
+        assert_eq!(0, score);
+    }
+
+    #[test]
+    fn should_bonus_white_passed_pawn() {
+        let board_state = BoardState::parse_fen("8/8/8/4P3/8/8/8/K6k w - - 0 1");
+        let score = PawnStructureEvaluation::evaluate(&board_state);
+        assert_eq!(30, score);
+    }
+
+    #[test]
+    fn should_bonus_black_passed_pawn() {
+        let board_state = BoardState::parse_fen("K6k/8/8/8/4p3/8/8/8 w - - 0 1");
+        let score = PawnStructureEvaluation::evaluate(&board_state);
+        assert_eq!(-30, score);
+    }
+
+    #[test]
+    fn should_block_passed_pawn_when_opponent_pawn_is_on_adjacent_file() {
+        let board_state = BoardState::parse_fen("8/3p4/8/4P3/8/8/8/K6k w - - 0 1");
+        let score = PawnStructureEvaluation::evaluate(&board_state);
+        assert_eq!(0, score);
+    }
+}

@@ -2,56 +2,48 @@ name: Tests
 
 on:
   push:
+    branches: [main]
     paths:
-      - 'Rudim/**'
-      - 'Rudim.Test/**'
-      - 'Rudim.sln'
-      - '.github/workflows/pipeline.yml'
-    branches: [ main ]
+      - "src/**"
+      - "tests/**"
+      - "benches/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/pipeline.yml"
   pull_request:
+    branches: [main]
     paths:
-      - 'Rudim/**'
-      - 'Rudim.Test/**'
-      - 'Rudim.sln'
-      - '.github/workflows/pipeline.yml'
-    branches: [ main ]
+      - "src/**"
+      - "tests/**"
+      - "benches/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/pipeline.yml"
 
 jobs:
-  build:
-    permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
+  ci:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        global-json-file: global.json
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore -c Release
-    - name: Perft 
-      run: dotnet run -c Release --perft --project='Rudim'
-    - name: Test
-      run: dotnet test --no-build --verbosity normal -c Release --collect:"XPlat Code Coverage"
-    - name: Benchmark
-      working-directory: Rudim
-      run: |
-        dotnet run -c Release --benchmark
-        echo "$(cat BenchmarkDotNet.Artifacts/results/Rudim.Benchmark-report-github.md)" >> $GITHUB_STEP_SUMMARY
-    - name: Generate Coverage Report
-      run: |
-        dotnet tool install --global dotnet-reportgenerator-globaltool
-        reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coverage-report" 
-    - name: Upload coverage artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: coverage-report
-        name: 'coverage-report'
-    - name: Deploy Coverage Report to GitHub Pages
-      uses: actions/deploy-pages@v4
-      with:
-        artifact_name: coverage-report
+    permissions:
+      contents: read
 
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain (rustup)
+        run: |
+          rustup toolchain install stable --profile minimal --component clippy --component rustfmt
+          rustup default stable
+          rustc --version
+          cargo --version
+
+      - name: Build
+        run: cargo build --locked
+
+      - name: Test
+        run: cargo test --locked
+
+      - name: Clippy
+        run: cargo clippy --locked --all-targets --all-features
+
+      - name: Format check
+        run: cargo fmt --all -- --check

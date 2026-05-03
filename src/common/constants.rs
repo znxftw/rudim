@@ -1,0 +1,12 @@
+pub const SIDES: usize = 2;
+pub const SIDES_WITH_BOTH: usize = SIDES + 1;
+pub const SQUARES: usize = 64;
+pub const PIECES: usize = 6;
+pub const MAX_RETRY_COUNT: usize = 100_000_000;
+pub const MAX_BISHOP_MASK: usize = 1 << 9;
+pub const MAX_ROOK_MASK: usize = 1 << 12;
+pub const MAX_MASK_INDEX: usize = MAX_ROOK_MASK;
+pub const MAX_CENTIPAWN_EVAL: i32 = 49000;
+pub const MAX_PLY: usize = 64;
+pub const BUFFER_TIME: u64 = 50;
+pub const MAX_SEARCH_DEPTH: usize = 64;

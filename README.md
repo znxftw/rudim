@@ -1,49 +1,71 @@
 # Rudim
 [![Pipeline](https://github.com/znxftw/rudim/actions/workflows/pipeline.yml/badge.svg)](https://github.com/znxftw/rudim/actions/workflows/pipeline.yml)
 
-[Coverage Reports](https://znxftw.github.io/rudim)
+Rudim is a chess engine written in Rust.
 
-## What does Rudim do?
+You can play against Rudim on lichess: [rudim-bot](https://lichess.org/@/rudim-bot).
 
-Rudim is a chess engine written in .NET (C#) with the goal of one day being the strongest C# engine.
+## Features
 
-Rudim has been hosted on lichess, you can [play with Rudim there](https://lichess.org/@/rudim-bot).  
+- Bitboards with magic bitboards for sliding move generation
+- Full make/unmake move pipeline with board history and draw detection
+- UCI protocol support (engine mode via stdin/stdout)
+- Iterative deepening + Negamax + alpha-beta + PVS + quiescence
+- Move ordering (MVV-LVA, killer moves, history heuristic)
+- Transposition table with Zobrist hashing
+- Null-move pruning
+- Perft driver for correctness/performance validation
 
+## Prerequisites
 
-### What all does Rudim implement?
+- Rust stable toolchain (`rustup` + `cargo`)
 
-- Bitboards & Magics
-- UCI Protocol (WIP - core functionality only)
-- Piece Square Tables & Material Evaluation ( + Tapered )
-- Iterative Deepening on Negamax (with Alpha Beta Pruning & PVS) & Quiescence Search
-- Move Ordering with Hash Move, MVV LVA, Killer Heuristic, History Heuristic
-- Transposition Tables using Zobrist Hashing
-- Null Move Pruning
+## Build and Run
 
-### What's next for Rudim?
+- Build: `cargo build`
+- Release build: `cargo build --release`
+- Run engine (UCI loop): `cargo run`
+- Run perft suite: `cargo run -- --perft`
+- Generate magic numbers: `cargo run -- --generate-magics`
 
-- Finish the implementation for the UCI commands (and any changes in the implementation for Rudim that might be a result of it)
-- Improve the Search, Move Generation, and Evaluation algorithms to make Rudim stronger.
+## Quality Checks
 
-## How does Rudim work?
+- Tests: `cargo test`
+- Lint (Clippy): `cargo clippy --all-targets --all-features`
+- Format: `cargo fmt --all`
+- Format check: `cargo fmt --all -- --check`
 
-I've written a series of blog posts on my journey through creating Rudim - you can read up on it [here](https://vishnubhagyanath.dev/tags/rudim/).
+## Benchmarks
 
-## Running Rudim
+Rudim uses Criterion benchmarks.
 
-Tests - `dotnet test`
+- Run all benches: `cargo bench`
+- Main benchmark suite (`find_best_move` at depth 6-7 on standard positions) lives in `benches/search_benchmark.rs`.
 
-Benchmark  - `dotnet run --project Rudim -c Release --benchmark`
+## Architecture Overview
 
-CLI - `dotnet run --project Rudim`
+Rudim currently implements these core engine capabilities:
 
-Perft - `dotnet run -c Release --perft --project Rudim` (Currently run at fixed positions and depths, in future can be made configurable)
+- Bitboard-based board representation & Magic bitboards
+- Incremental make/unmake move pipeline with board history with a pseudo-legal move generator
+- Draw detection (including repetition and fifty-move rule handling)
+- Zobrist hashing and transposition table integration
+- Iterative deepening search
+- Negamax with alpha-beta pruning and principal variation search
+- Quiescence search
+- Move ordering heuristics (MVV-LVA, killer moves, history heuristic)
+- Null-move pruning
+- UCI protocol command handling (`uci`, `isready`, `position`, `go`, `stop`, `ucinewgame`, `debug`, `quit`)
+- Rofchade Piece Square Tables and Simple Pawn Structure Evaluations
 
 ## Contributing
 
-Feel free to raise a PR for one of the open issues on the repo - there are not many contributing guidelines in place yet, if contributing increases, this project can have some more strict guidelines.
+PRs are welcome.
 
-Some basic things to keep in mind when contributing
-- Run all tests and make sure they pass
-- Write test scenarios for any new logic you are adding or modify existing tests to cover logic you are modifiying
-- Run a tournament with the latest commit on master (usually 5+0, 200 games is what I do as a quick check). If there is a significant loss in ELO something might be wrong or can be improved. PRs would be merged only if ELO improvement >= 10 for a new feature.
+Before opening a PR, please run:
+
+- `cargo fmt --all -- --check`
+- `cargo clippy --all-targets --all-features`
+- `cargo test`
+
+If your change affects search strength, run a tournament/regression check as well.

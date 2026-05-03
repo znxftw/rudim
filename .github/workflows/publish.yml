@@ -1,90 +1,71 @@
-name: publish
-run-name: "Generate binaries for ${{ inputs.commit }}"
+name: Publish
+
 on:
   workflow_dispatch:
-    inputs:
-      commit:
-        description: "Commit id to generate binaries for"
-        required: true
 
 jobs:
-  linux-x64:
-    runs-on: ubuntu-latest
+  build-binaries:
+    name: Build ${{ matrix.asset_name }}
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            binary_path: target/x86_64-unknown-linux-gnu/release/rudim
+            asset_name: linux-x64
+            output_name: Rudim
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            binary_path: target/x86_64-pc-windows-msvc/release/rudim.exe
+            asset_name: windows-x64
+            output_name: Rudim.exe
+          - os: macos-13
+            target: x86_64-apple-darwin
+            binary_path: target/x86_64-apple-darwin/release/rudim
+            asset_name: osx-x64
+            output_name: Rudim
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            binary_path: target/aarch64-apple-darwin/release/rudim
+            asset_name: osx-arm64
+            output_name: Rudim
+
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.commit }}
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Publish
-        working-directory: Rudim
-        run: dotnet publish -c Release -p:PublishProfile=FolderProfile
-      - uses: actions/upload-artifact@v4
-        with:
-          name: linux-x64
-          path: Rudim/bin/Release/net9.0/publish/
 
-  windows-x64:
-    runs-on: windows-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.commit }}
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Publish
-        working-directory: Rudim
-        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o bin/Release/net9.0/publish/
-      - uses: actions/upload-artifact@v4
-        with:
-          name: windows-x64
-          path: Rudim/bin/Release/net9.0/publish/
+      - name: Setup Rust toolchain (rustup)
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add ${{ matrix.target }}
+          rustc --version
+          cargo --version
 
-  osx-x64:
-    runs-on: macos-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.commit }}
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Publish
-        working-directory: Rudim
-        run: dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o bin/Release/net9.0/publish/
-      - uses: actions/upload-artifact@v4
-        with:
-          name: osx-x64
-          path: Rudim/bin/Release/net9.0/publish/
+      - name: Build release binary
+        run: cargo build --locked --release --target ${{ matrix.target }}
 
-  osx-arm64:
-    runs-on: macos-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.commit }}
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Publish
-        working-directory: Rudim
-        run: dotnet publish -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o bin/Release/net9.0/publish/
-      - uses: actions/upload-artifact@v4
-        with:
-          name: osx-arm64
-          path: Rudim/bin/Release/net9.0/publish/
+      - name: Stage binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp ${{ matrix.binary_path }} dist/${{ matrix.output_name }}
+          chmod +x dist/${{ matrix.output_name }}
 
+      - name: Stage binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Copy-Item "${{ matrix.binary_path }}" "dist/${{ matrix.output_name }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: dist/${{ matrix.output_name }}
