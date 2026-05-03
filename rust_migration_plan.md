@@ -255,8 +255,8 @@ Migrate all leaf-level types that have zero internal dependencies.
 ## Phase 10: CLI Perft & End-to-End Integration
 
 ### 10.1 Perft Driver (CLI)
-- [ ] `src/perft/mod.rs` — Reimplement as a CLI tool: `traverse()` recursive node counter, `--perft` should run `perft_test()` logic
-- [ ] Perft data: Starting (depths 0-6), KiwiPete (1-5), Endgame (1-7)
+- [x] `src/perft/mod.rs` — Reimplement as a CLI tool: `traverse()` recursive node counter, `--perft` should run `perft_test()` logic
+- [x] Perft data: Starting (depths 0-6), KiwiPete (1-5), Endgame (1-7)
 
 ### 10.2 Engine State
 - [ ] `src/engine.rs` — `Global` equivalent: `reset()`, `set_ready()`, `is_ready()`
