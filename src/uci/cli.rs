@@ -10,7 +10,7 @@ struct InfoCommand;
 
 impl CliCommand for InfoCommand {
     fn run(&self, _parameters: &[&str]) {
-        write_line("Rudim v2.0 by znxftw");
+        write_line(&format!("Rudim v{} by znxftw", env!("CARGO_PKG_VERSION")));
     }
 }
 
