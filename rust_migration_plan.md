@@ -233,7 +233,7 @@ Migrate all leaf-level types that have zero internal dependencies.
 ## Phase 9: UCI Protocol & CLI
 
 ### 9.1 CLI Framework
-- [ ] `src/uci/cli.rs` — main input loop, command dispatch (`info`, `uci`, `exit`)
+- [x] `src/uci/cli.rs` — main input loop, command dispatch (`info`, `uci`, `exit`)
 
 ### 9.2 UCI Commands
 - [ ] `src/uci/mod.rs` — `UciClient` holding board state, debug mode
