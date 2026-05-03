@@ -36,7 +36,7 @@ fn search_internal(
     cancellation_token: &AtomicBool,
 ) -> i32 {
     let ply = SEARCH_DEPTH.load(Ordering::Relaxed) - depth;
-    let is_pv_node = beta - alpha > 1;
+    let is_pv_node = beta > 1 + alpha; // beta - alpha > 1 overflow
 
     NODES.fetch_add(1, Ordering::Relaxed);
 

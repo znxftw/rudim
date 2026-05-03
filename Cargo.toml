@@ -8,3 +8,4 @@ bitflags = "2.11.1"
 
 [dev-dependencies]
 criterion = "0.8.2"
+serial_test = "3.1"
