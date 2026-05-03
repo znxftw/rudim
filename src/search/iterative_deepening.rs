@@ -33,6 +33,13 @@ pub fn nodes() -> i32 {
     STATE.lock().unwrap().nodes
 }
 
+pub fn reset_state() {
+    let mut state = STATE.lock().unwrap();
+    state.best_move = Move::NO_MOVE;
+    state.score = 0;
+    state.nodes = 0;
+}
+
 pub fn search(
     board_state: &mut BoardState,
     depth: i32,

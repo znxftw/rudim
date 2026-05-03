@@ -5,13 +5,9 @@ pub mod time_management;
 use crate::board::state::BoardState;
 use crate::common::helpers::STARTING_FEN;
 use crate::common::moves::Move;
-use crate::common::tt;
-use crate::eval::move_ordering;
-use crate::search::quiescence;
-use std::sync::atomic::{AtomicBool, Ordering};
+use crate::engine;
+use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock, Mutex};
-
-static IS_READY: AtomicBool = AtomicBool::new(false);
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SearchState {
@@ -113,16 +109,13 @@ pub(crate) fn has_flag(name: &str, parameters: &[&str]) -> bool {
 }
 
 pub(crate) fn reset_global() {
-    IS_READY.store(false, Ordering::Relaxed);
-    move_ordering::reset_move_heuristic();
-    quiescence::reset_nodes();
-    tt::TT.lock().unwrap().clear();
+    engine::reset();
 }
 
 pub(crate) fn set_ready() {
-    IS_READY.store(true, Ordering::Relaxed);
+    engine::set_ready();
 }
 
 pub(crate) fn is_ready() -> bool {
-    IS_READY.load(Ordering::Relaxed)
+    engine::is_ready()
 }

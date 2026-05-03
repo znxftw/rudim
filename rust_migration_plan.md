@@ -259,7 +259,7 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] Perft data: Starting (depths 0-6), KiwiPete (1-5), Endgame (1-7)
 
 ### 10.2 Engine State
-- [ ] `src/engine.rs` — `Global` equivalent: `reset()`, `set_ready()`, `is_ready()`
+- [x] `src/engine.rs` — `Global` equivalent: `reset()`, `set_ready()`, `is_ready()`
 
 ### 10.3 Main Entry Point
 - [ ] `src/main.rs` — CLI arg parsing: `--benchmark`, `--perft`, default → UCI loop

@@ -12,6 +12,11 @@ pub fn nodes() -> i32 {
     NODES.load(Ordering::Relaxed)
 }
 
+pub fn reset_state() {
+    NODES.store(0, Ordering::Relaxed);
+    SEARCH_DEPTH.store(0, Ordering::Relaxed);
+}
+
 pub fn search(board_state: &mut BoardState, depth: i32, cancellation_token: &AtomicBool) -> i32 {
     SEARCH_DEPTH.store(depth, Ordering::Relaxed);
     NODES.store(0, Ordering::Relaxed);
