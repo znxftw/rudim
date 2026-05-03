@@ -21,12 +21,12 @@ fn find_move_from_move_list(board: &mut BoardState, expected_move: Move) -> Move
     board.generate_moves();
 
     for &m in &board.moves {
-        if m.source == expected_move.source && m.target == expected_move.target {
-            if expected_move.move_type == MoveType::Quiet
-                || ((m.move_type.value() & !8) == expected_move.move_type.value())
-            {
-                return m;
-            }
+        if m.source == expected_move.source
+            && m.target == expected_move.target
+            && (expected_move.move_type == MoveType::Quiet
+                || ((m.move_type.value() & !8) == expected_move.move_type.value()))
+        {
+            return m;
         }
     }
 

@@ -95,10 +95,11 @@ pub(crate) fn output_best_move(move_obj: Move) {
 
 pub(crate) fn get_parameter(name: &str, parameters: &[&str], fallback: i32) -> i32 {
     for i in 0..parameters.len() {
-        if parameters[i] == name && i + 1 < parameters.len() {
-            if let Ok(value) = parameters[i + 1].parse::<i32>() {
-                return value;
-            }
+        if parameters[i] == name
+            && i + 1 < parameters.len()
+            && let Ok(value) = parameters[i + 1].parse::<i32>()
+        {
+            return value;
         }
     }
     fallback

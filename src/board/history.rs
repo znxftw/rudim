@@ -199,7 +199,7 @@ mod tests {
         use crate::common::move_type::MoveType;
 
         let mut board_state = BoardState::parse_fen(STARTING_FEN);
-        let original_state_pieces = board_state.pieces.clone();
+        let original_state_pieces = board_state.pieces;
         let original_state_side = board_state.side_to_move;
         let original_board_hash = board_state.board_hash;
 

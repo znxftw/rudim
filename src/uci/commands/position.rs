@@ -72,12 +72,12 @@ impl UciClient {
         board.generate_moves();
 
         for &m in &board.moves {
-            if m.source == move_obj.source && m.target == move_obj.target {
-                if move_obj.move_type == MoveType::Quiet
-                    || ((m.move_type.value() & !8) == move_obj.move_type.value())
-                {
-                    return m;
-                }
+            if m.source == move_obj.source
+                && m.target == move_obj.target
+                && (move_obj.move_type == MoveType::Quiet
+                    || ((m.move_type.value() & !8) == move_obj.move_type.value()))
+            {
+                return m;
             }
         }
 
@@ -94,12 +94,12 @@ mod tests {
     fn find_move_from_move_list(board: &mut BoardState, move_obj: Move) -> Move {
         board.generate_moves();
         for &m in &board.moves {
-            if m.source == move_obj.source && m.target == move_obj.target {
-                if move_obj.move_type == MoveType::Quiet
-                    || ((m.move_type.value() & !8) == move_obj.move_type.value())
-                {
-                    return m;
-                }
+            if m.source == move_obj.source
+                && m.target == move_obj.target
+                && (move_obj.move_type == MoveType::Quiet
+                    || ((m.move_type.value() & !8) == move_obj.move_type.value()))
+            {
+                return m;
             }
         }
         Move::NO_MOVE

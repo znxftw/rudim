@@ -323,6 +323,28 @@ pub fn find_magic_number(square: Square, bits_in_mask: i32, is_bishop: bool) -> 
     panic!("No magic number found");
 }
 
+/// Regenerates all magic numbers by brute-force search and prints them to stdout.
+/// Intended to be called from `main` via a CLI flag (e.g. `--generate-magics`).
+pub fn generate_all_magic_numbers() {
+    println!("pub const BISHOP_MAGICS: [u64; 64] = [");
+    for square in 0..64 {
+        let sq = Square::from(square);
+        let bits = get_bishop_mask(sq).0.count_ones() as i32;
+        let magic = find_magic_number(sq, bits, true);
+        println!("    {magic},");
+    }
+    println!("];");
+
+    println!("pub const ROOK_MAGICS: [u64; 64] = [");
+    for square in 0..64 {
+        let sq = Square::from(square);
+        let bits = get_rook_mask(sq).0.count_ones() as i32;
+        let magic = find_magic_number(sq, bits, false);
+        println!("    {magic},");
+    }
+    println!("]");
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -427,26 +449,4 @@ mod tests {
 
         assert_eq!(3, occupancy_mapping.0.count_ones());
     }
-}
-
-/// Regenerates all magic numbers by brute-force search and prints them to stdout.
-/// Intended to be called from `main` via a CLI flag (e.g. `--generate-magics`).
-pub fn generate_all_magic_numbers() {
-    println!("pub const BISHOP_MAGICS: [u64; 64] = [");
-    for square in 0..64 {
-        let sq = Square::from(square);
-        let bits = get_bishop_mask(sq).0.count_ones() as i32;
-        let magic = find_magic_number(sq, bits, true);
-        println!("    {magic},");
-    }
-    println!("];");
-
-    println!("pub const ROOK_MAGICS: [u64; 64] = [");
-    for square in 0..64 {
-        let sq = Square::from(square);
-        let bits = get_rook_mask(sq).0.count_ones() as i32;
-        let magic = find_magic_number(sq, bits, false);
-        println!("    {magic},");
-    }
-    println!("]");
 }

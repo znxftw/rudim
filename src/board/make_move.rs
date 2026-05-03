@@ -229,7 +229,7 @@ mod tests {
     #[test]
     fn test_should_make_and_undo_null_move_correctly() {
         let mut board_state = BoardState::parse_fen(STARTING_FEN);
-        let original_state_pieces = board_state.pieces.clone();
+        let original_state_pieces = board_state.pieces;
         let original_state_side = board_state.side_to_move;
         let original_board_hash = board_state.board_hash;
 
@@ -293,13 +293,13 @@ mod tests {
             let parsed_move = Move::parse_long_algebraic(move_str).unwrap();
             let mut found_move = Move::NO_MOVE;
             for &m in &board_state.moves {
-                if m.source == parsed_move.source && m.target == parsed_move.target {
-                    if parsed_move.move_type == MoveType::Quiet
-                        || ((m.move_type.value() & !8) == parsed_move.move_type.value())
-                    {
-                        found_move = m;
-                        break;
-                    }
+                if m.source == parsed_move.source
+                    && m.target == parsed_move.target
+                    && (parsed_move.move_type == MoveType::Quiet
+                        || ((m.move_type.value() & !8) == parsed_move.move_type.value()))
+                {
+                    found_move = m;
+                    break;
                 }
             }
             assert_ne!(
@@ -357,7 +357,7 @@ mod tests {
         for move_str in moves {
             board_state.generate_moves();
             let parsed_move = Move::parse_long_algebraic(move_str)
-                .expect(&format!("Failed to parse move: '{}'", move_str));
+                .unwrap_or_else(|| panic!("Failed to parse move: '{}'", move_str));
             let mut found_move = Move::NO_MOVE;
             for &m in &board_state.moves {
                 if m.source == parsed_move.source && m.target == parsed_move.target {
