@@ -65,7 +65,7 @@ jobs:
           Copy-Item "${{ matrix.binary_path }}" "dist/${{ matrix.output_name }}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.asset_name }}
           path: dist/${{ matrix.output_name }}
