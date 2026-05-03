@@ -279,9 +279,9 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] Criterion benchmarks: `find_best_move` at depth 6-7 for all 4 standard positions
 - [ ] Remove C# project files (`.sln`, `.csproj`, `Rudim/`, `Rudim.Test/`) or move to `legacy/` branch
 - [x] Update `README.md` — Rust build instructions, architecture overview
-- [ ] Cross-compilation targets: Windows, Linux, macOS
-- [ ] Publish workflow for tagged releases
-- [ ] **Final Gate**: Full CI green, perft correct, tournament test (200 games 5+0 vs latest C# build, ELO should be ≈ equivalent)
+- [x] Cross-compilation targets: Windows, Linux, macOS
+- [x] Publish workflow for tagged releases
+- [x] **Final Gate**: Full CI green, perft correct, tournament test (200 games 5+0 vs latest C# build, ELO should be ≈ equivalent)
 
 ---
 
