@@ -10,8 +10,20 @@ use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
+use crate::search::iterative_deepening;
+use std::sync::atomic::AtomicBool;
 
 impl BoardState {
+    pub fn find_best_move(
+        &mut self,
+        depth: i32,
+        cancellation_token: &AtomicBool,
+        debug_mode: &mut bool,
+    ) -> Move {
+        iterative_deepening::search(self, depth, cancellation_token, debug_mode);
+        iterative_deepening::best_move()
+    }
+
     pub fn generate_moves(&mut self) {
         self.moves.clear();
 
