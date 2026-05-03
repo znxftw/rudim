@@ -236,19 +236,19 @@ Migrate all leaf-level types that have zero internal dependencies.
 - [x] `src/uci/cli.rs` — main input loop, command dispatch (`info`, `uci`, `exit`)
 
 ### 9.2 UCI Commands
-- [ ] `src/uci/mod.rs` — `UciClient` holding board state, debug mode
-- [ ] `position` — startpos / fen + moves parsing
-- [ ] `go` — depth, wtime/btime/winc/binc, movetime, infinite; async search with cancellation
-- [ ] `isready` / `ucinewgame` / `stop` / `debug` / `quit`
-- [ ] `src/uci/time_management.rs` — `calculate_move_time(clock, increment)`
+- [x] `src/uci/mod.rs` — `UciClient` holding board state, debug mode
+- [x] `position` — startpos / fen + moves parsing
+- [x] `go` — depth, wtime/btime/winc/binc, movetime, infinite; async search with cancellation
+- [x] `isready` / `ucinewgame` / `stop` / `debug` / `quit`
+- [x] `src/uci/time_management.rs` — `calculate_move_time(clock, increment)`
 
 ### 9.3 Tests
-- [ ] Port `InfoCommandTest.cs`, `DebugCommandTest.cs`, `IsReadyCommandTest.cs`, `UciNewGameCommandTest.cs`, `PositionCommandTest.cs`, `TimeManagementTest.cs`
-- [ ] Time management: simulate 75-400 move games without exhausting clock (11 inline data cases)
+- [x] Port `InfoCommandTest.cs`, `DebugCommandTest.cs`, `IsReadyCommandTest.cs`, `UciNewGameCommandTest.cs`, `PositionCommandTest.cs`, `TimeManagementTest.cs`
+- [x] Time management: simulate 75-400 move games without exhausting clock (11 inline data cases)
 
 ### Gate
-- [ ] `cargo test` — all UCI tests pass
-- [ ] Manual smoke test: run binary, type `uci`, `isready`, `position startpos`, `go depth 6`, verify output
+- [x] `cargo test` — all UCI tests pass
+- [x] Manual smoke test: run binary, type `uci`, `isready`, `position startpos`, `go depth 6`, verify output
 
 ---
 

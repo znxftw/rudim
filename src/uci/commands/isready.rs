@@ -9,3 +9,32 @@ impl UciClient {
         cli::write_line("readyok");
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serial_test::serial;
+
+    #[test]
+    #[serial]
+    fn should_initialize_engine_when_not_ready() {
+        let mut uci_client = UciClient::new();
+        reset_global();
+
+        uci_client.run_isready(&[]);
+
+        assert!(is_ready());
+    }
+
+    #[test]
+    #[serial]
+    fn should_still_respond_when_already_ready() {
+        let mut uci_client = UciClient::new();
+        reset_global();
+        set_ready();
+
+        uci_client.run_isready(&[]);
+
+        assert!(is_ready());
+    }
+}

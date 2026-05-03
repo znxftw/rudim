@@ -84,3 +84,78 @@ impl UciClient {
         Move::NO_MOVE
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::board::state::BoardState;
+    use serial_test::serial;
+
+    fn find_move_from_move_list(board: &mut BoardState, move_obj: Move) -> Move {
+        board.generate_moves();
+        for &m in &board.moves {
+            if m.source == move_obj.source && m.target == move_obj.target {
+                if move_obj.move_type == MoveType::Quiet
+                    || ((m.move_type.value() & !8) == move_obj.move_type.value())
+                {
+                    return m;
+                }
+            }
+        }
+        Move::NO_MOVE
+    }
+
+    #[test]
+    #[serial]
+    fn should_set_position_from_fen() {
+        let mut uci_client = UciClient::new();
+        let fen = "rnbqkb1r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+        uci_client.run_position(&[
+            "fen",
+            "rnbqkb1r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+            "w",
+            "KQkq",
+            "-",
+            "0",
+            "1",
+        ]);
+
+        assert_eq!(
+            BoardState::parse_fen(fen),
+            *uci_client.board.lock().unwrap()
+        );
+    }
+
+    #[test]
+    #[serial]
+    fn should_set_position_to_start_pos() {
+        let mut uci_client = UciClient::new();
+
+        uci_client.run_position(&["startpos"]);
+
+        assert_eq!(BoardState::default(), *uci_client.board.lock().unwrap());
+    }
+
+    #[test]
+    #[serial]
+    fn should_set_position_to_start_pos_and_apply_moves() {
+        let mut uci_client = UciClient::new();
+
+        uci_client.run_position(&["startpos", "moves", "e2e4", "e7e5"]);
+
+        let mut expected_state = BoardState::default();
+        let white_move = find_move_from_move_list(
+            &mut expected_state,
+            Move::parse_long_algebraic("e2e4").unwrap(),
+        );
+        expected_state.make_move(white_move);
+        let black_move = find_move_from_move_list(
+            &mut expected_state,
+            Move::parse_long_algebraic("e7e5").unwrap(),
+        );
+        expected_state.make_move(black_move);
+
+        assert_eq!(expected_state, *uci_client.board.lock().unwrap());
+    }
+}
