@@ -3,6 +3,7 @@ use crate::common::constants::{MAX_PLY, PIECES, SQUARES};
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
+use std::sync::{LazyLock, Mutex};
 
 pub struct MoveOrdering {
     pub killer_moves: [[Move; MAX_PLY]; 2],
@@ -103,6 +104,38 @@ impl Default for MoveOrdering {
     fn default() -> Self {
         Self::new()
     }
+}
+
+pub static MOVE_ORDERING: LazyLock<Mutex<MoveOrdering>> =
+    LazyLock::new(|| Mutex::new(MoveOrdering::new()));
+
+pub fn populate_move_score(move_obj: &mut Move, board_state: &BoardState, ply: usize) {
+    let move_ordering = MOVE_ORDERING.lock().unwrap();
+    move_ordering.populate_move_score(move_obj, board_state, ply);
+}
+
+pub fn add_killer_move(move_obj: Move, ply: usize) {
+    let mut move_ordering = MOVE_ORDERING.lock().unwrap();
+    move_ordering.add_killer_move(move_obj, ply);
+}
+
+pub fn add_history_move(piece: usize, move_obj: Move, depth: i32) {
+    let mut move_ordering = MOVE_ORDERING.lock().unwrap();
+    move_ordering.add_history_move(piece, move_obj, depth);
+}
+
+pub fn reset_move_heuristic() {
+    let mut move_ordering = MOVE_ORDERING.lock().unwrap();
+    move_ordering.reset();
+}
+
+pub fn is_move_heuristic_empty() -> bool {
+    let move_ordering = MOVE_ORDERING.lock().unwrap();
+    move_ordering.is_move_heuristic_empty()
+}
+
+pub fn populate_hash_move(move_obj: &mut Move) {
+    MoveOrdering::populate_hash_move(move_obj);
 }
 
 #[cfg(test)]

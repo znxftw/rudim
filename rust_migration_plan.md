@@ -210,12 +210,12 @@ Migrate all leaf-level types that have zero internal dependencies.
 ## Phase 8: Search
 
 ### 8.1 Quiescence Search
-- [ ] `src/search/quiescence.rs` — `search()` with alpha-beta on captures only, standing pat evaluation, node counter
+- [x] `src/search/quiescence.rs` — `search()` with alpha-beta on captures only, standing pat evaluation, node counter
 
 ### 8.2 Negamax
-- [ ] `src/search/negamax.rs` — `search()` with alpha-beta + PVS, null move pruning, TT probe/store, draw detection
-- [ ] PVS: `search_deeper()`, `principal_variation_search()`
-- [ ] Helpers: `alpha_update()`, `beta_cutoff()`, `populate_move_scores()`, `can_prune_null_move()`
+- [x] `src/search/negamax.rs` — `search()` with alpha-beta + PVS, null move pruning, TT probe/store, draw detection
+- [x] PVS: `search_deeper()`, `principal_variation_search()`
+- [x] Helpers: `alpha_update()`, `beta_cutoff()`, `populate_move_scores()`, `can_prune_null_move()`
 
 ### 8.3 Iterative Deepening
 - [ ] `src/search/iterative_deepening.rs` — depth 1..N loop, cancellation token (use `AtomicBool` or `mpsc` channel), PV collection, info string output
