@@ -1,12 +1,11 @@
-use crate::bitboard::Bitboard;
 use crate::bitboard::attacks::{
     add_square_to_board_and_stop_at_occupied_square, get_bishop_attacks, get_rook_attacks,
 };
+use crate::bitboard::Bitboard;
 use crate::common::constants::{MAX_MASK_INDEX, MAX_RETRY_COUNT};
 use crate::common::random;
 use crate::common::square::Square;
 
-// TODO: Revisit magics once Perft / Correctness Tests are ready
 // Precalculated by generate_all_magic_numbers()
 pub const BISHOP_MAGICS: [u64; 64] = [
     572335195422784,

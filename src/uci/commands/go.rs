@@ -51,7 +51,6 @@ impl UciClient {
         };
 
         if infinite {
-            // TODO: implement infinite
             return;
         }
 
