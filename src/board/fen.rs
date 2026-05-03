@@ -4,6 +4,7 @@ use crate::common::helpers::STARTING_FEN;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
+use crate::common::zobrist;
 
 impl BoardState {
     pub fn parse_fen(fen: &str) -> Self {
@@ -15,7 +16,7 @@ impl BoardState {
         parse_castling(&mut board, sections[2]);
         parse_en_passant(&mut board, sections[3]);
         // parse_ply(&mut board, sections[4]); // TODO: pending ply
-        // board.board_hash = zobrist::get_board_hash(&board); // TODO: Phase 6
+        board.board_hash = zobrist::get_board_hash(&board);
 
         board.board_hash = crate::common::zobrist::get_board_hash(&board);
         board

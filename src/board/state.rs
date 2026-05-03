@@ -116,6 +116,21 @@ impl BoardState {
         let occupancy = self.occupancies[Side::Both as usize];
         let defending_side = attacking_side.other();
 
+        let queen_attacks = self.pieces[attacking_side as usize][Piece::Queen as usize].0;
+
+        if get_bishop_attacks_from_table(square, occupancy).0
+            & (self.pieces[attacking_side as usize][Piece::Bishop as usize].0 | queen_attacks)
+            != 0
+        {
+            return true;
+        }
+        if get_rook_attacks_from_table(square, occupancy).0
+            & (self.pieces[attacking_side as usize][Piece::Rook as usize].0 | queen_attacks)
+            != 0
+        {
+            return true;
+        }
+
         if PAWN_ATTACKS[defending_side as usize][sq]
             & self.pieces[attacking_side as usize][Piece::Pawn as usize].0
             != 0
@@ -129,25 +144,7 @@ impl BoardState {
         if KING_ATTACKS[sq] & self.pieces[attacking_side as usize][Piece::King as usize].0 != 0 {
             return true;
         }
-        if get_bishop_attacks_from_table(square, occupancy).0
-            & self.pieces[attacking_side as usize][Piece::Bishop as usize].0
-            != 0
-        {
-            return true;
-        }
-        if get_rook_attacks_from_table(square, occupancy).0
-            & self.pieces[attacking_side as usize][Piece::Rook as usize].0
-            != 0
-        {
-            return true;
-        }
-        // TODO: can be combined with rook / bishop
-        if get_queen_attacks_from_table(square, occupancy).0
-            & self.pieces[attacking_side as usize][Piece::Queen as usize].0
-            != 0
-        {
-            return true;
-        }
+
         false
     }
 
