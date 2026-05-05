@@ -13,7 +13,7 @@ impl PieceSquareTableEvaluation {
         let mut score = 0;
 
         score += Self::score_position(board_state);
-        score += PawnStructureEvaluation::evaluate(board_state);
+        // score += PawnStructureEvaluation::evaluate(board_state);
 
         if board_state.side_to_move == Side::White {
             score
