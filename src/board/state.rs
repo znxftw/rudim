@@ -1,6 +1,7 @@
 use crate::bitboard::Bitboard;
 use crate::bitboard::lookups::{
-    KING_ATTACKS, KNIGHT_ATTACKS, PAWN_ATTACKS, get_bishop_attacks_from_table, get_rook_attacks_from_table,
+    KING_ATTACKS, KNIGHT_ATTACKS, PAWN_ATTACKS, get_bishop_attacks_from_table,
+    get_rook_attacks_from_table,
 };
 use crate::board::history::History;
 use crate::common::castle::Castle;

@@ -1,7 +1,7 @@
+use crate::bitboard::Bitboard;
 use crate::bitboard::attacks::{
     add_square_to_board_and_stop_at_occupied_square, get_bishop_attacks, get_rook_attacks,
 };
-use crate::bitboard::Bitboard;
 use crate::common::constants::{MAX_MASK_INDEX, MAX_RETRY_COUNT};
 use crate::common::random;
 use crate::common::square::Square;
