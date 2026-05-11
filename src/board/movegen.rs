@@ -1,7 +1,7 @@
 use crate::bitboard::Bitboard;
 use crate::bitboard::lookups::{
-    KING_ATTACKS, KNIGHT_ATTACKS, PAWN_ATTACKS, get_bishop_attacks_from_table,
-    get_queen_attacks_from_table, get_rook_attacks_from_table,
+    get_bishop_attacks_from_table, get_queen_attacks_from_table, get_rook_attacks_from_table,
+    king_attacks, knight_attacks, pawn_attacks,
 };
 use crate::board::state::BoardState;
 use crate::common::castle::Castle;
@@ -85,7 +85,7 @@ impl BoardState {
             return;
         }
         let ep_bit = 1u64 << (self.en_passant_square as usize);
-        let attacks = Bitboard(PAWN_ATTACKS[self.side_to_move as usize][source] & ep_bit);
+        let attacks = Bitboard(pawn_attacks()[self.side_to_move as usize][source] & ep_bit);
         if attacks.0 > 0 {
             let target = attacks.get_lsb() as usize;
             self.add_pawn_move(source, target, true, false);
@@ -94,7 +94,7 @@ impl BoardState {
 
     fn generate_pawn_attacks(&mut self, source: usize) {
         let enemy_occ = self.occupancies[self.side_to_move.other() as usize];
-        let mut attacks = Bitboard(PAWN_ATTACKS[self.side_to_move as usize][source] & enemy_occ.0);
+        let mut attacks = Bitboard(pawn_attacks()[self.side_to_move as usize][source] & enemy_occ.0);
 
         while attacks.0 > 0 {
             let target = attacks.get_lsb() as usize;
@@ -123,7 +123,7 @@ impl BoardState {
         let mut bitboard = self.pieces[self.side_to_move as usize][Piece::Knight as usize];
         while bitboard.0 > 0 {
             let source = bitboard.get_lsb() as usize;
-            let attacks = Bitboard(KNIGHT_ATTACKS[source]);
+            let attacks = Bitboard(knight_attacks()[source]);
             self.add_attacks(source, attacks);
             bitboard.clear_bit(source);
         }
@@ -158,7 +158,7 @@ impl BoardState {
     fn generate_king_moves(&mut self) {
         let source =
             self.pieces[self.side_to_move as usize][Piece::King as usize].get_lsb() as usize;
-        let attacks = Bitboard(KING_ATTACKS[source]);
+        let attacks = Bitboard(king_attacks()[source]);
 
         self.add_attacks(source, attacks);
         self.generate_castle_moves();

@@ -15,7 +15,7 @@ impl BoardState {
         let original_last_draw_killer = self.last_draw_killer;
 
         self.board_hash ^=
-            zobrist::ZOBRIST_TABLE[self.get_piece_on(m.source) as usize][m.source as usize];
+            zobrist::zobrist_table()[self.get_piece_on(m.source) as usize][m.source as usize];
         let moved_piece = self.remove_piece(m.source);
         if moved_piece == Piece::Pawn {
             self.last_draw_killer = self.move_count;
@@ -38,7 +38,7 @@ impl BoardState {
 
         self.add_piece(m.target, self.side_to_move, final_moved_piece);
         self.board_hash ^=
-            zobrist::ZOBRIST_TABLE[self.get_piece_on(m.target) as usize][m.target as usize];
+            zobrist::zobrist_table()[self.get_piece_on(m.target) as usize][m.target as usize];
 
         self.update_castling_rights(m);
         self.update_en_passant(m);
@@ -73,7 +73,7 @@ impl BoardState {
             m.target
         };
 
-        self.board_hash ^= zobrist::ZOBRIST_TABLE[self.get_piece_on(target_square) as usize]
+        self.board_hash ^= zobrist::zobrist_table()[self.get_piece_on(target_square) as usize]
             [target_square as usize];
         self.last_draw_killer = self.move_count;
 
@@ -115,8 +115,8 @@ impl BoardState {
         self.remove_piece(source);
         self.add_piece(target, side, Piece::Rook);
 
-        self.board_hash ^= zobrist::ZOBRIST_TABLE[rook_index as usize][source as usize];
-        self.board_hash ^= zobrist::ZOBRIST_TABLE[rook_index as usize][target as usize];
+        self.board_hash ^= zobrist::zobrist_table()[rook_index as usize][source as usize];
+        self.board_hash ^= zobrist::zobrist_table()[rook_index as usize][target as usize];
     }
 
     pub fn unmake_move(&mut self, m: Move) {
