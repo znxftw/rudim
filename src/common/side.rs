@@ -7,12 +7,11 @@ pub enum Side {
 }
 
 impl Side {
-    pub fn other(&self) -> Self {
-        match self {
-            Side::White => Side::Black,
-            Side::Black => Side::White,
-            Side::Both => Side::Both,
-        }
+    pub fn other(self) -> Self {
+        let x = self as usize;
+        // when single bit number, becomes x ^ 1
+        // when second bit is set, becomes x ^ 0
+        SIDES[x ^ (1 - (x >> 1))]
     }
 }
 
