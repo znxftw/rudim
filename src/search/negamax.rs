@@ -107,19 +107,18 @@ fn search_internal(
             continue;
         }
 
-        let is_quiet = !move_obj.is_capture() && !move_obj.is_promotion();
-        let gives_check = board_state.is_in_check(board_state.side_to_move);
-
-        let needs_lmr = depth >= 3
-            && number_of_legal_moves >= 3
-            && is_quiet
-            && !is_evading_check
-            && !gives_check;
+        let needs_lmr = crate::search::lmr::needs_reduction(
+            depth,
+            number_of_legal_moves,
+            move_obj,
+            board_state,
+            is_evading_check,
+        );
 
         let mut score;
 
         if needs_lmr {
-            let reduction = 1;
+            let reduction = crate::search::lmr::get_reduction(depth, number_of_legal_moves);
             score = -search_internal(
                 board_state,
                 depth - 1 - reduction,
