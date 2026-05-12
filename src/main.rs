@@ -1,4 +1,4 @@
-use rudim::bitboard::{lookups, magics};
+use rudim::bitboard::magics;
 use rudim::perft;
 use rudim::uci;
 
@@ -10,11 +10,11 @@ fn main() {
             magics::generate_all_magic_numbers();
         }
         Some("--perft") => {
-            lookups::init();
+            rudim::init();
             perft::run_cli();
         }
         _ => {
-            lookups::init();
+            rudim::init();
             uci::cli::run();
         }
     }
