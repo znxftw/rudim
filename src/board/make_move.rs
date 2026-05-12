@@ -186,6 +186,20 @@ impl BoardState {
     }
 
     pub fn is_draw(&self) -> bool {
+        let num_pieces = self.occupancies[Side::Both as usize].0.count_ones();
+        if num_pieces == 2 {
+            // Assumes a legal board with 2 Kings only
+            return true;
+        } else if num_pieces == 3 {
+            let knights = self.pieces[Side::White as usize][Piece::Knight as usize].0
+                | self.pieces[Side::Black as usize][Piece::Knight as usize].0;
+            let bishops = self.pieces[Side::White as usize][Piece::Bishop as usize].0
+                | self.pieces[Side::Black as usize][Piece::Bishop as usize].0;
+            if (knights | bishops) != 0 {
+                return true;
+            }
+        }
+
         if self.move_count - self.last_draw_killer > 100 {
             return true;
         }
@@ -485,4 +499,44 @@ mod tests {
         board.make_move(ng1);
         assert!(board.is_draw());
     }
+
+    #[test]
+    fn test_is_draw_insufficient_material() {
+        // KvK
+        let board = BoardState::parse_fen("8/8/8/8/8/8/8/4K2k w - - 0 1");
+        assert!(board.is_draw());
+
+        // KvKB
+        let board = BoardState::parse_fen("8/8/8/8/8/8/8/4K1Bk w - - 0 1");
+        assert!(board.is_draw());
+
+        // KvKN
+        let board = BoardState::parse_fen("8/8/8/8/8/8/8/4K1Nk w - - 0 1");
+        assert!(board.is_draw());
+        
+        // KBvK
+        let board = BoardState::parse_fen("8/8/8/8/8/8/8/4K1bk w - - 0 1");
+        assert!(board.is_draw());
+        
+        // KNvK
+        let board = BoardState::parse_fen("8/8/8/8/8/8/8/4K1nk w - - 0 1");
+        assert!(board.is_draw());
+        
+        // KvKBB (not a forced draw)
+        let board = BoardState::parse_fen("8/8/8/8/8/8/8/4KBBk w - - 0 1");
+        assert!(!board.is_draw());
+        
+        // KvP
+        let board = BoardState::parse_fen("8/8/8/8/8/8/4P3/4K2k w - - 0 1");
+        assert!(!board.is_draw());
+        
+        // KvR
+        let board = BoardState::parse_fen("8/8/8/8/8/8/4R3/4K2k w - - 0 1");
+        assert!(!board.is_draw());
+        
+        // KvQ
+        let board = BoardState::parse_fen("8/8/8/8/8/8/4Q3/4K2k w - - 0 1");
+        assert!(!board.is_draw());
+    }
 }
+
