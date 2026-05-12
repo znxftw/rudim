@@ -513,30 +513,29 @@ mod tests {
         // KvKN
         let board = BoardState::parse_fen("8/8/8/8/8/8/8/4K1Nk w - - 0 1");
         assert!(board.is_draw());
-        
+
         // KBvK
         let board = BoardState::parse_fen("8/8/8/8/8/8/8/4K1bk w - - 0 1");
         assert!(board.is_draw());
-        
+
         // KNvK
         let board = BoardState::parse_fen("8/8/8/8/8/8/8/4K1nk w - - 0 1");
         assert!(board.is_draw());
-        
+
         // KvKBB (not a forced draw)
         let board = BoardState::parse_fen("8/8/8/8/8/8/8/4KBBk w - - 0 1");
         assert!(!board.is_draw());
-        
+
         // KvP
         let board = BoardState::parse_fen("8/8/8/8/8/8/4P3/4K2k w - - 0 1");
         assert!(!board.is_draw());
-        
+
         // KvR
         let board = BoardState::parse_fen("8/8/8/8/8/8/4R3/4K2k w - - 0 1");
         assert!(!board.is_draw());
-        
+
         // KvQ
         let board = BoardState::parse_fen("8/8/8/8/8/8/4Q3/4K2k w - - 0 1");
         assert!(!board.is_draw());
     }
 }
-
