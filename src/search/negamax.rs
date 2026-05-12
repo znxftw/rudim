@@ -85,6 +85,8 @@ fn search_internal(
     let mut found_pv = false;
     let mut entry_type = TranspositionEntryType::Alpha;
 
+    let is_evading_check = board_state.is_in_check(board_state.side_to_move);
+
     board_state.generate_moves();
     populate_move_scores(board_state, ply as usize);
 
@@ -105,15 +107,49 @@ fn search_internal(
             continue;
         }
 
-        let score = search_deeper(
-            board_state,
+        let needs_lmr = crate::search::lmr::needs_reduction(
             depth,
-            alpha,
-            beta,
-            cancellation_token,
-            found_pv,
-            allow_null_move,
+            number_of_legal_moves,
+            move_obj,
+            board_state,
+            is_evading_check,
         );
+
+        let mut score;
+
+        if needs_lmr {
+            let reduction = crate::search::lmr::get_reduction(depth, number_of_legal_moves);
+            score = -search_internal(
+                board_state,
+                depth - 1 - reduction,
+                -alpha - 1,
+                -alpha,
+                allow_null_move,
+                cancellation_token,
+            );
+
+            if score > alpha {
+                score = search_deeper(
+                    board_state,
+                    depth,
+                    alpha,
+                    beta,
+                    cancellation_token,
+                    found_pv,
+                    allow_null_move,
+                );
+            }
+        } else {
+            score = search_deeper(
+                board_state,
+                depth,
+                alpha,
+                beta,
+                cancellation_token,
+                found_pv,
+                allow_null_move,
+            );
+        }
 
         number_of_legal_moves += 1;
 
