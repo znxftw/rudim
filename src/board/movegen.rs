@@ -94,7 +94,8 @@ impl BoardState {
 
     fn generate_pawn_attacks(&mut self, source: usize) {
         let enemy_occ = self.occupancies[self.side_to_move.other() as usize];
-        let mut attacks = Bitboard(pawn_attacks()[self.side_to_move as usize][source] & enemy_occ.0);
+        let mut attacks =
+            Bitboard(pawn_attacks()[self.side_to_move as usize][source] & enemy_occ.0);
 
         while attacks.0 > 0 {
             let target = attacks.get_lsb() as usize;

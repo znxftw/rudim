@@ -2,42 +2,40 @@ use crate::board::state::BoardState;
 use crate::common::random;
 use crate::common::side::Side;
 use crate::common::square::Square;
-use std::sync::{Once, OnceLock};
+use std::sync::LazyLock;
 
-static ZOBRIST_TABLE_LOCK: OnceLock<[[u64; 64]; 14]> = OnceLock::new();
-static INIT_ONCE: Once = Once::new();
+static ZOBRIST_TABLE: LazyLock<[[u64; 64]; 14]> = LazyLock::new(|| {
+    let mut table = [[0u64; 64]; 14];
+    random::reset_seed();
+
+    // 12 piece types (6 for each color) and 64 squares, and extra - en passant, + edge cases below
+    // [13][0] == white to move
+    // [13][1] == black to move
+    // [13][2..18] == castling rights
+    for entry in table.iter_mut() {
+        for square in entry.iter_mut() {
+            *square = random::next_u64();
+        }
+    }
+
+    table
+});
 
 pub fn init() {
-    INIT_ONCE.call_once(|| {
-        let mut table = [[0u64; 64]; 14];
-        random::reset_seed();
-
-        // 12 piece types (6 for each color) and 64 squares, and extra - en passant, + edge cases below
-        // [13][0] == white to move
-        // [13][1] == black to move
-        // [13][2..18] == castling rights
-        for entry in table.iter_mut() {
-            for square in entry.iter_mut() {
-                *square = random::next_u64();
-            }
-        }
-
-        ZOBRIST_TABLE_LOCK.set(table).unwrap();
-    });
+    let _ = LazyLock::force(&ZOBRIST_TABLE);
 }
 
 #[inline(always)]
 pub fn zobrist_table() -> &'static [[u64; 64]; 14] {
     #[cfg(debug_assertions)]
     {
-        if ZOBRIST_TABLE_LOCK.get().is_none() {
-            crate::init();
-        }
-        ZOBRIST_TABLE_LOCK.get().unwrap()
+        LazyLock::force(&ZOBRIST_TABLE)
     }
     #[cfg(not(debug_assertions))]
     {
-        unsafe { ZOBRIST_TABLE_LOCK.get().unwrap_unchecked() }
+        // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
+        // get() will hence always return a value.
+        unsafe { LazyLock::get(&ZOBRIST_TABLE).unwrap_unchecked() }
     }
 }
 
@@ -91,7 +89,6 @@ mod tests {
 
     #[test]
     fn test_starting_hash_is_deterministic() {
-        init();
         let board = BoardState::parse_fen(STARTING_FEN);
         let hash = get_board_hash(&board);
         assert_eq!(hash, 17316932686648747093);

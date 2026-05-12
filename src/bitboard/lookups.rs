@@ -1,4 +1,4 @@
-use std::sync::{Once, OnceLock};
+use std::sync::LazyLock;
 
 use crate::bitboard::Bitboard;
 use crate::bitboard::attacks::{
@@ -11,97 +11,72 @@ use crate::common::constants::{MAX_BISHOP_MASK, MAX_ROOK_MASK, SQUARES};
 use crate::common::side::Side;
 use crate::common::square::Square;
 
-static BISHOP_MASK_BITS: OnceLock<[u32; SQUARES]> = OnceLock::new();
-static ROOK_MASK_BITS: OnceLock<[u32; SQUARES]> = OnceLock::new();
-static BISHOP_MASKS: OnceLock<[u64; SQUARES]> = OnceLock::new();
-static ROOK_MASKS: OnceLock<[u64; SQUARES]> = OnceLock::new();
-static PAWN_ATTACKS: OnceLock<[[u64; SQUARES]; 2]> = OnceLock::new();
-static KNIGHT_ATTACKS: OnceLock<[u64; SQUARES]> = OnceLock::new();
-static KING_ATTACKS: OnceLock<[u64; SQUARES]> = OnceLock::new();
-static BISHOP_ATTACKS: OnceLock<Vec<[u64; MAX_BISHOP_MASK]>> = OnceLock::new();
-static ROOK_ATTACKS: OnceLock<Vec<[u64; MAX_ROOK_MASK]>> = OnceLock::new();
-
-macro_rules! get_table {
-    ($lock:expr) => {
-        {
-            #[cfg(debug_assertions)]
-            {
-                if $lock.get().is_none() {
-                    crate::init();
-                }
-                $lock.get().unwrap()
-            }
-            #[cfg(not(debug_assertions))]
-            {
-                unsafe { $lock.get().unwrap_unchecked() }
-            }
-        }
-    };
-}
-
-#[inline(always)] fn bishop_mask_bits() -> &'static [u32; SQUARES] { get_table!(BISHOP_MASK_BITS) }
-#[inline(always)] fn rook_mask_bits() -> &'static [u32; SQUARES] { get_table!(ROOK_MASK_BITS) }
-#[inline(always)] fn bishop_masks() -> &'static [u64; SQUARES] { get_table!(BISHOP_MASKS) }
-#[inline(always)] fn rook_masks() -> &'static [u64; SQUARES] { get_table!(ROOK_MASKS) }
-#[inline(always)] pub fn pawn_attacks() -> &'static [[u64; SQUARES]; 2] { get_table!(PAWN_ATTACKS) }
-#[inline(always)] pub fn knight_attacks() -> &'static [u64; SQUARES] { get_table!(KNIGHT_ATTACKS) }
-#[inline(always)] pub fn king_attacks() -> &'static [u64; SQUARES] { get_table!(KING_ATTACKS) }
-#[inline(always)] fn bishop_attacks() -> &'static Vec<[u64; MAX_BISHOP_MASK]> { get_table!(BISHOP_ATTACKS) }
-#[inline(always)] fn rook_attacks() -> &'static Vec<[u64; MAX_ROOK_MASK]> { get_table!(ROOK_ATTACKS) }
-
-static INIT_ONCE: Once = Once::new();
-
-pub fn init() {
-    INIT_ONCE.call_once(|| {
-        let mut bishop_mask_bits_table = [0u32; SQUARES];
-    for (sq, entry) in bishop_mask_bits_table.iter_mut().enumerate() {
+static BISHOP_MASK_BITS: LazyLock<[u32; SQUARES]> = LazyLock::new(|| {
+    let mut bits = [0u32; SQUARES];
+    for (sq, entry) in bits.iter_mut().enumerate() {
         *entry = get_bishop_mask(Square::from(sq)).0.count_ones();
     }
-    BISHOP_MASK_BITS.set(bishop_mask_bits_table).unwrap();
+    bits
+});
 
-    let mut rook_mask_bits_table = [0u32; SQUARES];
-    for (sq, entry) in rook_mask_bits_table.iter_mut().enumerate() {
+static ROOK_MASK_BITS: LazyLock<[u32; SQUARES]> = LazyLock::new(|| {
+    let mut bits = [0u32; SQUARES];
+    for (sq, entry) in bits.iter_mut().enumerate() {
         *entry = get_rook_mask(Square::from(sq)).0.count_ones();
     }
-    ROOK_MASK_BITS.set(rook_mask_bits_table).unwrap();
+    bits
+});
 
-    let mut bishop_masks_table = [0u64; SQUARES];
-    for (sq, entry) in bishop_masks_table.iter_mut().enumerate() {
+static BISHOP_MASKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
+    let mut masks = [0u64; SQUARES];
+    for (sq, entry) in masks.iter_mut().enumerate() {
         *entry = get_bishop_mask(Square::from(sq)).0;
     }
-    BISHOP_MASKS.set(bishop_masks_table).unwrap();
+    masks
+});
 
-    let mut rook_masks_table = [0u64; SQUARES];
-    for (sq, entry) in rook_masks_table.iter_mut().enumerate() {
+static ROOK_MASKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
+    let mut masks = [0u64; SQUARES];
+    for (sq, entry) in masks.iter_mut().enumerate() {
         *entry = get_rook_mask(Square::from(sq)).0;
     }
-    ROOK_MASKS.set(rook_masks_table).unwrap();
+    masks
+});
 
-    let mut pawn_attacks_table = [[0u64; SQUARES]; 2];
-    for (sq, entry) in pawn_attacks_table[Side::White as usize].iter_mut().enumerate() {
+static PAWN_ATTACKS: LazyLock<[[u64; SQUARES]; 2]> = LazyLock::new(|| {
+    let mut table = [[0u64; SQUARES]; 2];
+    for (sq, entry) in table[Side::White as usize].iter_mut().enumerate() {
         *entry = get_pawn_attacks(Square::from(sq), Side::White).0;
     }
-    for (sq, entry) in pawn_attacks_table[Side::Black as usize].iter_mut().enumerate() {
+    for (sq, entry) in table[Side::Black as usize].iter_mut().enumerate() {
         *entry = get_pawn_attacks(Square::from(sq), Side::Black).0;
     }
-    PAWN_ATTACKS.set(pawn_attacks_table).unwrap();
+    table
+});
 
-    let mut knight_attacks_table = [0u64; SQUARES];
-    for (sq, entry) in knight_attacks_table.iter_mut().enumerate() {
+static KNIGHT_ATTACKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
+    let mut table = [0u64; SQUARES];
+    for (sq, entry) in table.iter_mut().enumerate() {
         *entry = get_knight_attacks(Square::from(sq)).0;
     }
-    KNIGHT_ATTACKS.set(knight_attacks_table).unwrap();
+    table
+});
 
-    let mut king_attacks_table = [0u64; SQUARES];
-    for (sq, entry) in king_attacks_table.iter_mut().enumerate() {
+static KING_ATTACKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
+    let mut table = [0u64; SQUARES];
+    for (sq, entry) in table.iter_mut().enumerate() {
         *entry = get_king_attacks(Square::from(sq)).0;
     }
-    KING_ATTACKS.set(king_attacks_table).unwrap();
+    table
+});
 
-    let mut bishop_attacks_table: Vec<[u64; MAX_BISHOP_MASK]> = vec![[0u64; MAX_BISHOP_MASK]; SQUARES];
+static BISHOP_ATTACKS: LazyLock<Vec<[u64; MAX_BISHOP_MASK]>> = LazyLock::new(|| {
+    let mut table: Vec<[u64; MAX_BISHOP_MASK]> = vec![[0u64; MAX_BISHOP_MASK]; SQUARES];
+    let bishop_mask_bits = &*BISHOP_MASK_BITS;
+
     for sq in 0..SQUARES {
         let mask = get_bishop_mask(Square::from(sq));
-        let bits = BISHOP_MASK_BITS.get().unwrap()[sq];
+        let bits = bishop_mask_bits[sq];
         let index_count = 1usize << bits;
 
         for index in 0..index_count {
@@ -110,15 +85,19 @@ pub fn init() {
                 .0
                 .wrapping_mul(BISHOP_MAGICS[sq])
                 .wrapping_shr(64 - bits) as usize;
-            bishop_attacks_table[sq][magic_index] = get_bishop_attacks(Square::from(sq), occupancy).0;
+            table[sq][magic_index] = get_bishop_attacks(Square::from(sq), occupancy).0;
         }
     }
-    BISHOP_ATTACKS.set(bishop_attacks_table).unwrap();
+    table
+});
 
-    let mut rook_attacks_table: Vec<[u64; MAX_ROOK_MASK]> = vec![[0u64; MAX_ROOK_MASK]; SQUARES];
+static ROOK_ATTACKS: LazyLock<Vec<[u64; MAX_ROOK_MASK]>> = LazyLock::new(|| {
+    let mut table: Vec<[u64; MAX_ROOK_MASK]> = vec![[0u64; MAX_ROOK_MASK]; SQUARES];
+    let rook_mask_bits = &*ROOK_MASK_BITS;
+
     for sq in 0..SQUARES {
         let mask = get_rook_mask(Square::from(sq));
-        let bits = ROOK_MASK_BITS.get().unwrap()[sq];
+        let bits = rook_mask_bits[sq];
         let index_count = 1usize << bits;
 
         for index in 0..index_count {
@@ -127,11 +106,74 @@ pub fn init() {
                 .0
                 .wrapping_mul(ROOK_MAGICS[sq])
                 .wrapping_shr(64 - bits) as usize;
-            rook_attacks_table[sq][magic_index] = get_rook_attacks(Square::from(sq), occupancy).0;
+            table[sq][magic_index] = get_rook_attacks(Square::from(sq), occupancy).0;
         }
     }
-        ROOK_ATTACKS.set(rook_attacks_table).unwrap();
-    });
+    table
+});
+
+macro_rules! get_table {
+    ($lock:expr) => {{
+        #[cfg(debug_assertions)]
+        {
+            LazyLock::force(&$lock)
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
+            // get() will hence always return a value.
+            unsafe { LazyLock::get(&$lock).unwrap_unchecked() }
+        }
+    }};
+}
+
+#[inline(always)]
+fn bishop_mask_bits() -> &'static [u32; SQUARES] {
+    get_table!(BISHOP_MASK_BITS)
+}
+#[inline(always)]
+fn rook_mask_bits() -> &'static [u32; SQUARES] {
+    get_table!(ROOK_MASK_BITS)
+}
+#[inline(always)]
+fn bishop_masks() -> &'static [u64; SQUARES] {
+    get_table!(BISHOP_MASKS)
+}
+#[inline(always)]
+fn rook_masks() -> &'static [u64; SQUARES] {
+    get_table!(ROOK_MASKS)
+}
+#[inline(always)]
+pub fn pawn_attacks() -> &'static [[u64; SQUARES]; 2] {
+    get_table!(PAWN_ATTACKS)
+}
+#[inline(always)]
+pub fn knight_attacks() -> &'static [u64; SQUARES] {
+    get_table!(KNIGHT_ATTACKS)
+}
+#[inline(always)]
+pub fn king_attacks() -> &'static [u64; SQUARES] {
+    get_table!(KING_ATTACKS)
+}
+#[inline(always)]
+fn bishop_attacks() -> &'static Vec<[u64; MAX_BISHOP_MASK]> {
+    get_table!(BISHOP_ATTACKS)
+}
+#[inline(always)]
+fn rook_attacks() -> &'static Vec<[u64; MAX_ROOK_MASK]> {
+    get_table!(ROOK_ATTACKS)
+}
+
+pub fn init() {
+    let _ = &*BISHOP_MASK_BITS;
+    let _ = &*ROOK_MASK_BITS;
+    let _ = &*BISHOP_MASKS;
+    let _ = &*ROOK_MASKS;
+    let _ = &*PAWN_ATTACKS;
+    let _ = &*KNIGHT_ATTACKS;
+    let _ = &*KING_ATTACKS;
+    let _ = &*BISHOP_ATTACKS;
+    let _ = &*ROOK_ATTACKS;
 }
 
 #[inline]
@@ -171,7 +213,6 @@ mod tests {
 
     #[test]
     fn pawn_table_matches_computed_for_all_squares() {
-        init();
         for sq in 0..SQUARES {
             let square = Square::from(sq);
             assert_eq!(
@@ -189,7 +230,6 @@ mod tests {
 
     #[test]
     fn knight_table_matches_computed_for_all_squares() {
-        init();
         for sq in 0..SQUARES {
             let square = Square::from(sq);
             assert_eq!(
@@ -202,7 +242,6 @@ mod tests {
 
     #[test]
     fn king_table_matches_computed_for_all_squares() {
-        init();
         for sq in 0..SQUARES {
             let square = Square::from(sq);
             assert_eq!(
@@ -215,7 +254,6 @@ mod tests {
 
     #[test]
     fn bishop_table_lookup_matches_computed_no_blockers() {
-        init();
         let occupancy = Bitboard(0);
         for sq in 0..SQUARES {
             let square = Square::from(sq);
@@ -227,7 +265,6 @@ mod tests {
 
     #[test]
     fn bishop_table_lookup_matches_computed_with_blocker() {
-        init();
         let mut occupancy = Bitboard(0);
         occupancy.set_bit(Square::D4 as usize);
         let square = Square::E5;
@@ -238,7 +275,6 @@ mod tests {
 
     #[test]
     fn rook_table_lookup_matches_computed_no_blockers() {
-        init();
         let occupancy = Bitboard(0);
         for sq in 0..SQUARES {
             let square = Square::from(sq);
@@ -250,7 +286,6 @@ mod tests {
 
     #[test]
     fn rook_table_lookup_matches_computed_with_blockers() {
-        init();
         let mut occupancy = Bitboard(0);
         occupancy.set_bit(Square::E3 as usize);
         occupancy.set_bit(Square::F5 as usize);
@@ -262,7 +297,6 @@ mod tests {
 
     #[test]
     fn queen_table_lookup_matches_computed_no_blockers() {
-        init();
         let occupancy = Bitboard(0);
         for sq in 0..SQUARES {
             let square = Square::from(sq);
@@ -274,7 +308,6 @@ mod tests {
 
     #[test]
     fn queen_table_lookup_matches_computed_with_blockers() {
-        init();
         let mut occupancy = Bitboard(0);
         occupancy.set_bit(Square::D4 as usize);
         occupancy.set_bit(Square::E3 as usize);
