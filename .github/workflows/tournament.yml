@@ -36,9 +36,9 @@ jobs:
       - name: Download Fastchess and Openings
         run: |
           # Download and setup fastchess
-          wget https://github.com/Disservin/fastchess/releases/download/v1.8.0-alpha/fastchess-ubuntu-22.04.zip
-          unzip -o fastchess-ubuntu-22.04.zip
-          chmod +x fastchess-ubuntu-22.04
+          wget https://github.com/Disservin/fastchess/releases/download/v1.8.0-alpha/fastchess-linux-x86-64.tar
+          tar -xvf fastchess-linux-x86-64.tar
+          chmod +x fastchess-linux-x86-64
 
           # Download and extract openings book
           wget https://github.com/official-stockfish/books/raw/master/8moves_v3.pgn.zip
@@ -47,7 +47,7 @@ jobs:
       - name: Run Tournaments
         run: |
           # 2+0.1 Tournament
-          ./fastchess-ubuntu-22.04 \
+          ./fastchess-linux-x86-64/fastchess \
             -engine cmd=./target/release/rudim name="Current Rudim" \
             -engine cmd=./stable-rudim/Rudim name="Stable Rudim" \
             -games 500 -each tc=2+0.1 -concurrency 4 \
