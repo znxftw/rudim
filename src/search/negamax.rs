@@ -85,8 +85,6 @@ fn search_internal(
     let mut found_pv = false;
     let mut entry_type = TranspositionEntryType::Alpha;
 
-    let is_evading_check = board_state.is_in_check(board_state.side_to_move);
-
     board_state.generate_moves();
     populate_move_scores(board_state, ply as usize);
 
@@ -107,13 +105,7 @@ fn search_internal(
             continue;
         }
 
-        let needs_lmr = crate::search::lmr::needs_reduction(
-            depth,
-            number_of_legal_moves,
-            move_obj,
-            board_state,
-            is_evading_check,
-        );
+        let needs_lmr = crate::search::lmr::needs_reduction(depth, number_of_legal_moves);
 
         let mut score;
 
