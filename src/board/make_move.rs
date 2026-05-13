@@ -1,3 +1,4 @@
+use crate::bitboard::attacks::{FILE_A, FILE_H};
 use crate::board::state::{BoardState, CASTLING_CONSTANTS};
 use crate::common::castle::Castle;
 use crate::common::moves::Move;
@@ -88,8 +89,19 @@ impl BoardState {
     fn update_en_passant(&mut self, m: Move) {
         let original_en_passant_square = self.en_passant_square;
         self.board_hash = zobrist::hash_en_passant(self, self.board_hash);
+
+        // TODO: this needs to be rethought for proper impl (FEN, and legal en passsnt represent EP square differently)
+        // https://www.talkchess.com/forum/viewtopic.php?t=33397
         self.en_passant_square = if m.move_type.is_double_push() {
-            self.en_passant_square_for(m)
+            let t = m.target as usize;
+            let adjacent = ((1u64 << (t - 1)) & !FILE_H) | ((1u64 << (t + 1)) & !FILE_A);
+            if adjacent & self.pieces[self.side_to_move.other() as usize][Piece::Pawn as usize].0
+                != 0
+            {
+                self.en_passant_square_for(m)
+            } else {
+                Square::NoSquare
+            }
         } else {
             Square::NoSquare
         };
@@ -388,6 +400,30 @@ mod tests {
     }
 
     #[test]
+    fn test_threefold_with_intervening_pawn_moves() {
+        let moves_str = "d2d4 e7e6 g1f3 g8f6 c1f4 c7c5 c2c3 c5d4 c3d4 d8b6 d1c2 b8c6 e2e3 c6b4 c2b3 b4d5 b3b6 d5b6 b1c3 f6d5 f4e5 d5c3 b2c3 f7f6 e5g3 b6d5 a1c1 f8a3 c1c2 e8g8 e3e4 d5e7 f1d3 d7d5 e1g1 d5e4 d3e4 f6f5 e4d3 f5f4 g3h4 a3d6 f3e5 e7f5 h4g5 h7h6 g5f4 f5d4 c3d4 f8f4 f1c1 f4f8 d3e4 f8d8 e4g6 d8f8 g6f7 g8h7 f7g6 h7g8 a2a4 a7a5 g6f7 g8h7 f7g6 h7g8 g6f7 g8h7 f7g6 h7g8";
+        let moves: Vec<&str> = moves_str.split_whitespace().collect();
+        let mut board = BoardState::default();
+        for (i, move_str) in moves.iter().enumerate() {
+            board.generate_moves();
+            let parsed = Move::parse_long_algebraic(move_str).unwrap();
+            let mut found = Move::NO_MOVE;
+            for &m in &board.moves {
+                if m.source == parsed.source && m.target == parsed.target {
+                    found = m;
+                    break;
+                }
+            }
+            assert_ne!(found, Move::NO_MOVE, "Move {} ({}) not found", i, move_str);
+            board.make_move(found);
+        }
+        assert!(
+            board.is_draw(),
+            "Should detect threefold repetition after the full sequence"
+        );
+    }
+
+    #[test]
     fn test_is_draw_threefold_repetition() {
         let mut board = BoardState::default();
 
@@ -463,7 +499,7 @@ mod tests {
         let mut board = BoardState::default();
         let e4 = Move::new(Square::E2, Square::E4, MoveType::DoublePush);
         let d5 = Move::new(Square::D7, Square::D5, MoveType::DoublePush);
-        let exd5 = Move::new(Square::E4, Square::D5, MoveType::Capture);
+        let dxe4 = Move::new(Square::D5, Square::E4, MoveType::Capture);
 
         let nf3 = Move::new(Square::G1, Square::F3, MoveType::Quiet);
         let nf6 = Move::new(Square::G8, Square::F6, MoveType::Quiet);
@@ -482,21 +518,20 @@ mod tests {
         board.make_move(nf3);
         board.make_move(nf6);
         board.make_move(ng1);
-        board.make_move(ng8);
         assert!(!board.is_draw());
 
-        board.make_move(exd5);
+        board.make_move(dxe4);
 
-        board.make_move(nf6);
         board.make_move(nf3);
         board.make_move(ng8);
         board.make_move(ng1);
+        board.make_move(nf6);
         assert!(!board.is_draw());
 
-        board.make_move(nf6);
         board.make_move(nf3);
         board.make_move(ng8);
         board.make_move(ng1);
+        board.make_move(nf6);
         assert!(board.is_draw());
     }
 

@@ -122,10 +122,6 @@ impl TranspositionTable {
         let mut pv = Vec::new();
 
         loop {
-            if board_state.is_draw() {
-                break;
-            }
-
             let hash = board_state.board_hash;
             let entry = match self.entries[(hash as usize) & (self.capacity - 1)] {
                 Some(e) => e,
