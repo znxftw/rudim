@@ -87,7 +87,6 @@ impl BoardState {
     }
 
     fn update_en_passant(&mut self, m: Move) {
-        let original_en_passant_square = self.en_passant_square;
         self.board_hash = zobrist::hash_en_passant(self, self.board_hash);
 
         // TODO: this needs to be rethought for proper impl (FEN, and legal en passsnt represent EP square differently)
@@ -106,20 +105,13 @@ impl BoardState {
             Square::NoSquare
         };
         self.board_hash = zobrist::hash_en_passant(self, self.board_hash);
-        if original_en_passant_square != self.en_passant_square {
-            self.last_draw_killer = self.move_count;
-        }
     }
 
     fn update_castling_rights(&mut self, m: Move) {
-        let original_castling_rights = self.castle;
         self.board_hash = zobrist::hash_castling_rights(self, self.board_hash);
         self.castle &= Castle::from_bits_retain(CASTLING_CONSTANTS[m.source as usize]);
         self.castle &= Castle::from_bits_retain(CASTLING_CONSTANTS[m.target as usize]);
         self.board_hash = zobrist::hash_castling_rights(self, self.board_hash);
-        if self.castle != original_castling_rights {
-            self.last_draw_killer = self.move_count;
-        }
     }
 
     fn move_rook_from(&mut self, source: Square, target: Square, side: Side) {
@@ -572,5 +564,43 @@ mod tests {
         // KvQ
         let board = BoardState::parse_fen("8/8/8/8/8/8/4Q3/4K2k w - - 0 1");
         assert!(!board.is_draw());
+    }
+
+    #[test]
+    fn should_not_reset_last_draw_killer_after_castle() {
+        let mut board = BoardState::parse_fen("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
+        let original_last_draw_killer = board.last_draw_killer;
+        board.make_move(Move::new(Square::E1, Square::G1, MoveType::Castle));
+        assert_eq!(board.last_draw_killer, original_last_draw_killer);
+    }
+
+    #[test]
+    fn should_reset_last_draw_killer_after_en_passant() {
+        let mut board =
+            BoardState::parse_fen("rnbqkbnr/pppp1ppp/8/4P3/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2");
+        let original_last_draw_killer = board.last_draw_killer;
+        // Quiet Moves which won't update draw killer
+        board.make_move(Move {
+            source: Square::B7,
+            target: Square::C6,
+            move_type: MoveType::Quiet,
+            score: 0,
+        });
+        board.make_move(Move {
+            source: Square::B1,
+            target: Square::C3,
+            move_type: MoveType::Quiet,
+            score: 0,
+        });
+        board.generate_moves();
+        let double_push = board
+            .moves
+            .iter()
+            .copied()
+            .find(|m| m.source == Square::F7 && m.target == Square::F5)
+            .expect("f7f5 double push must exist");
+        board.make_move(double_push);
+        assert_eq!(board.en_passant_square, Square::F6);
+        assert_ne!(board.last_draw_killer, original_last_draw_killer);
     }
 }
