@@ -11,13 +11,14 @@ Rudim currently implements these core engine capabilities:
 
 - Bitboard-based board representation & Magic bitboards
 - Incremental make/unmake move pipeline with board history with a pseudo-legal move generator
-- Draw detection (including repetition and fifty-move rule handling)
+- Draw detection (three-fold repetition, fifty-move rule handling and basic insufficient material)
 - Zobrist hashing and transposition table integration
 - Iterative deepening search
 - Negamax with alpha-beta pruning and principal variation search
 - Quiescence search
 - Move ordering heuristics (MVV-LVA, killer moves, history heuristic)
 - Null-move pruning
+- Late Move Reduction
 - UCI protocol command handling (`uci`, `isready`, `position`, `go`, `stop`, `ucinewgame`, `debug`, `quit`)
 - Rofchade Piece Square Tables and Simple Pawn Structure Evaluations
 
@@ -38,11 +39,10 @@ Rudim currently implements these core engine capabilities:
 - Tests: `cargo test`
 - Lint (Clippy): `cargo clippy --all-targets --all-features`
 - Format: `cargo fmt --all`
-- Format check: `cargo fmt --all -- --check`
 
 ## Benchmarks
 
-Rudim uses Criterion benchmarks.
+Rudim uses Criterion benchmarks to validate how some sample position searches are performing
 
 - Run all benches: `cargo bench`
 - Main benchmark suite (`find_best_move` at depth 6-7 on standard positions) lives in `benches/search_benchmark.rs`.
