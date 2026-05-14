@@ -11,18 +11,29 @@ Series of blog posts on how I wrote rudim : [vishnubhagyanath.dev](https://vishn
 
 Rudim currently implements these core engine capabilities:
 
+### Board Representation
+
 - Bitboard-based board representation & Magic bitboards
 - Incremental make/unmake move pipeline with board history with a pseudo-legal move generator
-- Draw detection (three-fold repetition, fifty-move rule handling and basic insufficient material)
 - Zobrist hashing and transposition table integration
+
+### Search
+
 - Iterative deepening search
 - Negamax with alpha-beta pruning and principal variation search
 - Quiescence search
 - Move ordering heuristics (MVV-LVA, killer moves, history heuristic)
 - Null-move pruning
 - Late Move Reduction
-- UCI protocol command handling (`uci`, `isready`, `position`, `go`, `stop`, `ucinewgame`, `debug`, `quit`)
+
+### Evaluation
+
 - Rofchade Piece Square Tables and Simple Pawn Structure Evaluations
+- Draw detection (three-fold repetition, fifty-move rule handling and basic insufficient material)
+
+### UCI Support
+
+- UCI protocol command handling (`uci`, `isready`, `position`, `go`, `stop`, `ucinewgame`, `debug`, `quit`)
 
 ## Prerequisites
 
