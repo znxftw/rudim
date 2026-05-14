@@ -34,17 +34,17 @@ impl PieceSquareTableEvaluation {
             while white_board.0 > 0 {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
-                positional_score += (MID_GAME_POSITIONS[piece_idx][square] * mid_game_phase)
-                    + (END_GAME_POSITIONS[piece_idx][square] * end_game_phase);
+                positional_score += (mid_game_positions()[piece_idx][square] * mid_game_phase)
+                    + (end_game_positions()[piece_idx][square] * end_game_phase);
             }
 
             while black_board.0 > 0 {
                 let square = black_board.get_lsb() as usize;
                 black_board.clear_bit(square);
                 let mirrored_square = Self::mirror_square(square);
-                positional_score -= (MID_GAME_POSITIONS[piece_idx][mirrored_square]
+                positional_score -= (mid_game_positions()[piece_idx][mirrored_square]
                     * mid_game_phase)
-                    + (END_GAME_POSITIONS[piece_idx][mirrored_square] * end_game_phase);
+                    + (end_game_positions()[piece_idx][mirrored_square] * end_game_phase);
             }
         }
 
@@ -55,6 +55,39 @@ impl PieceSquareTableEvaluation {
         let row = square >> 3;
         let col = square & 7;
         ((7 - row) << 3) + col
+    }
+}
+
+pub fn init() {
+    let _ = LazyLock::force(&MID_GAME_POSITIONS);
+    let _ = LazyLock::force(&END_GAME_POSITIONS);
+}
+
+#[inline(always)]
+fn mid_game_positions() -> &'static [[i32; 64]; 6] {
+    #[cfg(debug_assertions)]
+    {
+        LazyLock::force(&MID_GAME_POSITIONS)
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
+        // get() will hence always return a value.
+        unsafe { LazyLock::get(&MID_GAME_POSITIONS).unwrap_unchecked() }
+    }
+}
+
+#[inline(always)]
+fn end_game_positions() -> &'static [[i32; 64]; 6] {
+    #[cfg(debug_assertions)]
+    {
+        LazyLock::force(&END_GAME_POSITIONS)
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
+        // get() will hence always return a value.
+        unsafe { LazyLock::get(&END_GAME_POSITIONS).unwrap_unchecked() }
     }
 }
 
