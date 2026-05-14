@@ -87,15 +87,15 @@ impl MoveOrdering {
     }
 
     pub fn sort_next_best_move(moves: &mut [Move], starting_index: usize) {
-        let mut best_index = starting_index;
-        for i in (starting_index + 1)..moves.len() {
-            if moves[i].score >= moves[best_index].score {
-                best_index = i;
+        if let Some((best_offset, _)) = moves[starting_index..]
+            .iter()
+            .enumerate()
+            .max_by_key(|(_, m)| m.score)
+        {
+            let best_index = starting_index + best_offset;
+            if best_index != starting_index {
+                moves.swap(best_index, starting_index);
             }
-        }
-
-        if best_index != starting_index {
-            moves.swap(best_index, starting_index);
         }
     }
 }
