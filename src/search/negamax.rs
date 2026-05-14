@@ -290,11 +290,9 @@ fn beta_cutoff(
 
 fn populate_move_scores(board_state: &mut BoardState, ply: usize) {
     // TODO: implement hash move scoring
-    let mut moves = board_state.moves.clone();
     // TODO: non-clone impl? mutable borrow?
-    for move_obj in &mut moves {
-        move_ordering::populate_move_score(move_obj, board_state, ply);
-    }
+    let mut moves = board_state.moves.clone();
+    move_ordering::populate_move_scores(&mut moves, board_state, ply);
     board_state.moves = moves;
 }
 
