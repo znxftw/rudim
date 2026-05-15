@@ -1,13 +1,13 @@
 use std::sync::LazyLock;
 
 use crate::bitboard::Bitboard;
-use crate::bitboard::attacks::{get_king_attacks, get_knight_attacks, get_pawn_attacks};
+use crate::bitboard::attacks::{FILE_A, FILE_H, get_king_attacks, get_knight_attacks};
 use crate::bitboard::lookup_utils::{
     magic_index, mask_bits_for_masks, occupancy_mapping, ray_attacks, ray_mask_without_edges,
 };
 use crate::bitboard::magics::{BISHOP_MAGICS, ROOK_MAGICS};
 use crate::common::constants::{MAX_BISHOP_MASK, MAX_ROOK_MASK, SQUARES};
-use crate::common::side::Side;
+
 use crate::common::square::Square;
 
 static BISHOP_MASK_BITS: [u32; SQUARES] = mask_bits_for_masks(generate_bishop_masks());
@@ -62,16 +62,38 @@ const fn rook_mask_for_square(square: usize) -> u64 {
         | ray_mask_without_edges(rook_rank, rook_file, 0, -1)
 }
 
-static PAWN_ATTACKS: LazyLock<[[u64; SQUARES]; 2]> = LazyLock::new(|| {
+static PAWN_ATTACKS: [[u64; SQUARES]; 2] = generate_pawn_attacks();
+
+const WHITE: usize = 0;
+const BLACK: usize = 1;
+
+const fn generate_pawn_attacks() -> [[u64; SQUARES]; 2] {
     let mut table = [[0u64; SQUARES]; 2];
-    for (sq, entry) in table[Side::White as usize].iter_mut().enumerate() {
-        *entry = get_pawn_attacks(Square::from(sq), Side::White).0;
+    let mut sq = 0;
+
+    while sq < SQUARES {
+        table[WHITE][sq] = pawn_attacks_for_square(sq, WHITE);
+        table[BLACK][sq] = pawn_attacks_for_square(sq, BLACK);
+        sq += 1;
     }
-    for (sq, entry) in table[Side::Black as usize].iter_mut().enumerate() {
-        *entry = get_pawn_attacks(Square::from(sq), Side::Black).0;
-    }
+
     table
-});
+}
+
+const fn pawn_attacks_for_square(square: usize, side: usize) -> u64 {
+    let pawn_board = 1u64 << square;
+    let mut attacks = 0u64;
+
+    if side == WHITE {
+        attacks |= (pawn_board >> 9) & !FILE_H;
+        attacks |= (pawn_board >> 7) & !FILE_A;
+    } else {
+        attacks |= (pawn_board << 7) & !FILE_H;
+        attacks |= (pawn_board << 9) & !FILE_A;
+    }
+
+    attacks
+}
 
 static KNIGHT_ATTACKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
     let mut table = [0u64; SQUARES];
@@ -194,7 +216,7 @@ fn rook_masks() -> &'static [u64; SQUARES] {
 }
 #[inline(always)]
 pub fn pawn_attacks() -> &'static [[u64; SQUARES]; 2] {
-    get_table!(PAWN_ATTACKS)
+    &PAWN_ATTACKS
 }
 #[inline(always)]
 pub fn knight_attacks() -> &'static [u64; SQUARES] {
@@ -218,7 +240,7 @@ pub fn init() {
     let _ = &ROOK_MASK_BITS;
     let _ = &BISHOP_MASKS;
     let _ = &ROOK_MASKS;
-    let _ = &*PAWN_ATTACKS;
+    let _ = &PAWN_ATTACKS;
     let _ = &*KNIGHT_ATTACKS;
     let _ = &*KING_ATTACKS;
     let _ = &BISHOP_ATTACKS;
@@ -258,7 +280,10 @@ pub fn get_queen_attacks_from_table(square: Square, occupancy: Bitboard) -> Bitb
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bitboard::attacks::{get_bishop_attacks, get_queen_attacks, get_rook_attacks};
+    use crate::bitboard::attacks::{
+        get_bishop_attacks, get_pawn_attacks, get_queen_attacks, get_rook_attacks,
+    };
+    use crate::common::side::Side;
 
     #[test]
     fn pawn_table_matches_computed_for_all_squares() {
