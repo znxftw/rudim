@@ -52,6 +52,9 @@ jobs:
       - name: Test
         run: cargo test --locked
 
+      - name: Verify perft correctness
+        run: cargo run --release -- --perft
+
       - name: Clippy
         run: cargo clippy --locked --all-targets --all-features
 
