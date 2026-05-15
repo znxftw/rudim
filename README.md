@@ -22,7 +22,7 @@ Rudim currently implements these core engine capabilities:
 - Iterative deepening search
 - Negamax with alpha-beta pruning and principal variation search
 - Quiescence search
-- Move ordering heuristics (MVV-LVA, killer moves, history heuristic)
+- Move ordering heuristics (MVV-LVA, killer moves, history heuristic, hash move)
 - Null-move pruning
 - Late Move Reduction
 
