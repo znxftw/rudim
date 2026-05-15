@@ -2,6 +2,7 @@
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicI32, AtomicU64, Ordering};
 
+// TODO: This has moved into `common::zobrist` - can be cleaned up / refactored for just magics later
 static ULONG_STATE: AtomicU64 = AtomicU64::new(1804289383);
 static INT_STATE: AtomicI32 = AtomicI32::new(1804289383);
 
