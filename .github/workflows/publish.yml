@@ -4,8 +4,94 @@ on:
   workflow_dispatch:
 
 jobs:
+  precheck:
+    name: Validate version and tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      should_build: ${{ steps.gate.outputs.should_build }}
+      cargo_version: ${{ steps.gate.outputs.cargo_version }}
+      latest_release_version: ${{ steps.gate.outputs.latest_release_version }}
+      matched_tag: ${{ steps.gate.outputs.matched_tag }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Rust toolchain (for metadata)
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustc --version
+          cargo --version
+
+      - name: Gate matrix on Cargo version and Git tag
+        id: gate
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          metadata_json=$(cargo metadata --no-deps --format-version 1)
+          cargo_version=$(printf '%s' "${metadata_json}" | jq -r '
+            [.packages[] | select(.name == "rudim") | .version][0] // empty
+          ')
+
+          latest_tag=$(curl -fsSL \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest" \
+            | jq -r '.tag_name // empty'
+          ) || latest_tag=""
+
+          latest_version=${latest_tag#v}
+
+          is_newer=false
+          if [ "${cargo_version}" != "${latest_version}" ]; then
+            is_newer=true
+          fi
+
+          matched_tag=""
+          if git rev-parse -q --verify "refs/tags/v${cargo_version}" >/dev/null; then
+            matched_tag="v${cargo_version}"
+          fi
+
+          tag_exists=false
+          if [ -n "${matched_tag}" ]; then
+            tag_exists=true
+          fi
+
+          should_build=false
+          if [ "${is_newer}" = "true" ] && [ "${tag_exists}" = "true" ]; then
+            should_build=true
+          fi
+
+          echo "cargo_version=${cargo_version}" >> "$GITHUB_OUTPUT"
+          echo "latest_release_version=${latest_version}" >> "$GITHUB_OUTPUT"
+          echo "matched_tag=${matched_tag}" >> "$GITHUB_OUTPUT"
+          echo "should_build=${should_build}" >> "$GITHUB_OUTPUT"
+
+          echo "Cargo version: ${cargo_version}"
+          echo "Latest release tag: ${latest_tag:-<none>}"
+          echo "Latest release version: ${latest_version:-<none>}"
+          echo "Matched git tag for Cargo version: ${matched_tag:-<none>}"
+          echo "Proceed with matrix: ${should_build}"
+
+      - name: Skip reason
+        if: steps.gate.outputs.should_build != 'true'
+        run: |
+          echo "Skipping build matrix."
+          echo "Cargo.toml version: ${{ steps.gate.outputs.cargo_version }}"
+          echo "Latest release version: ${{ steps.gate.outputs.latest_release_version || '<none>' }}"
+          echo "Matched tag: ${{ steps.gate.outputs.matched_tag || '<none>' }}"
+
   build-binaries:
     name: Build ${{ matrix.asset_name }}
+    needs: precheck
+    if: needs.precheck.outputs.should_build == 'true'
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -79,3 +165,10 @@ jobs:
         with:
           name: ${{ matrix.asset_name }}
           path: dist/${{ matrix.output_name }}
+
+      - name: Build gate summary
+        run: |
+          echo "Building artifacts for Cargo version: ${{ needs.precheck.outputs.cargo_version }}"
+          echo "Latest published release version: ${{ needs.precheck.outputs.latest_release_version || '<none>' }}"
+          echo "Using git tag: ${{ needs.precheck.outputs.matched_tag }}"
+          echo "Current matrix asset: ${{ matrix.asset_name }}"
