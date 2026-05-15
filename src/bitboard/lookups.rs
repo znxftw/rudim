@@ -1,17 +1,18 @@
 use crate::bitboard::Bitboard;
-use crate::bitboard::attacks::{FILE_A, FILE_AB, FILE_GH, FILE_H};
+use crate::bitboard::attacks::{
+    bishop_attacks_for_occupancy, king_attacks_for_square, knight_attacks_for_square,
+    pawn_attacks_for_square, rook_attacks_for_occupancy,
+};
 use crate::bitboard::lookup_utils::{
-    magic_index, mask_bits_for_masks, occupancy_mapping, ray_attacks, ray_mask_without_edges,
+    magic_index, mask_bits_for_masks, occupancy_mapping, ray_mask_without_edges,
 };
 use crate::bitboard::magics::{BISHOP_MAGICS, ROOK_MAGICS};
 use crate::common::constants::{MAX_BISHOP_MASK, MAX_ROOK_MASK, SQUARES};
-
+use crate::common::side::Side;
 use crate::common::square::Square;
 
 static BISHOP_MASK_BITS: [u32; SQUARES] = mask_bits_for_masks(generate_bishop_masks());
-
 static ROOK_MASK_BITS: [u32; SQUARES] = mask_bits_for_masks(generate_rook_masks());
-
 static BISHOP_MASKS: [u64; SQUARES] = generate_bishop_masks();
 
 const fn generate_bishop_masks() -> [u64; SQUARES] {
@@ -60,7 +61,14 @@ const fn rook_mask_for_square(square: usize) -> u64 {
         | ray_mask_without_edges(rook_rank, rook_file, 0, -1)
 }
 
+
+// TODO: recheck
+#[allow(long_running_const_eval)]
+static ROOK_ATTACKS: [[u64; MAX_ROOK_MASK]; SQUARES] = generate_rook_attacks();
+static BISHOP_ATTACKS: [[u64; MAX_BISHOP_MASK]; SQUARES] = generate_bishop_attacks();
 static PAWN_ATTACKS: [[u64; SQUARES]; 2] = generate_pawn_attacks();
+static KNIGHT_ATTACKS: [u64; SQUARES] = generate_knight_attacks();
+static KING_ATTACKS: [u64; SQUARES] = generate_king_attacks();
 
 const WHITE: usize = 0;
 const BLACK: usize = 1;
@@ -70,30 +78,15 @@ const fn generate_pawn_attacks() -> [[u64; SQUARES]; 2] {
     let mut sq = 0;
 
     while sq < SQUARES {
-        table[WHITE][sq] = pawn_attacks_for_square(sq, WHITE);
-        table[BLACK][sq] = pawn_attacks_for_square(sq, BLACK);
+        table[WHITE][sq] = pawn_attacks_for_square(sq, Side::White);
+        table[BLACK][sq] = pawn_attacks_for_square(sq, Side::Black);
         sq += 1;
     }
 
     table
 }
 
-const fn pawn_attacks_for_square(square: usize, side: usize) -> u64 {
-    let pawn_board = 1u64 << square;
-    let mut attacks = 0u64;
 
-    if side == WHITE {
-        attacks |= (pawn_board >> 9) & !FILE_H;
-        attacks |= (pawn_board >> 7) & !FILE_A;
-    } else {
-        attacks |= (pawn_board << 7) & !FILE_H;
-        attacks |= (pawn_board << 9) & !FILE_A;
-    }
-
-    attacks
-}
-
-static KNIGHT_ATTACKS: [u64; SQUARES] = generate_knight_attacks();
 
 const fn generate_knight_attacks() -> [u64; SQUARES] {
     let mut table = [0u64; SQUARES];
@@ -107,23 +100,7 @@ const fn generate_knight_attacks() -> [u64; SQUARES] {
     table
 }
 
-const fn knight_attacks_for_square(square: usize) -> u64 {
-    let knight_board = 1u64 << square;
-    let mut attacks = 0u64;
 
-    attacks |= (knight_board << 17) & !FILE_A;
-    attacks |= (knight_board << 10) & !FILE_AB;
-    attacks |= (knight_board >> 6) & !FILE_AB;
-    attacks |= (knight_board >> 15) & !FILE_A;
-    attacks |= (knight_board << 15) & !FILE_H;
-    attacks |= (knight_board << 6) & !FILE_GH;
-    attacks |= (knight_board >> 10) & !FILE_GH;
-    attacks |= (knight_board >> 17) & !FILE_H;
-
-    attacks
-}
-
-static KING_ATTACKS: [u64; SQUARES] = generate_king_attacks();
 
 const fn generate_king_attacks() -> [u64; SQUARES] {
     let mut table = [0u64; SQUARES];
@@ -137,23 +114,6 @@ const fn generate_king_attacks() -> [u64; SQUARES] {
     table
 }
 
-const fn king_attacks_for_square(square: usize) -> u64 {
-    let king_board = 1u64 << square;
-    let mut attacks = 0u64;
-
-    attacks |= (king_board << 1) & !FILE_A;
-    attacks |= (king_board >> 7) & !FILE_A;
-    attacks |= (king_board << 9) & !FILE_A;
-    attacks |= (king_board >> 1) & !FILE_H;
-    attacks |= (king_board << 7) & !FILE_H;
-    attacks |= (king_board >> 9) & !FILE_H;
-    attacks |= king_board << 8;
-    attacks |= king_board >> 8;
-
-    attacks
-}
-
-static BISHOP_ATTACKS: [[u64; MAX_BISHOP_MASK]; SQUARES] = generate_bishop_attacks();
 
 const fn generate_bishop_attacks() -> [[u64; MAX_BISHOP_MASK]; SQUARES] {
     let mut table = [[0u64; MAX_BISHOP_MASK]; SQUARES];
@@ -178,19 +138,6 @@ const fn generate_bishop_attacks() -> [[u64; MAX_BISHOP_MASK]; SQUARES] {
     table
 }
 
-const fn bishop_attacks_for_occupancy(square: usize, occupancy: u64) -> u64 {
-    let bishop_rank = (square >> 3) as i32;
-    let bishop_file = (square & 7) as i32;
-
-    ray_attacks(bishop_rank, bishop_file, 1, 1, occupancy)
-        | ray_attacks(bishop_rank, bishop_file, -1, 1, occupancy)
-        | ray_attacks(bishop_rank, bishop_file, -1, -1, occupancy)
-        | ray_attacks(bishop_rank, bishop_file, 1, -1, occupancy)
-}
-
-// TODO: recheck
-#[allow(long_running_const_eval)]
-static ROOK_ATTACKS: [[u64; MAX_ROOK_MASK]; SQUARES] = generate_rook_attacks();
 
 const fn generate_rook_attacks() -> [[u64; MAX_ROOK_MASK]; SQUARES] {
     let mut table = [[0u64; MAX_ROOK_MASK]; SQUARES];
@@ -213,16 +160,6 @@ const fn generate_rook_attacks() -> [[u64; MAX_ROOK_MASK]; SQUARES] {
     }
 
     table
-}
-
-const fn rook_attacks_for_occupancy(square: usize, occupancy: u64) -> u64 {
-    let rook_rank = (square >> 3) as i32;
-    let rook_file = (square & 7) as i32;
-
-    ray_attacks(rook_rank, rook_file, 1, 0, occupancy)
-        | ray_attacks(rook_rank, rook_file, -1, 0, occupancy)
-        | ray_attacks(rook_rank, rook_file, 0, 1, occupancy)
-        | ray_attacks(rook_rank, rook_file, 0, -1, occupancy)
 }
 
 #[inline(always)]

@@ -59,10 +59,7 @@ impl PieceSquareTableEvaluation {
 
 pub fn init() {}
 
-const fn add_piece_values(
-    mut tables: [[i32; 64]; 6],
-    piece_values: [i32; 6],
-) -> [[i32; 64]; 6] {
+const fn add_piece_values(mut tables: [[i32; 64]; 6], piece_values: [i32; 6]) -> [[i32; 64]; 6] {
     let mut piece = 0;
     while piece < 6 {
         let mut square = 0;

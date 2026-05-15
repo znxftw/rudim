@@ -1,4 +1,5 @@
 use crate::bitboard::Bitboard;
+use crate::bitboard::lookup_utils::ray_attacks;
 use crate::common::side::Side;
 use crate::common::square::Square;
 
@@ -9,53 +10,67 @@ pub const FILE_H: u64 = 9259542123273814144;
 pub const FILE_AB: u64 = FILE_A | FILE_B;
 pub const FILE_GH: u64 = FILE_G | FILE_H;
 
-pub fn get_pawn_attacks(square: Square, side: Side) -> Bitboard {
-    let mut result_board = 0u64;
-    let pawn_board = 1u64 << (square as usize);
+pub const fn pawn_attacks_for_square(square: usize, side: Side) -> u64 {
+    let pawn_board = 1u64 << square;
+    let mut attacks = 0u64;
 
-    if side == Side::White {
-        result_board |= (pawn_board >> 9) & !FILE_H;
-        result_board |= (pawn_board >> 7) & !FILE_A;
-    } else {
-        result_board |= (pawn_board << 7) & !FILE_H;
-        result_board |= (pawn_board << 9) & !FILE_A;
+    match side {
+        Side::White => {
+            attacks |= (pawn_board >> 9) & !FILE_H;
+            attacks |= (pawn_board >> 7) & !FILE_A;
+        }
+        Side::Black => {
+            attacks |= (pawn_board << 7) & !FILE_H;
+            attacks |= (pawn_board << 9) & !FILE_A;
+        }
+        Side::Both => {}
     }
 
-    Bitboard(result_board)
+    attacks
+}
+
+pub fn get_pawn_attacks(square: Square, side: Side) -> Bitboard {
+    Bitboard(pawn_attacks_for_square(square as usize, side))
+}
+
+pub const fn knight_attacks_for_square(square: usize) -> u64 {
+    let knight_board = 1u64 << square;
+    let mut attacks = 0u64;
+
+    attacks |= (knight_board << 17) & !FILE_A;
+    attacks |= (knight_board << 10) & !FILE_AB;
+    attacks |= (knight_board >> 6) & !FILE_AB;
+    attacks |= (knight_board >> 15) & !FILE_A;
+    attacks |= (knight_board << 15) & !FILE_H;
+    attacks |= (knight_board << 6) & !FILE_GH;
+    attacks |= (knight_board >> 10) & !FILE_GH;
+    attacks |= (knight_board >> 17) & !FILE_H;
+
+    attacks
 }
 
 pub fn get_knight_attacks(square: Square) -> Bitboard {
-    let mut result_board = 0u64;
-    let knight_board = 1u64 << (square as usize);
+    Bitboard(knight_attacks_for_square(square as usize))
+}
 
-    result_board |= (knight_board << 17) & !FILE_A;
-    result_board |= (knight_board << 10) & !FILE_AB;
-    result_board |= (knight_board >> 6) & !FILE_AB;
-    result_board |= (knight_board >> 15) & !FILE_A;
-    result_board |= (knight_board << 15) & !FILE_H;
-    result_board |= (knight_board << 6) & !FILE_GH;
-    result_board |= (knight_board >> 10) & !FILE_GH;
-    result_board |= (knight_board >> 17) & !FILE_H;
+pub const fn king_attacks_for_square(square: usize) -> u64 {
+    let king_board = 1u64 << square;
+    let mut attacks = 0u64;
 
-    Bitboard(result_board)
+    attacks |= (king_board << 1) & !FILE_A;
+    attacks |= (king_board >> 7) & !FILE_A;
+    attacks |= (king_board << 9) & !FILE_A;
+    attacks |= (king_board >> 1) & !FILE_H;
+    attacks |= (king_board << 7) & !FILE_H;
+    attacks |= (king_board >> 9) & !FILE_H;
+    attacks |= king_board << 8;
+    attacks |= king_board >> 8;
+
+    attacks
 }
 
 pub fn get_king_attacks(square: Square) -> Bitboard {
-    let mut result_board = 0u64;
-    let king_board = 1u64 << (square as usize);
-
-    result_board |= (king_board << 1) & !FILE_A;
-    result_board |= (king_board >> 7) & !FILE_A;
-    result_board |= (king_board << 9) & !FILE_A;
-
-    result_board |= (king_board >> 1) & !FILE_H;
-    result_board |= (king_board << 7) & !FILE_H;
-    result_board |= (king_board >> 9) & !FILE_H;
-
-    result_board |= king_board << 8;
-    result_board |= king_board >> 8;
-
-    Bitboard(result_board)
+    Bitboard(king_attacks_for_square(square as usize))
 }
 
 pub(crate) fn add_square_to_board_and_stop_at_occupied_square(
@@ -68,94 +83,32 @@ pub(crate) fn add_square_to_board_and_stop_at_occupied_square(
     (1u64 << ((rank * 8) + file) & occupancy.0) > 0
 }
 
+pub const fn bishop_attacks_for_occupancy(square: usize, occupancy: u64) -> u64 {
+    let bishop_rank = (square >> 3) as i32;
+    let bishop_file = (square & 7) as i32;
+
+    ray_attacks(bishop_rank, bishop_file, 1, 1, occupancy)
+        | ray_attacks(bishop_rank, bishop_file, -1, 1, occupancy)
+        | ray_attacks(bishop_rank, bishop_file, -1, -1, occupancy)
+        | ray_attacks(bishop_rank, bishop_file, 1, -1, occupancy)
+}
+
 pub fn get_bishop_attacks(square: Square, occupancy: Bitboard) -> Bitboard {
-    let mut result_board = 0u64;
-    let sq = square as i32;
-    let bishop_rank = sq >> 3;
-    let bishop_file = sq & (8 - 1);
+    Bitboard(bishop_attacks_for_occupancy(square as usize, occupancy.0))
+}
 
-    for (rank, file) in ((bishop_rank + 1)..8).zip((bishop_file + 1)..8) {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy)
-        {
-            break;
-        }
-    }
+pub const fn rook_attacks_for_occupancy(square: usize, occupancy: u64) -> u64 {
+    let rook_rank = (square >> 3) as i32;
+    let rook_file = (square & 7) as i32;
 
-    for (rank, file) in (0..bishop_rank).rev().zip((bishop_file + 1)..8) {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy)
-        {
-            break;
-        }
-    }
-
-    for (rank, file) in (0..bishop_rank).rev().zip((0..bishop_file).rev()) {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy)
-        {
-            break;
-        }
-    }
-
-    for (rank, file) in ((bishop_rank + 1)..8).zip((0..bishop_file).rev()) {
-        if add_square_to_board_and_stop_at_occupied_square(&mut result_board, rank, file, occupancy)
-        {
-            break;
-        }
-    }
-
-    Bitboard(result_board)
+    ray_attacks(rook_rank, rook_file, 1, 0, occupancy)
+        | ray_attacks(rook_rank, rook_file, -1, 0, occupancy)
+        | ray_attacks(rook_rank, rook_file, 0, 1, occupancy)
+        | ray_attacks(rook_rank, rook_file, 0, -1, occupancy)
 }
 
 pub fn get_rook_attacks(square: Square, occupancy: Bitboard) -> Bitboard {
-    let mut result_board = 0u64;
-    let sq = square as i32;
-    let rook_rank = sq >> 3;
-    let rook_file = sq & (8 - 1);
-
-    for rank in (rook_rank + 1)..8 {
-        if add_square_to_board_and_stop_at_occupied_square(
-            &mut result_board,
-            rank,
-            rook_file,
-            occupancy,
-        ) {
-            break;
-        }
-    }
-
-    for rank in (0..rook_rank).rev() {
-        if add_square_to_board_and_stop_at_occupied_square(
-            &mut result_board,
-            rank,
-            rook_file,
-            occupancy,
-        ) {
-            break;
-        }
-    }
-
-    for file in (rook_file + 1)..8 {
-        if add_square_to_board_and_stop_at_occupied_square(
-            &mut result_board,
-            rook_rank,
-            file,
-            occupancy,
-        ) {
-            break;
-        }
-    }
-
-    for file in (0..rook_file).rev() {
-        if add_square_to_board_and_stop_at_occupied_square(
-            &mut result_board,
-            rook_rank,
-            file,
-            occupancy,
-        ) {
-            break;
-        }
-    }
-
-    Bitboard(result_board)
+    Bitboard(rook_attacks_for_occupancy(square as usize, occupancy.0))
 }
 
 pub fn get_queen_attacks(square: Square, occupancy: Bitboard) -> Bitboard {
