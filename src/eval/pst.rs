@@ -4,7 +4,6 @@ use crate::common::constants;
 use crate::common::game_phase;
 use crate::common::side::Side;
 use crate::eval::pawns::PawnStructureEvaluation;
-use std::sync::LazyLock;
 
 pub struct PieceSquareTableEvaluation;
 
@@ -34,17 +33,17 @@ impl PieceSquareTableEvaluation {
             while white_board.0 > 0 {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
-                positional_score += (mid_game_positions()[piece_idx][square] * mid_game_phase)
-                    + (end_game_positions()[piece_idx][square] * end_game_phase);
+                positional_score += (MID_GAME_POSITIONS[piece_idx][square] * mid_game_phase)
+                    + (END_GAME_POSITIONS[piece_idx][square] * end_game_phase);
             }
 
             while black_board.0 > 0 {
                 let square = black_board.get_lsb() as usize;
                 black_board.clear_bit(square);
                 let mirrored_square = Self::mirror_square(square);
-                positional_score -= (mid_game_positions()[piece_idx][mirrored_square]
+                positional_score -= (MID_GAME_POSITIONS[piece_idx][mirrored_square]
                     * mid_game_phase)
-                    + (end_game_positions()[piece_idx][mirrored_square] * end_game_phase);
+                    + (END_GAME_POSITIONS[piece_idx][mirrored_square] * end_game_phase);
             }
         }
 
@@ -58,44 +57,29 @@ impl PieceSquareTableEvaluation {
     }
 }
 
-pub fn init() {
-    let _ = LazyLock::force(&MID_GAME_POSITIONS);
-    let _ = LazyLock::force(&END_GAME_POSITIONS);
+pub fn init() {}
+
+const fn add_piece_values(
+    mut tables: [[i32; 64]; 6],
+    piece_values: [i32; 6],
+) -> [[i32; 64]; 6] {
+    let mut piece = 0;
+    while piece < 6 {
+        let mut square = 0;
+        while square < 64 {
+            tables[piece][square] += piece_values[piece];
+            square += 1;
+        }
+        piece += 1;
+    }
+
+    tables
 }
 
-#[inline(always)]
-fn mid_game_positions() -> &'static [[i32; 64]; 6] {
-    #[cfg(debug_assertions)]
-    {
-        LazyLock::force(&MID_GAME_POSITIONS)
-    }
-    #[cfg(not(debug_assertions))]
-    {
-        // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
-        // get() will hence always return a value.
-        unsafe { LazyLock::get(&MID_GAME_POSITIONS).unwrap_unchecked() }
-    }
-}
-
-#[inline(always)]
-fn end_game_positions() -> &'static [[i32; 64]; 6] {
-    #[cfg(debug_assertions)]
-    {
-        LazyLock::force(&END_GAME_POSITIONS)
-    }
-    #[cfg(not(debug_assertions))]
-    {
-        // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
-        // get() will hence always return a value.
-        unsafe { LazyLock::get(&END_GAME_POSITIONS).unwrap_unchecked() }
-    }
-}
-
-static MID_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
-    let piece_values = [82, 337, 365, 477, 1025, 0];
-    // Values borrowed from Rofchade
-    // http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19
-    let mut tables = [
+const MID_GAME_POSITIONS: [[i32; 64]; 6] = add_piece_values(
+    [
+        // Values borrowed from Rofchade
+        // http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19
         // Pawn
         [
             0, 0, 0, 0, 0, 0, 0, 0, 98, 134, 61, 95, 68, 126, 34, -11, -6, 7, 26, 31, 65, 56, 25,
@@ -136,19 +120,12 @@ static MID_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
             -33, -51, -14, -14, -22, -46, -44, -30, -15, -27, 1, 7, -8, -64, -43, -16, 9, 8, -15,
             36, 12, -54, 8, -28, 24, 14,
         ],
-    ];
+    ],
+    [82, 337, 365, 477, 1025, 0],
+);
 
-    for (piece, table) in tables.iter_mut().enumerate() {
-        for val in table.iter_mut() {
-            *val += piece_values[piece];
-        }
-    }
-    tables
-});
-
-static END_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
-    let piece_values = [94, 281, 297, 512, 936, 0];
-    let mut tables = [
+const END_GAME_POSITIONS: [[i32; 64]; 6] = add_piece_values(
+    [
         // Pawn
         [
             0, 0, 0, 0, 0, 0, 0, 0, 178, 173, 158, 134, 147, 132, 165, 187, 94, 100, 85, 67, 56,
@@ -188,15 +165,9 @@ static END_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
             -3, 11, 21, 23, 16, 7, -9, -27, -11, 4, 13, 14, 4, -5, -17, -53, -34, -21, -11, -28,
             -14, -24, -43,
         ],
-    ];
-
-    for (piece, table) in tables.iter_mut().enumerate() {
-        for val in table.iter_mut() {
-            *val += piece_values[piece];
-        }
-    }
-    tables
-});
+    ],
+    [94, 281, 297, 512, 936, 0],
+);
 
 #[cfg(test)]
 mod tests {
