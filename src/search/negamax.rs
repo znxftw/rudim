@@ -86,7 +86,7 @@ fn search_internal(
     let mut entry_type = TranspositionEntryType::Alpha;
 
     board_state.generate_moves();
-    populate_move_scores(board_state, ply as usize);
+    populate_move_scores(board_state, ply as usize, tt_best);
 
     let mut number_of_legal_moves = 0;
 
@@ -288,11 +288,26 @@ fn beta_cutoff(
     beta
 }
 
-fn populate_move_scores(board_state: &mut BoardState, ply: usize) {
-    // TODO: implement hash move scoring
+fn populate_move_scores(
+    board_state: &mut BoardState,
+    ply: usize,
+    hash_move: Option<crate::common::moves::Move>,
+) {
     // TODO: non-clone impl? mutable borrow?
     let mut moves = board_state.moves.clone();
     move_ordering::populate_move_scores(&mut moves, board_state, ply);
+
+    if let Some(hash_move) = hash_move
+        && hash_move != crate::common::moves::Move::NO_MOVE
+    {
+        for move_obj in &mut moves {
+            if *move_obj == hash_move {
+                move_ordering::populate_hash_move(move_obj);
+                break;
+            }
+        }
+    }
+
     board_state.moves = moves;
 }
 

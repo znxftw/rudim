@@ -71,8 +71,7 @@ impl TranspositionTable {
         }
 
         if entry.depth < depth {
-            // TODO: Optimization - Return entry.best_move even if depth is lower to improve move ordering
-            return (false, 0, None);
+            return (false, 0, Some(entry.best_move));
         }
 
         match entry.entry_type {
@@ -81,14 +80,14 @@ impl TranspositionTable {
                 if entry.score <= alpha {
                     (true, alpha, Some(entry.best_move))
                 } else {
-                    (false, 0, None)
+                    (false, 0, Some(entry.best_move))
                 }
             }
             TranspositionEntryType::Beta => {
                 if entry.score >= beta {
                     (true, beta, Some(entry.best_move))
                 } else {
-                    (false, 0, None)
+                    (false, 0, Some(entry.best_move))
                 }
             }
         }

@@ -83,7 +83,7 @@ impl MoveOrdering {
     }
 
     pub fn populate_hash_move(move_obj: &mut Move) {
-        move_obj.score = 10_500;
+        move_obj.score = 1_000_000;
     }
 
     pub fn sort_next_best_move(moves: &mut [Move], starting_index: usize) {
