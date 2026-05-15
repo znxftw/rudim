@@ -149,7 +149,7 @@ impl TranspositionTable {
 
             pv.push(entry.best_move);
 
-            if board_state.is_draw(){
+            if board_state.is_draw() {
                 break;
             }
         }
