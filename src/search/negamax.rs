@@ -55,7 +55,9 @@ fn search_internal(
     };
 
     if has_value {
-        if let Some(best) = tt_best {
+        if let Some(best) = tt_best
+            && best != crate::common::moves::Move::NO_MOVE
+        {
             board_state.best_move = best;
         }
         return tt::TranspositionTable::retrieve_score(tt_score, ply);
@@ -78,7 +80,15 @@ fn search_internal(
         board_state.undo_null_move();
 
         if score >= beta {
-            return beta; // TODO : Store in TT
+            let mut table = tt::TT.lock().unwrap();
+            table.submit_entry(
+                board_state.board_hash,
+                tt::TranspositionTable::adjust_score(beta, ply),
+                depth,
+                crate::common::moves::Move::NO_MOVE,
+                TranspositionEntryType::Beta,
+            );
+            return beta;
         }
     }
 
