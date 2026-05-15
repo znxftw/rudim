@@ -11,6 +11,7 @@ use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
+use crate::eval::pst;
 use std::fmt;
 
 #[rustfmt::skip]
@@ -37,6 +38,8 @@ pub struct BoardState {
     pub move_count: i32,
     pub best_move: Move,
     pub phase: i32,
+    pub pst_midgame_score: i32,
+    pub pst_endgame_score: i32,
     pub board_hash: u64,
     pub last_draw_killer: i32,
     pub history: History,
@@ -55,6 +58,8 @@ impl BoardState {
             move_count: 0,
             best_move: Move::NO_MOVE,
             phase: 0,
+            pst_midgame_score: 0,
+            pst_endgame_score: 0,
             board_hash: 0,
             last_draw_killer: 0,
             history: History::new(),
@@ -68,11 +73,23 @@ impl BoardState {
         self.occupancies[Side::Both as usize].set_bit(sq);
         self.piece_mapping[sq] = piece;
         self.phase = add_phase(self.phase, piece);
+        self.apply_incremental_pst_delta(side, piece, sq, 1);
     }
 
     pub fn remove_piece(&mut self, square: Square) -> Piece {
         let sq = square as usize;
         let piece = self.piece_mapping[sq];
+        let side = if self.occupancies[Side::White as usize].get_bit(sq) == 1 {
+            Side::White
+        } else {
+            debug_assert_eq!(
+                self.occupancies[Side::Black as usize].get_bit(sq),
+                1,
+                "remove_piece called on empty square {}",
+                square
+            );
+            Side::Black
+        };
         self.pieces[Side::White as usize][piece as usize].clear_bit(sq);
         self.pieces[Side::Black as usize][piece as usize].clear_bit(sq);
         self.occupancies[Side::White as usize].clear_bit(sq);
@@ -80,6 +97,7 @@ impl BoardState {
         self.occupancies[Side::Both as usize].clear_bit(sq);
         self.piece_mapping[sq] = Piece::None;
         self.phase = remove_phase(self.phase, piece);
+        self.apply_incremental_pst_delta(side, piece, sq, -1);
         piece
     }
 
@@ -152,6 +170,12 @@ impl BoardState {
     pub fn clipped_phase(&self) -> i32 {
         crate::common::game_phase::get_clipped_phase(self.phase)
     }
+
+    fn apply_incremental_pst_delta(&mut self, side: Side, piece: Piece, square: usize, sign: i32) {
+        let (mid_game, end_game) = pst::piece_square_delta(piece, side, square);
+        self.pst_midgame_score += sign * mid_game;
+        self.pst_endgame_score += sign * end_game;
+    }
 }
 
 impl Default for BoardState {
@@ -168,6 +192,9 @@ impl PartialEq for BoardState {
             && self.en_passant_square == other.en_passant_square
             && self.castle == other.castle
             && self.moves == other.moves
+            && self.phase == other.phase
+            && self.pst_midgame_score == other.pst_midgame_score
+            && self.pst_endgame_score == other.pst_endgame_score
     }
 }
 

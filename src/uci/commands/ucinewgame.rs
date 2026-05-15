@@ -38,6 +38,8 @@ mod tests {
                 0,
                 0,
                 Move::NO_MOVE,
+                0,
+                0,
             );
         }
 

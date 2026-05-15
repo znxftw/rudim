@@ -1,7 +1,7 @@
 use crate::board::state::BoardState;
 use crate::common::constants::MAX_PLY;
+use crate::eval;
 use crate::eval::move_ordering;
-use crate::eval::pst::PieceSquareTableEvaluation;
 use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
 
 static NODES: AtomicI32 = AtomicI32::new(0);
@@ -18,7 +18,7 @@ pub fn search(
         return 0;
     }
 
-    let eval = PieceSquareTableEvaluation::evaluate(board_state);
+    let eval = eval::evaluate(board_state);
 
     if eval >= beta {
         return beta;

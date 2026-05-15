@@ -1,8 +1,8 @@
-use crate::bitboard::Bitboard;
 use crate::board::state::BoardState;
 use crate::common::constants;
 use crate::common::game_phase;
 use crate::common::side::Side;
+use crate::eval::context::{EvalContext, Evaluation};
 use crate::eval::pawns::PawnStructureEvaluation;
 use std::sync::LazyLock;
 
@@ -10,9 +10,15 @@ pub struct PieceSquareTableEvaluation;
 
 impl PieceSquareTableEvaluation {
     pub fn evaluate(board_state: &BoardState) -> i32 {
+        crate::eval::context::evaluate::<Self>(board_state)
+    }
+}
+
+impl Evaluation for PieceSquareTableEvaluation {
+    fn evaluate(board_state: &BoardState, eval_context: &EvalContext) -> i32 {
         let mut score = 0;
 
-        score += Self::score_position(board_state);
+        score += score_position(board_state, eval_context);
         score += PawnStructureEvaluation::evaluate(board_state);
 
         if board_state.side_to_move == Side::White {
@@ -21,41 +27,45 @@ impl PieceSquareTableEvaluation {
             -score
         }
     }
+}
 
-    fn score_position(board_state: &BoardState) -> i32 {
-        let mut positional_score = 0;
-        let mid_game_phase = board_state.clipped_phase();
-        let end_game_phase = game_phase::TOTAL_PHASE - mid_game_phase;
+fn score_position(board_state: &BoardState, eval_context: &EvalContext) -> i32 {
+    let mid_game_phase = board_state.clipped_phase();
+    let end_game_phase = game_phase::TOTAL_PHASE - mid_game_phase;
 
-        for piece_idx in 0..constants::PIECES {
-            let mut white_board = Bitboard(board_state.pieces[Side::White as usize][piece_idx].0);
-            let mut black_board = Bitboard(board_state.pieces[Side::Black as usize][piece_idx].0);
+    let positional_score = (eval_context.pst_midgame_score * mid_game_phase)
+        + (eval_context.pst_endgame_score * end_game_phase);
 
-            while white_board.0 > 0 {
-                let square = white_board.get_lsb() as usize;
-                white_board.clear_bit(square);
-                positional_score += (mid_game_positions()[piece_idx][square] * mid_game_phase)
-                    + (end_game_positions()[piece_idx][square] * end_game_phase);
-            }
+    (positional_score as f64 * game_phase::PHASE_FACTOR) as i32
+}
 
-            while black_board.0 > 0 {
-                let square = black_board.get_lsb() as usize;
-                black_board.clear_bit(square);
-                let mirrored_square = Self::mirror_square(square);
-                positional_score -= (mid_game_positions()[piece_idx][mirrored_square]
-                    * mid_game_phase)
-                    + (end_game_positions()[piece_idx][mirrored_square] * end_game_phase);
-            }
-        }
+#[inline(always)]
+pub fn piece_square_delta(
+    piece: crate::common::piece::Piece,
+    side: Side,
+    square: usize,
+) -> (i32, i32) {
+    let piece_idx = piece as usize;
+    debug_assert!(piece_idx < constants::PIECES);
 
-        (positional_score as f64 * game_phase::PHASE_FACTOR) as i32
+    if side == Side::White {
+        (
+            mid_game_positions()[piece_idx][square],
+            end_game_positions()[piece_idx][square],
+        )
+    } else {
+        let mirrored_square = mirror_square(square);
+        (
+            -mid_game_positions()[piece_idx][mirrored_square],
+            -end_game_positions()[piece_idx][mirrored_square],
+        )
     }
+}
 
-    fn mirror_square(square: usize) -> usize {
-        let row = square >> 3;
-        let col = square & 7;
-        ((7 - row) << 3) + col
-    }
+fn mirror_square(square: usize) -> usize {
+    let row = square >> 3;
+    let col = square & 7;
+    ((7 - row) << 3) + col
 }
 
 pub fn init() {

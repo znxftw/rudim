@@ -13,6 +13,8 @@ pub struct BoardHistory {
     pub board_hash: u64,
     pub last_draw_killer: i32,
     pub best_move: Move,
+    pub pst_midgame_score: i32,
+    pub pst_endgame_score: i32,
 }
 
 impl Default for BoardHistory {
@@ -24,6 +26,8 @@ impl Default for BoardHistory {
             board_hash: 0,
             last_draw_killer: 0,
             best_move: Move::NO_MOVE,
+            pst_midgame_score: 0,
+            pst_endgame_score: 0,
         }
     }
 }
@@ -50,6 +54,8 @@ impl History {
         board_hash: u64,
         last_draw_killer: i32,
         best_move: Move,
+        pst_midgame_score: i32,
+        pst_endgame_score: i32,
     ) {
         if self.index < HISTORY_SIZE {
             self.entries[self.index] = BoardHistory {
@@ -59,6 +65,8 @@ impl History {
                 board_hash,
                 last_draw_killer,
                 best_move,
+                pst_midgame_score,
+                pst_endgame_score,
             };
             self.index += 1;
         } else {
@@ -125,6 +133,8 @@ mod tests {
             123456789,
             42,
             best_move,
+            100,
+            -80,
         );
 
         assert!(!history.is_empty());
@@ -137,6 +147,8 @@ mod tests {
         assert_eq!(restored.board_hash, 123456789);
         assert_eq!(restored.last_draw_killer, 42);
         assert_eq!(restored.best_move, best_move);
+        assert_eq!(restored.pst_midgame_score, 100);
+        assert_eq!(restored.pst_endgame_score, -80);
         assert!(history.is_empty());
     }
 
@@ -150,6 +162,8 @@ mod tests {
             0,
             0,
             Move::NO_MOVE,
+            0,
+            0,
         );
         assert!(!history.is_empty());
         history.clear();
@@ -169,6 +183,8 @@ mod tests {
             hash,
             0,
             Move::NO_MOVE,
+            0,
+            0,
         );
         history.save(
             Piece::None,
@@ -177,6 +193,8 @@ mod tests {
             0x123,
             0,
             Move::NO_MOVE,
+            0,
+            0,
         );
         history.save(
             Piece::None,
@@ -185,6 +203,8 @@ mod tests {
             hash,
             0,
             Move::NO_MOVE,
+            0,
+            0,
         );
 
         assert!(history.has_hash_appeared_twice(hash, 0));

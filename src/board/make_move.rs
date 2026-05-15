@@ -14,6 +14,8 @@ impl BoardState {
         let original_en_passant_square = self.en_passant_square;
         let original_castling_rights = self.castle;
         let original_last_draw_killer = self.last_draw_killer;
+        let original_pst_midgame_score = self.pst_midgame_score;
+        let original_pst_endgame_score = self.pst_endgame_score;
 
         self.board_hash ^=
             zobrist::zobrist_table()[self.get_piece_on(m.source) as usize][m.source as usize];
@@ -52,6 +54,8 @@ impl BoardState {
             original_board_hash,
             original_last_draw_killer,
             self.best_move,
+            original_pst_midgame_score,
+            original_pst_endgame_score,
         );
         self.best_move = Move::NO_MOVE;
         self.move_count += 1;
@@ -177,6 +181,8 @@ impl BoardState {
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
         self.best_move = history.best_move;
+        self.pst_midgame_score = history.pst_midgame_score;
+        self.pst_endgame_score = history.pst_endgame_score;
         self.move_count -= 1;
     }
 
@@ -222,6 +228,8 @@ impl BoardState {
             self.board_hash,
             self.last_draw_killer,
             self.best_move,
+            self.pst_midgame_score,
+            self.pst_endgame_score,
         );
         self.update_en_passant(Move::NO_MOVE);
         self.flip_side_to_move();
@@ -234,6 +242,8 @@ impl BoardState {
         self.board_hash = history.board_hash;
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
+        self.pst_midgame_score = history.pst_midgame_score;
+        self.pst_endgame_score = history.pst_endgame_score;
     }
 }
 
