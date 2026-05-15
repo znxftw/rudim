@@ -1,7 +1,5 @@
-use std::sync::LazyLock;
-
 use crate::bitboard::Bitboard;
-use crate::bitboard::attacks::{FILE_A, FILE_H, get_king_attacks, get_knight_attacks};
+use crate::bitboard::attacks::{FILE_A, FILE_AB, FILE_GH, FILE_H};
 use crate::bitboard::lookup_utils::{
     magic_index, mask_bits_for_masks, occupancy_mapping, ray_attacks, ray_mask_without_edges,
 };
@@ -95,21 +93,65 @@ const fn pawn_attacks_for_square(square: usize, side: usize) -> u64 {
     attacks
 }
 
-static KNIGHT_ATTACKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
-    let mut table = [0u64; SQUARES];
-    for (sq, entry) in table.iter_mut().enumerate() {
-        *entry = get_knight_attacks(Square::from(sq)).0;
-    }
-    table
-});
+static KNIGHT_ATTACKS: [u64; SQUARES] = generate_knight_attacks();
 
-static KING_ATTACKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
+const fn generate_knight_attacks() -> [u64; SQUARES] {
     let mut table = [0u64; SQUARES];
-    for (sq, entry) in table.iter_mut().enumerate() {
-        *entry = get_king_attacks(Square::from(sq)).0;
+    let mut sq = 0;
+
+    while sq < SQUARES {
+        table[sq] = knight_attacks_for_square(sq);
+        sq += 1;
     }
+
     table
-});
+}
+
+const fn knight_attacks_for_square(square: usize) -> u64 {
+    let knight_board = 1u64 << square;
+    let mut attacks = 0u64;
+
+    attacks |= (knight_board << 17) & !FILE_A;
+    attacks |= (knight_board << 10) & !FILE_AB;
+    attacks |= (knight_board >> 6) & !FILE_AB;
+    attacks |= (knight_board >> 15) & !FILE_A;
+    attacks |= (knight_board << 15) & !FILE_H;
+    attacks |= (knight_board << 6) & !FILE_GH;
+    attacks |= (knight_board >> 10) & !FILE_GH;
+    attacks |= (knight_board >> 17) & !FILE_H;
+
+    attacks
+}
+
+static KING_ATTACKS: [u64; SQUARES] = generate_king_attacks();
+
+const fn generate_king_attacks() -> [u64; SQUARES] {
+    let mut table = [0u64; SQUARES];
+    let mut sq = 0;
+
+    while sq < SQUARES {
+        table[sq] = king_attacks_for_square(sq);
+        sq += 1;
+    }
+
+    table
+}
+
+const fn king_attacks_for_square(square: usize) -> u64 {
+    let king_board = 1u64 << square;
+    let mut attacks = 0u64;
+
+    attacks |= (king_board << 1) & !FILE_A;
+    attacks |= (king_board >> 7) & !FILE_A;
+    attacks |= (king_board << 9) & !FILE_A;
+    attacks |= (king_board >> 1) & !FILE_H;
+    attacks |= (king_board << 7) & !FILE_H;
+    attacks |= (king_board >> 9) & !FILE_H;
+    attacks |= king_board << 8;
+    attacks |= king_board >> 8;
+
+    attacks
+}
 
 static BISHOP_ATTACKS: [[u64; MAX_BISHOP_MASK]; SQUARES] = generate_bishop_attacks();
 
@@ -183,21 +225,6 @@ const fn rook_attacks_for_occupancy(square: usize, occupancy: u64) -> u64 {
         | ray_attacks(rook_rank, rook_file, 0, -1, occupancy)
 }
 
-macro_rules! get_table {
-    ($lock:expr) => {{
-        #[cfg(debug_assertions)]
-        {
-            LazyLock::force(&$lock)
-        }
-        #[cfg(not(debug_assertions))]
-        {
-            // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
-            // get() will hence always return a value.
-            unsafe { LazyLock::get(&$lock).unwrap_unchecked() }
-        }
-    }};
-}
-
 #[inline(always)]
 fn bishop_mask_bits() -> &'static [u32; SQUARES] {
     &BISHOP_MASK_BITS
@@ -220,11 +247,11 @@ pub fn pawn_attacks() -> &'static [[u64; SQUARES]; 2] {
 }
 #[inline(always)]
 pub fn knight_attacks() -> &'static [u64; SQUARES] {
-    get_table!(KNIGHT_ATTACKS)
+    &KNIGHT_ATTACKS
 }
 #[inline(always)]
 pub fn king_attacks() -> &'static [u64; SQUARES] {
-    get_table!(KING_ATTACKS)
+    &KING_ATTACKS
 }
 #[inline(always)]
 fn bishop_attacks() -> &'static [[u64; MAX_BISHOP_MASK]; SQUARES] {
@@ -241,8 +268,8 @@ pub fn init() {
     let _ = &BISHOP_MASKS;
     let _ = &ROOK_MASKS;
     let _ = &PAWN_ATTACKS;
-    let _ = &*KNIGHT_ATTACKS;
-    let _ = &*KING_ATTACKS;
+    let _ = &KNIGHT_ATTACKS;
+    let _ = &KING_ATTACKS;
     let _ = &BISHOP_ATTACKS;
     let _ = &ROOK_ATTACKS;
 }
@@ -281,7 +308,8 @@ pub fn get_queen_attacks_from_table(square: Square, occupancy: Bitboard) -> Bitb
 mod tests {
     use super::*;
     use crate::bitboard::attacks::{
-        get_bishop_attacks, get_pawn_attacks, get_queen_attacks, get_rook_attacks,
+        get_bishop_attacks, get_king_attacks, get_knight_attacks, get_pawn_attacks,
+        get_queen_attacks, get_rook_attacks,
     };
     use crate::common::side::Side;
 
