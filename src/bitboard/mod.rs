@@ -1,4 +1,5 @@
 pub mod attacks;
+pub(crate) mod lookup_utils;
 pub mod lookups;
 pub mod magics;
 

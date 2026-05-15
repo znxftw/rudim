@@ -2,22 +2,17 @@ use std::sync::LazyLock;
 
 use crate::bitboard::Bitboard;
 use crate::bitboard::attacks::{
-    get_bishop_attacks, get_king_attacks, get_knight_attacks, get_pawn_attacks, get_rook_attacks,
+    get_king_attacks, get_knight_attacks, get_pawn_attacks, get_rook_attacks,
 };
-use crate::bitboard::magics::{
-    BISHOP_MAGICS, ROOK_MAGICS, get_bishop_mask, get_occupancy_mapping, get_rook_mask,
+use crate::bitboard::lookup_utils::{
+    magic_index, mask_bits_for_masks, occupancy_mapping, ray_attacks, ray_mask_without_edges,
 };
+use crate::bitboard::magics::{BISHOP_MAGICS, ROOK_MAGICS, get_occupancy_mapping, get_rook_mask};
 use crate::common::constants::{MAX_BISHOP_MASK, MAX_ROOK_MASK, SQUARES};
 use crate::common::side::Side;
 use crate::common::square::Square;
 
-static BISHOP_MASK_BITS: LazyLock<[u32; SQUARES]> = LazyLock::new(|| {
-    let mut bits = [0u32; SQUARES];
-    for (sq, entry) in bits.iter_mut().enumerate() {
-        *entry = get_bishop_mask(Square::from(sq)).0.count_ones();
-    }
-    bits
-});
+static BISHOP_MASK_BITS: [u32; SQUARES] = mask_bits_for_masks(generate_bishop_masks());
 
 static ROOK_MASK_BITS: LazyLock<[u32; SQUARES]> = LazyLock::new(|| {
     let mut bits = [0u32; SQUARES];
@@ -27,13 +22,29 @@ static ROOK_MASK_BITS: LazyLock<[u32; SQUARES]> = LazyLock::new(|| {
     bits
 });
 
-static BISHOP_MASKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
+static BISHOP_MASKS: [u64; SQUARES] = generate_bishop_masks();
+
+const fn generate_bishop_masks() -> [u64; SQUARES] {
     let mut masks = [0u64; SQUARES];
-    for (sq, entry) in masks.iter_mut().enumerate() {
-        *entry = get_bishop_mask(Square::from(sq)).0;
+    let mut sq = 0;
+
+    while sq < SQUARES {
+        masks[sq] = bishop_mask_for_square(sq);
+        sq += 1;
     }
+
     masks
-});
+}
+
+const fn bishop_mask_for_square(square: usize) -> u64 {
+    let bishop_rank = (square >> 3) as i32;
+    let bishop_file = (square & 7) as i32;
+
+    ray_mask_without_edges(bishop_rank, bishop_file, 1, 1)
+        | ray_mask_without_edges(bishop_rank, bishop_file, -1, 1)
+        | ray_mask_without_edges(bishop_rank, bishop_file, -1, -1)
+        | ray_mask_without_edges(bishop_rank, bishop_file, 1, -1)
+}
 
 static ROOK_MASKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
     let mut masks = [0u64; SQUARES];
@@ -70,26 +81,40 @@ static KING_ATTACKS: LazyLock<[u64; SQUARES]> = LazyLock::new(|| {
     table
 });
 
-static BISHOP_ATTACKS: LazyLock<Vec<[u64; MAX_BISHOP_MASK]>> = LazyLock::new(|| {
-    let mut table: Vec<[u64; MAX_BISHOP_MASK]> = vec![[0u64; MAX_BISHOP_MASK]; SQUARES];
-    let bishop_mask_bits = &*BISHOP_MASK_BITS;
+static BISHOP_ATTACKS: [[u64; MAX_BISHOP_MASK]; SQUARES] = generate_bishop_attacks();
 
-    for sq in 0..SQUARES {
-        let mask = get_bishop_mask(Square::from(sq));
-        let bits = bishop_mask_bits[sq];
+const fn generate_bishop_attacks() -> [[u64; MAX_BISHOP_MASK]; SQUARES] {
+    let mut table = [[0u64; MAX_BISHOP_MASK]; SQUARES];
+    let mut sq = 0;
+
+    while sq < SQUARES {
+        let mask = BISHOP_MASKS[sq];
+        let bits = BISHOP_MASK_BITS[sq];
         let index_count = 1usize << bits;
+        let mut index = 0;
 
-        for index in 0..index_count {
-            let occupancy = get_occupancy_mapping(index, bits as i32, mask);
-            let magic_index = occupancy
-                .0
-                .wrapping_mul(BISHOP_MAGICS[sq])
-                .wrapping_shr(64 - bits) as usize;
-            table[sq][magic_index] = get_bishop_attacks(Square::from(sq), occupancy).0;
+        while index < index_count {
+            let occupancy = occupancy_mapping(index, bits, mask);
+            let table_index = magic_index(occupancy, BISHOP_MAGICS[sq], bits);
+            table[sq][table_index] = bishop_attacks_for_occupancy(sq, occupancy);
+            index += 1;
         }
+
+        sq += 1;
     }
+
     table
-});
+}
+
+const fn bishop_attacks_for_occupancy(square: usize, occupancy: u64) -> u64 {
+    let bishop_rank = (square >> 3) as i32;
+    let bishop_file = (square & 7) as i32;
+
+    ray_attacks(bishop_rank, bishop_file, 1, 1, occupancy)
+        | ray_attacks(bishop_rank, bishop_file, -1, 1, occupancy)
+        | ray_attacks(bishop_rank, bishop_file, -1, -1, occupancy)
+        | ray_attacks(bishop_rank, bishop_file, 1, -1, occupancy)
+}
 
 static ROOK_ATTACKS: LazyLock<Vec<[u64; MAX_ROOK_MASK]>> = LazyLock::new(|| {
     let mut table: Vec<[u64; MAX_ROOK_MASK]> = vec![[0u64; MAX_ROOK_MASK]; SQUARES];
@@ -129,7 +154,7 @@ macro_rules! get_table {
 
 #[inline(always)]
 fn bishop_mask_bits() -> &'static [u32; SQUARES] {
-    get_table!(BISHOP_MASK_BITS)
+    &BISHOP_MASK_BITS
 }
 #[inline(always)]
 fn rook_mask_bits() -> &'static [u32; SQUARES] {
@@ -137,7 +162,7 @@ fn rook_mask_bits() -> &'static [u32; SQUARES] {
 }
 #[inline(always)]
 fn bishop_masks() -> &'static [u64; SQUARES] {
-    get_table!(BISHOP_MASKS)
+    &BISHOP_MASKS
 }
 #[inline(always)]
 fn rook_masks() -> &'static [u64; SQUARES] {
@@ -156,8 +181,8 @@ pub fn king_attacks() -> &'static [u64; SQUARES] {
     get_table!(KING_ATTACKS)
 }
 #[inline(always)]
-fn bishop_attacks() -> &'static Vec<[u64; MAX_BISHOP_MASK]> {
-    get_table!(BISHOP_ATTACKS)
+fn bishop_attacks() -> &'static [[u64; MAX_BISHOP_MASK]; SQUARES] {
+    &BISHOP_ATTACKS
 }
 #[inline(always)]
 fn rook_attacks() -> &'static Vec<[u64; MAX_ROOK_MASK]> {
@@ -165,14 +190,14 @@ fn rook_attacks() -> &'static Vec<[u64; MAX_ROOK_MASK]> {
 }
 
 pub fn init() {
-    let _ = &*BISHOP_MASK_BITS;
+    let _ = &BISHOP_MASK_BITS;
     let _ = &*ROOK_MASK_BITS;
-    let _ = &*BISHOP_MASKS;
+    let _ = &BISHOP_MASKS;
     let _ = &*ROOK_MASKS;
     let _ = &*PAWN_ATTACKS;
     let _ = &*KNIGHT_ATTACKS;
     let _ = &*KING_ATTACKS;
-    let _ = &*BISHOP_ATTACKS;
+    let _ = &BISHOP_ATTACKS;
     let _ = &*ROOK_ATTACKS;
 }
 
