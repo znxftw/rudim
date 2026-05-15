@@ -45,7 +45,7 @@ pub(crate) const fn ray_mask_without_edges(
     let mut rank = start_rank + rank_delta;
     let mut file = start_file + file_delta;
 
-    while is_inside_mask_edges(rank, file) {
+    while is_on_board(rank, file) && is_on_board(rank + rank_delta, file + file_delta) {
         result = set_square(result, rank, file);
         rank += rank_delta;
         file += file_delta;
@@ -75,10 +75,6 @@ pub(crate) const fn ray_attacks(
     }
 
     result
-}
-
-const fn is_inside_mask_edges(rank: i32, file: i32) -> bool {
-    rank > 0 && rank < 7 && file > 0 && file < 7
 }
 
 const fn is_on_board(rank: i32, file: i32) -> bool {
