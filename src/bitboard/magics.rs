@@ -7,7 +7,7 @@ use crate::common::random;
 use crate::common::square::Square;
 
 // Precalculated by generate_all_magic_numbers()
-pub const BISHOP_MAGICS: [u64; 64] = [
+pub static BISHOP_MAGICS: [u64; 64] = [
     572335195422784,
     9225705203045892096,
     1155322839151150592,
@@ -74,7 +74,7 @@ pub const BISHOP_MAGICS: [u64; 64] = [
     9297788375727620608,
 ];
 
-pub const ROOK_MAGICS: [u64; 64] = [
+pub static ROOK_MAGICS: [u64; 64] = [
     11565244117967444096,
     594492744072699904,
     2197769949736337536,

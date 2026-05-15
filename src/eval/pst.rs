@@ -73,7 +73,7 @@ const fn add_piece_values(mut tables: [[i32; 64]; 6], piece_values: [i32; 6]) ->
     tables
 }
 
-const MID_GAME_POSITIONS: [[i32; 64]; 6] = add_piece_values(
+static MID_GAME_POSITIONS: [[i32; 64]; 6] = add_piece_values(
     [
         // Values borrowed from Rofchade
         // http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19
@@ -121,7 +121,7 @@ const MID_GAME_POSITIONS: [[i32; 64]; 6] = add_piece_values(
     [82, 337, 365, 477, 1025, 0],
 );
 
-const END_GAME_POSITIONS: [[i32; 64]; 6] = add_piece_values(
+static END_GAME_POSITIONS: [[i32; 64]; 6] = add_piece_values(
     [
         // Pawn
         [

@@ -21,7 +21,7 @@ impl Square {
 }
 
 #[rustfmt::skip]
-const SQUARES: [Square; 65] = [
+static SQUARES: [Square; 65] = [
     Square::A8, Square::B8, Square::C8, Square::D8, Square::E8, Square::F8, Square::G8, Square::H8,
     Square::A7, Square::B7, Square::C7, Square::D7, Square::E7, Square::F7, Square::G7, Square::H7,
     Square::A6, Square::B6, Square::C6, Square::D6, Square::E6, Square::F6, Square::G6, Square::H6,
