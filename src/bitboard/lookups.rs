@@ -61,7 +61,6 @@ const fn rook_mask_for_square(square: usize) -> u64 {
         | ray_mask_without_edges(rook_rank, rook_file, 0, -1)
 }
 
-
 // TODO: recheck
 #[allow(long_running_const_eval)]
 static ROOK_ATTACKS: [[u64; MAX_ROOK_MASK]; SQUARES] = generate_rook_attacks();
@@ -86,8 +85,6 @@ const fn generate_pawn_attacks() -> [[u64; SQUARES]; 2] {
     table
 }
 
-
-
 const fn generate_knight_attacks() -> [u64; SQUARES] {
     let mut table = [0u64; SQUARES];
     let mut sq = 0;
@@ -100,8 +97,6 @@ const fn generate_knight_attacks() -> [u64; SQUARES] {
     table
 }
 
-
-
 const fn generate_king_attacks() -> [u64; SQUARES] {
     let mut table = [0u64; SQUARES];
     let mut sq = 0;
@@ -113,7 +108,6 @@ const fn generate_king_attacks() -> [u64; SQUARES] {
 
     table
 }
-
 
 const fn generate_bishop_attacks() -> [[u64; MAX_BISHOP_MASK]; SQUARES] {
     let mut table = [[0u64; MAX_BISHOP_MASK]; SQUARES];
@@ -137,7 +131,6 @@ const fn generate_bishop_attacks() -> [[u64; MAX_BISHOP_MASK]; SQUARES] {
 
     table
 }
-
 
 const fn generate_rook_attacks() -> [[u64; MAX_ROOK_MASK]; SQUARES] {
     let mut table = [[0u64; MAX_ROOK_MASK]; SQUARES];
