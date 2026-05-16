@@ -23,3 +23,7 @@ debug-assertions = true
 lto = "fat"
 panic = "abort"
 codegen-units = 1
+
+[profile.profiling]
+inherits = "release"
+debug = true
