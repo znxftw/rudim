@@ -13,3 +13,13 @@ serial_test = "3.1"
 [[bench]]
 name = "search_benchmark"
 harness = false
+
+[profile.dev]
+opt-level = 3
+debug = true
+debug-assertions = true
+
+[profile.release]
+lto = "fat"
+panic = "abort"
+codegen-units = 1
