@@ -33,7 +33,7 @@ fn find_move_from_move_list(board: &mut BoardState, expected_move: Move) -> Move
     Move::NO_MOVE
 }
 
-fn assert_traversal(position: &str, expected_nodes: i32, expected_score: i32, depth: i32) {
+fn assert_traversal(position: &str, expected_nodes: i32, expected_score: i32, depth: u8) {
     reset_global_state();
 
     let mut board_state = BoardState::parse_fen(position);

@@ -15,7 +15,7 @@ pub enum TranspositionEntryType {
 pub struct TranspositionTableEntry {
     pub score: i32,
     pub hash: u64,
-    pub depth: i32,
+    pub depth: u8,
     pub best_move: Move,
     pub entry_type: TranspositionEntryType,
 }
@@ -60,7 +60,7 @@ impl TranspositionTable {
         hash: u64,
         alpha: i32,
         beta: i32,
-        depth: i32,
+        depth: u8,
     ) -> (bool, i32, Option<Move>) {
         let entry = match self.entries[(hash as usize) & (self.capacity - 1)] {
             Some(e) => e,
@@ -98,7 +98,7 @@ impl TranspositionTable {
         &mut self,
         hash: u64,
         score: i32,
-        depth: i32,
+        depth: u8,
         best_move: Move,
         entry_type: TranspositionEntryType,
     ) {

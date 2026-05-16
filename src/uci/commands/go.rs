@@ -23,7 +23,7 @@ impl UciClient {
             state.best_move = Move::NO_MOVE;
         }
 
-        let depth = get_parameter("depth", parameters, 8);
+        let depth = get_parameter("depth", parameters, 8) as u8;
         let winc = get_parameter("winc", parameters, -1);
         let binc = get_parameter("binc", parameters, -1);
         let wtime = get_parameter("wtime", parameters, -1);
@@ -70,7 +70,7 @@ impl UciClient {
         let search_depth = if allotted_time == -1 {
             depth
         } else {
-            constants::MAX_SEARCH_DEPTH as i32
+            constants::MAX_SEARCH_DEPTH
         };
 
         thread::spawn(move || {

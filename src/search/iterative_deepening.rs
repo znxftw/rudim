@@ -42,7 +42,7 @@ pub fn reset_state() {
 
 pub fn search(
     board_state: &mut BoardState,
-    depth: i32,
+    depth: u8,
     cancellation_token: &AtomicBool,
     debug_mode: &mut bool,
 ) {

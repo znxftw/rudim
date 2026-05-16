@@ -3,6 +3,8 @@ use crate::common::piece::Piece;
 use crate::common::square::Square;
 use std::hash::{Hash, Hasher};
 
+// TODO: optimize memory here, can save a lot of TT space
+// ref for ideas https://github.com/codedeliveryservice/Reckless/blob/main/src/types/moves.rs
 #[derive(Debug, Clone, Copy)]
 pub struct Move {
     pub source: Square,

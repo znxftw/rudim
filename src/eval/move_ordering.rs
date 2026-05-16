@@ -63,8 +63,8 @@ impl MoveOrdering {
         self.killer_moves[0][ply] = move_obj;
     }
 
-    pub fn add_history_move(&mut self, piece: usize, move_obj: Move, depth: i32) {
-        self.history_moves[piece][move_obj.target as usize] += depth * depth;
+    pub fn add_history_move(&mut self, piece: usize, move_obj: Move, depth: u8) {
+        self.history_moves[piece][move_obj.target as usize] += (depth as i32) * (depth as i32);
     }
 
     pub fn reset(&mut self) {
@@ -121,7 +121,7 @@ pub fn add_killer_move(move_obj: Move, ply: usize) {
     move_ordering.add_killer_move(move_obj, ply);
 }
 
-pub fn add_history_move(piece: usize, move_obj: Move, depth: i32) {
+pub fn add_history_move(piece: usize, move_obj: Move, depth: u8) {
     let mut move_ordering = MOVE_ORDERING.lock().unwrap();
     move_ordering.add_history_move(piece, move_obj, depth);
 }

@@ -3,10 +3,10 @@ use crate::common::constants;
 use crate::common::tt::{self, TranspositionEntryType};
 use crate::eval::move_ordering;
 use crate::search::quiescence;
-use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI32, AtomicU8, Ordering};
 
 static NODES: AtomicI32 = AtomicI32::new(0);
-static SEARCH_DEPTH: AtomicI32 = AtomicI32::new(0);
+static SEARCH_DEPTH: AtomicU8 = AtomicU8::new(0);
 
 pub fn nodes() -> i32 {
     NODES.load(Ordering::Relaxed)
@@ -17,7 +17,7 @@ pub fn reset_state() {
     SEARCH_DEPTH.store(0, Ordering::Relaxed);
 }
 
-pub fn search(board_state: &mut BoardState, depth: i32, cancellation_token: &AtomicBool) -> i32 {
+pub fn search(board_state: &mut BoardState, depth: u8, cancellation_token: &AtomicBool) -> i32 {
     SEARCH_DEPTH.store(depth, Ordering::Relaxed);
     NODES.store(0, Ordering::Relaxed);
     quiescence::reset_nodes();
@@ -34,7 +34,7 @@ pub fn search(board_state: &mut BoardState, depth: i32, cancellation_token: &Ato
 
 fn search_internal(
     board_state: &mut BoardState,
-    depth: i32,
+    depth: u8,
     mut alpha: i32,
     beta: i32,
     allow_null_move: bool,
@@ -60,10 +60,10 @@ fn search_internal(
         {
             board_state.best_move = best;
         }
-        return tt::TranspositionTable::retrieve_score(tt_score, ply);
+        return tt::TranspositionTable::retrieve_score(tt_score, ply as i32);
     }
 
-    if depth <= 0 {
+    if depth == 0 {
         return quiescence::search(board_state, alpha, beta, cancellation_token);
     }
 
@@ -71,7 +71,7 @@ fn search_internal(
         board_state.make_null_move();
         let score = -search_internal(
             board_state,
-            depth - 1 - 2,
+            depth.saturating_sub(3),
             -beta,
             -beta + 1,
             false,
@@ -83,7 +83,7 @@ fn search_internal(
             let mut table = tt::TT.lock().unwrap();
             table.submit_entry(
                 board_state.board_hash,
-                tt::TranspositionTable::adjust_score(beta, ply),
+                tt::TranspositionTable::adjust_score(beta, ply as i32),
                 depth,
                 crate::common::moves::Move::NO_MOVE,
                 TranspositionEntryType::Beta,
@@ -123,7 +123,7 @@ fn search_internal(
             let reduction = crate::search::lmr::get_reduction(depth, number_of_legal_moves);
             score = -search_internal(
                 board_state,
-                depth - 1 - reduction,
+                depth.saturating_sub(1 + reduction),
                 -alpha - 1,
                 -alpha,
                 allow_null_move,
@@ -176,7 +176,7 @@ fn search_internal(
 
     if number_of_legal_moves == 0 {
         if board_state.is_in_check(board_state.side_to_move) {
-            return -constants::MAX_CENTIPAWN_EVAL + ply;
+            return -constants::MAX_CENTIPAWN_EVAL + ply as i32;
         }
         return 0;
     }
@@ -185,7 +185,7 @@ fn search_internal(
         let mut table = tt::TT.lock().unwrap();
         table.submit_entry(
             board_state.board_hash,
-            tt::TranspositionTable::adjust_score(alpha, ply),
+            tt::TranspositionTable::adjust_score(alpha, ply as i32),
             depth,
             board_state.best_move,
             entry_type,
@@ -197,7 +197,7 @@ fn search_internal(
 
 fn search_deeper(
     board_state: &mut BoardState,
-    depth: i32,
+    depth: u8,
     alpha: i32,
     beta: i32,
     cancellation_token: &AtomicBool,
@@ -227,7 +227,7 @@ fn search_deeper(
 
 fn principal_variation_search(
     board_state: &mut BoardState,
-    depth: i32,
+    depth: u8,
     alpha: i32,
     beta: i32,
     allow_null_move: bool,
@@ -258,7 +258,7 @@ fn alpha_update(
     score: i32,
     move_obj: crate::common::moves::Move,
     board_state: &mut BoardState,
-    depth: i32,
+    depth: u8,
     alpha: &mut i32,
     found_pv: &mut bool,
     entry_type: &mut TranspositionEntryType,
@@ -278,7 +278,7 @@ fn beta_cutoff(
     move_obj: crate::common::moves::Move,
     ply: usize,
     board_state: &BoardState,
-    depth: i32,
+    depth: u8,
 ) -> i32 {
     {
         let mut table = tt::TT.lock().unwrap();
@@ -325,7 +325,7 @@ fn can_prune_null_move(
     is_pv_node: bool,
     board_state: &BoardState,
     allow_null_move: bool,
-    depth: i32,
+    depth: u8,
 ) -> bool {
     allow_null_move
         && !is_pv_node

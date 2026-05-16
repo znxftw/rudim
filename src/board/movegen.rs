@@ -16,7 +16,7 @@ use std::sync::atomic::AtomicBool;
 impl BoardState {
     pub fn find_best_move(
         &mut self,
-        depth: i32,
+        depth: u8,
         cancellation_token: &AtomicBool,
         debug_mode: &mut bool,
     ) -> Move {

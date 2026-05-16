@@ -9,4 +9,4 @@ pub const MAX_MASK_INDEX: usize = MAX_ROOK_MASK;
 pub const MAX_CENTIPAWN_EVAL: i32 = 49000;
 pub const MAX_PLY: usize = 64;
 pub const BUFFER_TIME: u64 = 50;
-pub const MAX_SEARCH_DEPTH: usize = 64;
+pub const MAX_SEARCH_DEPTH: u8 = 64;

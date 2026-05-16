@@ -25,7 +25,7 @@ fn main() {
 }
 
 fn run_searches() {
-    const PROFILE_DEPTH: i32 = 13;
+    const PROFILE_DEPTH: u8 = 13;
 
     rudim::init();
 

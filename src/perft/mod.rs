@@ -3,7 +3,7 @@ use crate::common::helpers::{ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
 
 #[derive(Clone, Copy)]
 pub struct PerftData {
-    pub depth: i32,
+    pub depth: u8,
     pub expected_nodes: u64,
     pub fen: &'static str,
 }
@@ -106,7 +106,7 @@ const PERFT_DATA: [PerftData; 19] = [
     },
 ];
 
-pub fn traverse(board_state: &mut BoardState, depth: i32) -> u64 {
+pub fn traverse(board_state: &mut BoardState, depth: u8) -> u64 {
     if depth == 0 {
         return 1;
     }
@@ -127,7 +127,7 @@ pub fn traverse(board_state: &mut BoardState, depth: i32) -> u64 {
     nodes
 }
 
-pub fn perft_test(depth: i32, expected_nodes: u64, fen: &str) {
+pub fn perft_test(depth: u8, expected_nodes: u64, fen: &str) {
     let mut board_state = BoardState::parse_fen(fen);
     let start = std::time::Instant::now();
     let nodes = traverse(&mut board_state, depth);
