@@ -3,7 +3,6 @@ use crate::common::constants;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 
-
 const DOUBLED_PAWN_PENALTY: i32 = 10;
 const ISOLATED_PAWN_PENALTY: i32 = 20;
 
@@ -26,6 +25,7 @@ impl PawnStructureEvaluation {
 
     fn score_doubled_pawns(white_pawns: u64, black_pawns: u64) -> i32 {
         let mut score = 0;
+        #[allow(clippy::needless_range_loop)]
         for file in 0..8 {
             let white_count = (white_pawns & FILE_MASKS[file]).count_ones() as i32;
             let black_count = (black_pawns & FILE_MASKS[file]).count_ones() as i32;
