@@ -25,10 +25,9 @@ impl PawnStructureEvaluation {
 
     fn score_doubled_pawns(white_pawns: u64, black_pawns: u64) -> i32 {
         let mut score = 0;
-        #[allow(clippy::needless_range_loop)]
-        for file in 0..8 {
-            let white_count = (white_pawns & FILE_MASKS[file]).count_ones() as i32;
-            let black_count = (black_pawns & FILE_MASKS[file]).count_ones() as i32;
+        for &mask in &FILE_MASKS {
+            let white_count = (white_pawns & mask).count_ones() as i32;
+            let black_count = (black_pawns & mask).count_ones() as i32;
             if white_count > 1 {
                 score -= (white_count - 1) * DOUBLED_PAWN_PENALTY;
             }
