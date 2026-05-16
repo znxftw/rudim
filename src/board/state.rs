@@ -38,7 +38,7 @@ pub struct BoardState {
     pub best_move: Move,
     pub phase: i32,
     pub board_hash: u64,
-    pub last_draw_killer: i32,
+    pub half_move_clock: u8,
     pub history: History,
 }
 
@@ -56,7 +56,7 @@ impl BoardState {
             best_move: Move::NO_MOVE,
             phase: 0,
             board_hash: 0,
-            last_draw_killer: 0,
+            half_move_clock: 0,
             history: History::new(),
         }
     }

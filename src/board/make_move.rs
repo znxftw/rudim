@@ -13,13 +13,15 @@ impl BoardState {
         let original_board_hash = self.board_hash;
         let original_en_passant_square = self.en_passant_square;
         let original_castling_rights = self.castle;
-        let original_last_draw_killer = self.last_draw_killer;
+        let original_half_move_clock = self.half_move_clock;
 
         self.board_hash ^=
             zobrist::zobrist_table()[self.get_piece_on(m.source) as usize][m.source as usize];
         let moved_piece = self.remove_piece(m.source);
-        if moved_piece == Piece::Pawn {
-            self.last_draw_killer = self.move_count;
+        if moved_piece == Piece::Pawn || m.is_capture() {
+            self.half_move_clock = 0;
+        } else {
+            self.half_move_clock += 1;
         }
 
         let mut final_moved_piece = moved_piece;
@@ -50,7 +52,7 @@ impl BoardState {
             original_en_passant_square,
             original_castling_rights,
             original_board_hash,
-            original_last_draw_killer,
+            original_half_move_clock,
             self.best_move,
         );
         self.best_move = Move::NO_MOVE;
@@ -76,7 +78,7 @@ impl BoardState {
 
         self.board_hash ^= zobrist::zobrist_table()[self.get_piece_on(target_square) as usize]
             [target_square as usize];
-        self.last_draw_killer = self.move_count;
+        self.half_move_clock = 0;
 
         self.remove_piece(target_square)
     }
@@ -172,7 +174,7 @@ impl BoardState {
                 moved_piece
             },
         );
-        self.last_draw_killer = history.last_draw_killer;
+        self.half_move_clock = history.half_move_clock;
         self.board_hash = history.board_hash;
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
@@ -204,14 +206,16 @@ impl BoardState {
             }
         }
 
-        if self.move_count - self.last_draw_killer > 100 {
+        if self.half_move_clock >= 100 {
             return true;
         }
-        if self.move_count - self.last_draw_killer <= 7 {
+        if self.half_move_clock <= 7 {
             return false;
         }
-        self.history
-            .has_hash_appeared_twice(self.board_hash, self.last_draw_killer as usize)
+        self.history.has_hash_appeared_twice(
+            self.board_hash,
+            (self.move_count - self.half_move_clock as i32) as usize,
+        )
     }
 
     pub fn make_null_move(&mut self) {
@@ -220,7 +224,7 @@ impl BoardState {
             self.en_passant_square,
             self.castle,
             self.board_hash,
-            self.last_draw_killer,
+            self.half_move_clock,
             self.best_move,
         );
         self.update_en_passant(Move::NO_MOVE);
@@ -230,7 +234,7 @@ impl BoardState {
     pub fn undo_null_move(&mut self) {
         let history = self.history.restore();
         self.flip_side_to_move();
-        self.last_draw_killer = history.last_draw_killer;
+        self.half_move_clock = history.half_move_clock;
         self.board_hash = history.board_hash;
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
@@ -567,18 +571,18 @@ mod tests {
     }
 
     #[test]
-    fn should_not_reset_last_draw_killer_after_castle() {
+    fn should_not_reset_half_move_clock_after_castle() {
         let mut board = BoardState::parse_fen("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
-        let original_last_draw_killer = board.last_draw_killer;
+        let original_half_move_clock = board.half_move_clock;
         board.make_move(Move::new(Square::E1, Square::G1, MoveType::Castle));
-        assert_eq!(board.last_draw_killer, original_last_draw_killer);
+        assert_eq!(board.half_move_clock, original_half_move_clock + 1);
     }
 
     #[test]
-    fn should_reset_last_draw_killer_after_en_passant() {
+    fn should_reset_half_move_clock_after_en_passant() {
         let mut board =
             BoardState::parse_fen("rnbqkbnr/pppp1ppp/8/4P3/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2");
-        let original_last_draw_killer = board.last_draw_killer;
+
         // Quiet Moves which won't update draw killer
         board.make_move(Move {
             source: Square::B7,
@@ -601,6 +605,6 @@ mod tests {
             .expect("f7f5 double push must exist");
         board.make_move(double_push);
         assert_eq!(board.en_passant_square, Square::F6);
-        assert_ne!(board.last_draw_killer, original_last_draw_killer);
+        assert_eq!(board.half_move_clock, 0);
     }
 }

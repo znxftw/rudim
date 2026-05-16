@@ -11,7 +11,7 @@ pub struct BoardHistory {
     pub en_passant_square: Square,
     pub castling_rights: Castle,
     pub board_hash: u64,
-    pub last_draw_killer: i32,
+    pub half_move_clock: u8,
     pub best_move: Move,
 }
 
@@ -22,7 +22,7 @@ impl Default for BoardHistory {
             en_passant_square: Square::NoSquare,
             castling_rights: Castle::NONE,
             board_hash: 0,
-            last_draw_killer: 0,
+            half_move_clock: 0,
             best_move: Move::NO_MOVE,
         }
     }
@@ -48,7 +48,7 @@ impl History {
         en_passant: Square,
         original_castling_rights: Castle,
         board_hash: u64,
-        last_draw_killer: i32,
+        half_move_clock: u8,
         best_move: Move,
     ) {
         if self.index < HISTORY_SIZE {
@@ -57,7 +57,7 @@ impl History {
                 en_passant_square: en_passant,
                 castling_rights: original_castling_rights,
                 board_hash,
-                last_draw_killer,
+                half_move_clock,
                 best_move,
             };
             self.index += 1;
@@ -135,7 +135,7 @@ mod tests {
         assert_eq!(restored.en_passant_square, Square::E3);
         assert_eq!(restored.castling_rights, Castle::WHITE_SHORT);
         assert_eq!(restored.board_hash, 123456789);
-        assert_eq!(restored.last_draw_killer, 42);
+        assert_eq!(restored.half_move_clock, 42);
         assert_eq!(restored.best_move, best_move);
         assert!(history.is_empty());
     }
