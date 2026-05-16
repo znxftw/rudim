@@ -2,7 +2,7 @@ use crate::board::state::BoardState;
 use crate::common::constants;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
-use std::sync::LazyLock;
+
 
 const DOUBLED_PAWN_PENALTY: i32 = 10;
 const ISOLATED_PAWN_PENALTY: i32 = 20;
@@ -68,22 +68,26 @@ impl PawnStructureEvaluation {
     }
 }
 
-static FILE_MASKS: LazyLock<[u64; 8]> = LazyLock::new(|| {
+static FILE_MASKS: [u64; 8] = {
     let mut masks = [0u64; 8];
-    #[allow(clippy::needless_range_loop)]
-    for file in 0..8 {
+    let mut file = 0;
+    while file < 8 {
         let mut mask = 0;
-        for row in 0..8 {
+        let mut row = 0;
+        while row < 8 {
             mask |= 1u64 << (row * 8 + file);
+            row += 1;
         }
         masks[file] = mask;
+        file += 1;
     }
     masks
-});
+};
 
-static ADJACENT_FILE_MASKS: LazyLock<[u64; 8]> = LazyLock::new(|| {
+static ADJACENT_FILE_MASKS: [u64; 8] = {
     let mut masks = [0u64; 8];
-    for file in 0..8 {
+    let mut file = 0;
+    while file < 8 {
         let mut mask = 0;
         if file > 0 {
             mask |= FILE_MASKS[file - 1];
@@ -92,19 +96,21 @@ static ADJACENT_FILE_MASKS: LazyLock<[u64; 8]> = LazyLock::new(|| {
             mask |= FILE_MASKS[file + 1];
         }
         masks[file] = mask;
+        file += 1;
     }
     masks
-});
+};
 
-static PASSED_PAWN_MASKS: LazyLock<[[u64; 64]; 2]> = LazyLock::new(|| {
+static PASSED_PAWN_MASKS: [[u64; 64]; 2] = {
     let mut masks = [[0u64; 64]; 2];
-    #[allow(clippy::needless_range_loop)]
-    for sq in 0..constants::SQUARES {
+    let mut sq = 0;
+    while sq < constants::SQUARES {
         let file = sq & 7;
         let row = sq >> 3;
 
         let mut white_mask = 0;
-        for r in 0..row {
+        let mut r = 0;
+        while r < row {
             white_mask |= 1u64 << (r * 8 + file);
             if file > 0 {
                 white_mask |= 1u64 << (r * 8 + file - 1);
@@ -112,11 +118,13 @@ static PASSED_PAWN_MASKS: LazyLock<[[u64; 64]; 2]> = LazyLock::new(|| {
             if file < 7 {
                 white_mask |= 1u64 << (r * 8 + file + 1);
             }
+            r += 1;
         }
         masks[Side::White as usize][sq] = white_mask;
 
         let mut black_mask = 0;
-        for r in row + 1..8 {
+        let mut r = row + 1;
+        while r < 8 {
             black_mask |= 1u64 << (r * 8 + file);
             if file > 0 {
                 black_mask |= 1u64 << (r * 8 + file - 1);
@@ -124,11 +132,13 @@ static PASSED_PAWN_MASKS: LazyLock<[[u64; 64]; 2]> = LazyLock::new(|| {
             if file < 7 {
                 black_mask |= 1u64 << (r * 8 + file + 1);
             }
+            r += 1;
         }
         masks[Side::Black as usize][sq] = black_mask;
+        sq += 1;
     }
     masks
-});
+};
 
 #[cfg(test)]
 mod tests {
