@@ -1,5 +1,4 @@
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
-use rudim::bitboard::lookups;
 use rudim::board::state::BoardState;
 use rudim::common::helpers::{ADVANCED_MOVE_FEN, ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
 use rudim::engine;
@@ -10,7 +9,7 @@ use std::time::Duration;
 static INIT: Once = Once::new();
 
 fn ensure_initialized() {
-    INIT.call_once(lookups::init);
+    INIT.call_once(rudim::init);
 }
 
 fn benchmark_find_best_move(c: &mut Criterion) {
