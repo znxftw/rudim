@@ -10,6 +10,7 @@ pub struct PieceSquareTableEvaluation;
 
 impl PieceSquareTableEvaluation {
     pub fn evaluate(board_state: &BoardState) -> i16 {
+        // TODO: score is deterministic per board state, can potentially cache it
         let mut score: i16 = 0;
 
         score += Self::score_position(board_state);
