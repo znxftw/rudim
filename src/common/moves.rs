@@ -10,7 +10,6 @@ pub struct Move {
     pub source: Square,
     pub target: Square,
     pub move_type: MoveType,
-    pub score: i32,
 }
 
 impl Move {
@@ -18,7 +17,6 @@ impl Move {
         source: Square::NoSquare,
         target: Square::NoSquare,
         move_type: MoveType::Quiet,
-        score: 0,
     };
 
     pub fn new(source: Square, target: Square, move_type: MoveType) -> Self {
@@ -26,7 +24,6 @@ impl Move {
             source,
             target,
             move_type,
-            score: 0,
         }
     }
 
@@ -111,8 +108,7 @@ mod tests {
     #[test]
     fn test_move_equality() {
         let m1 = Move::new(Square::E2, Square::E4, MoveType::Quiet);
-        let mut m2 = Move::new(Square::E2, Square::E4, MoveType::Quiet);
-        m2.score = 100;
+        let m2 = Move::new(Square::E2, Square::E4, MoveType::Quiet);
 
         assert_eq!(m1, m2);
     }

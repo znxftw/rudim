@@ -26,7 +26,7 @@ pub struct TranspositionTable {
 }
 
 impl TranspositionTable {
-    // 65536 * 32 * 24 bytes = 48 MB
+    // 65536 * 32 * 16 bytes = 32 MB
     pub const DEFAULT_CAPACITY: usize = 65536 * 32;
 
     pub fn new(capacity: usize) -> Self {

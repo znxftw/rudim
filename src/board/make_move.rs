@@ -314,13 +314,13 @@ mod tests {
 
             let parsed_move = Move::parse_long_algebraic(move_str).unwrap();
             let mut found_move = Move::NO_MOVE;
-            for &m in &board_state.moves {
-                if m.source == parsed_move.source
-                    && m.target == parsed_move.target
+            for m in &board_state.moves {
+                if m.mv.source == parsed_move.source
+                    && m.mv.target == parsed_move.target
                     && (parsed_move.move_type == MoveType::Quiet
-                        || ((m.move_type.value() & !8) == parsed_move.move_type.value()))
+                        || ((m.mv.move_type.value() & !8) == parsed_move.move_type.value()))
                 {
-                    found_move = m;
+                    found_move = m.mv;
                     break;
                 }
             }
@@ -381,9 +381,9 @@ mod tests {
             let parsed_move = Move::parse_long_algebraic(move_str)
                 .unwrap_or_else(|| panic!("Failed to parse move: '{}'", move_str));
             let mut found_move = Move::NO_MOVE;
-            for &m in &board_state.moves {
-                if m.source == parsed_move.source && m.target == parsed_move.target {
-                    found_move = m;
+            for m in &board_state.moves {
+                if m.mv.source == parsed_move.source && m.mv.target == parsed_move.target {
+                    found_move = m.mv;
                     break;
                 }
             }
@@ -404,9 +404,9 @@ mod tests {
             board.generate_moves();
             let parsed = Move::parse_long_algebraic(move_str).unwrap();
             let mut found = Move::NO_MOVE;
-            for &m in &board.moves {
-                if m.source == parsed.source && m.target == parsed.target {
-                    found = m;
+            for m in &board.moves {
+                if m.mv.source == parsed.source && m.mv.target == parsed.target {
+                    found = m.mv;
                     break;
                 }
             }
@@ -588,22 +588,20 @@ mod tests {
             source: Square::B7,
             target: Square::C6,
             move_type: MoveType::Quiet,
-            score: 0,
         });
         board.make_move(Move {
             source: Square::B1,
             target: Square::C3,
             move_type: MoveType::Quiet,
-            score: 0,
         });
         board.generate_moves();
         let double_push = board
             .moves
             .iter()
             .copied()
-            .find(|m| m.source == Square::F7 && m.target == Square::F5)
+            .find(|m| m.mv.source == Square::F7 && m.mv.target == Square::F5)
             .expect("f7f5 double push must exist");
-        board.make_move(double_push);
+        board.make_move(double_push.mv);
         assert_eq!(board.en_passant_square, Square::F6);
         assert_eq!(board.half_move_clock, 0);
     }

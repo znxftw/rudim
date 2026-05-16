@@ -6,6 +6,7 @@ pub mod move_type;
 pub mod moves;
 pub mod piece;
 pub mod random;
+pub mod scored_moves;
 pub mod side;
 pub mod square;
 pub mod tt;

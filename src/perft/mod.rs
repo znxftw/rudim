@@ -117,11 +117,11 @@ pub fn traverse(board_state: &mut BoardState, depth: u8) -> u64 {
     let moves = board_state.moves.clone();
 
     for move_ in moves {
-        board_state.make_move(move_);
+        board_state.make_move(move_.mv);
         if !board_state.is_in_check(board_state.side_to_move.other()) {
             nodes += traverse(board_state, depth - 1);
         }
-        board_state.unmake_move(move_);
+        board_state.unmake_move(move_.mv);
     }
 
     nodes

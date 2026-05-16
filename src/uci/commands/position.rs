@@ -71,13 +71,13 @@ impl UciClient {
         let mut board = self.board.lock().unwrap();
         board.generate_moves();
 
-        for &m in &board.moves {
-            if m.source == move_obj.source
-                && m.target == move_obj.target
+        for m in &board.moves {
+            if m.mv.source == move_obj.source
+                && m.mv.target == move_obj.target
                 && (move_obj.move_type == MoveType::Quiet
-                    || ((m.move_type.value() & !8) == move_obj.move_type.value()))
+                    || ((m.mv.move_type.value() & !8) == move_obj.move_type.value()))
             {
-                return m;
+                return m.mv;
             }
         }
 
@@ -93,13 +93,13 @@ mod tests {
 
     fn find_move_from_move_list(board: &mut BoardState, move_obj: Move) -> Move {
         board.generate_moves();
-        for &m in &board.moves {
-            if m.source == move_obj.source
-                && m.target == move_obj.target
+        for m in &board.moves {
+            if m.mv.source == move_obj.source
+                && m.mv.target == move_obj.target
                 && (move_obj.move_type == MoveType::Quiet
-                    || ((m.move_type.value() & !8) == move_obj.move_type.value()))
+                    || ((m.mv.move_type.value() & !8) == move_obj.move_type.value()))
             {
-                return m;
+                return m.mv;
             }
         }
         Move::NO_MOVE

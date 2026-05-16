@@ -9,6 +9,7 @@ use crate::common::constants::{PIECES, SIDES, SIDES_WITH_BOTH, SQUARES};
 use crate::common::game_phase::{add_phase, remove_phase};
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
+use crate::common::scored_moves::ScoredMove;
 use crate::common::side::Side;
 use crate::common::square::Square;
 use std::fmt;
@@ -33,7 +34,7 @@ pub struct BoardState {
     pub side_to_move: Side,
     pub en_passant_square: Square,
     pub castle: Castle,
-    pub moves: Vec<Move>,
+    pub moves: Vec<ScoredMove>,
     pub move_count: i32,
     pub best_move: Move,
     pub phase: i32,

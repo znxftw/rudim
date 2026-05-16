@@ -8,6 +8,7 @@ use crate::common::castle::Castle;
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
+use crate::common::scored_moves::ScoredMove;
 use crate::common::side::Side;
 use crate::common::square::Square;
 use crate::search::iterative_deepening;
@@ -177,7 +178,7 @@ impl BoardState {
                 && !self.is_square_attacked(Square::F1, Side::Black)
             {
                 self.moves
-                    .push(Move::new(Square::E1, Square::G1, MoveType::Castle));
+                    .push(ScoredMove::new(Square::E1, Square::G1, MoveType::Castle));
             }
             if self.castle.contains(Castle::WHITE_LONG)
                 && occ.get_bit(Square::D1 as usize) == 0
@@ -187,7 +188,7 @@ impl BoardState {
                 && !self.is_square_attacked(Square::D1, Side::Black)
             {
                 self.moves
-                    .push(Move::new(Square::E1, Square::C1, MoveType::Castle));
+                    .push(ScoredMove::new(Square::E1, Square::C1, MoveType::Castle));
             }
         } else {
             if self.castle.contains(Castle::BLACK_SHORT)
@@ -197,7 +198,7 @@ impl BoardState {
                 && !self.is_square_attacked(Square::F8, Side::White)
             {
                 self.moves
-                    .push(Move::new(Square::E8, Square::G8, MoveType::Castle));
+                    .push(ScoredMove::new(Square::E8, Square::G8, MoveType::Castle));
             }
             if self.castle.contains(Castle::BLACK_LONG)
                 && occ.get_bit(Square::D8 as usize) == 0
@@ -207,7 +208,7 @@ impl BoardState {
                 && !self.is_square_attacked(Square::D8, Side::White)
             {
                 self.moves
-                    .push(Move::new(Square::E8, Square::C8, MoveType::Castle));
+                    .push(ScoredMove::new(Square::E8, Square::C8, MoveType::Castle));
             }
         }
     }
@@ -230,7 +231,7 @@ impl BoardState {
         } else {
             MoveType::Quiet
         };
-        self.moves.push(Move::new(
+        self.moves.push(ScoredMove::new(
             Square::from(source),
             Square::from(target),
             move_type,
@@ -245,7 +246,7 @@ impl BoardState {
             let capture = self.is_square_capture(target);
             let src = Square::from(source);
             let tgt = Square::from(target);
-            self.moves.push(Move::new(
+            self.moves.push(ScoredMove::new(
                 src,
                 tgt,
                 if capture {
@@ -254,7 +255,7 @@ impl BoardState {
                     MoveType::KnightPromotion
                 },
             ));
-            self.moves.push(Move::new(
+            self.moves.push(ScoredMove::new(
                 src,
                 tgt,
                 if capture {
@@ -263,7 +264,7 @@ impl BoardState {
                     MoveType::BishopPromotion
                 },
             ));
-            self.moves.push(Move::new(
+            self.moves.push(ScoredMove::new(
                 src,
                 tgt,
                 if capture {
@@ -272,7 +273,7 @@ impl BoardState {
                     MoveType::RookPromotion
                 },
             ));
-            self.moves.push(Move::new(
+            self.moves.push(ScoredMove::new(
                 src,
                 tgt,
                 if capture {
@@ -282,7 +283,7 @@ impl BoardState {
                 },
             ));
         } else if enpassant || double_push {
-            self.moves.push(Move::new(
+            self.moves.push(ScoredMove::new(
                 Square::from(source),
                 Square::from(target),
                 if enpassant {
@@ -326,7 +327,7 @@ mod tests {
     fn starting_position_has_no_castle_moves() {
         let mut board = BoardState::parse_fen(STARTING_FEN);
         board.generate_moves();
-        let castle_count = board.moves.iter().filter(|m| m.is_castle()).count();
+        let castle_count = board.moves.iter().filter(|m| m.mv.is_castle()).count();
         assert_eq!(castle_count, 0, "No castling from starting position");
     }
 
@@ -334,7 +335,7 @@ mod tests {
     fn kiwi_pete_has_castle_moves() {
         let mut board = BoardState::parse_fen(KIWI_PETE_FEN);
         board.generate_moves();
-        let castle_count = board.moves.iter().filter(|m| m.is_castle()).count();
+        let castle_count = board.moves.iter().filter(|m| m.mv.is_castle()).count();
         assert_eq!(
             castle_count, 2,
             "KiwiPete should have exactly 2 castling options"
@@ -345,7 +346,7 @@ mod tests {
     fn advanced_fen_has_promotion_moves() {
         let mut board = BoardState::parse_fen(ADVANCED_MOVE_FEN);
         board.generate_moves();
-        let promo_count = board.moves.iter().filter(|m| m.is_promotion()).count();
+        let promo_count = board.moves.iter().filter(|m| m.mv.is_promotion()).count();
         assert_eq!(
             promo_count, 12,
             "AdvancedMove FEN should have exactly 12 promotions"
@@ -359,7 +360,7 @@ mod tests {
         let ep_count = board
             .moves
             .iter()
-            .filter(|m| m.move_type == MoveType::EnPassant)
+            .filter(|m| m.mv.move_type == MoveType::EnPassant)
             .count();
         assert_eq!(
             ep_count, 1,

@@ -3,6 +3,7 @@ use crate::common::constants::{MAX_PLY, PIECES, SQUARES};
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
+use crate::common::scored_moves::ScoredMove;
 use std::sync::{LazyLock, Mutex};
 
 pub struct MoveOrdering {
@@ -30,25 +31,32 @@ impl MoveOrdering {
         }
     }
 
-    pub fn populate_move_score(&self, move_obj: &mut Move, board_state: &BoardState, ply: usize) {
-        if !move_obj.is_capture() {
-            if *move_obj == self.killer_moves[0][ply] {
+    pub fn populate_move_score(
+        &self,
+        move_obj: &mut ScoredMove,
+        board_state: &BoardState,
+        ply: usize,
+    ) {
+        if !move_obj.mv.is_capture() {
+            if move_obj.mv == self.killer_moves[0][ply] {
                 move_obj.score = 9000;
-            } else if *move_obj == self.killer_moves[1][ply] {
+            } else if move_obj.mv == self.killer_moves[1][ply] {
                 move_obj.score = 8000;
             } else {
-                let piece = board_state.get_piece_on(move_obj.source);
+                let piece = board_state.get_piece_on(move_obj.mv.source);
                 if piece != -1 {
-                    move_obj.score = self.history_moves[piece as usize][move_obj.target as usize];
+                    move_obj.score =
+                        self.history_moves[piece as usize][move_obj.mv.target as usize];
                 }
             }
             return;
         };
-        let source_piece = board_state.get_piece_on_side(move_obj.source, board_state.side_to_move);
-        let target_piece: usize = if move_obj.move_type == MoveType::EnPassant {
+        let source_piece =
+            board_state.get_piece_on_side(move_obj.mv.source, board_state.side_to_move);
+        let target_piece: usize = if move_obj.mv.move_type == MoveType::EnPassant {
             Piece::Pawn as usize
         } else {
-            board_state.get_piece_on_side(move_obj.target, board_state.side_to_move.other())
+            board_state.get_piece_on_side(move_obj.mv.target, board_state.side_to_move.other())
         };
 
         move_obj.score = MVV_LVA[target_piece][source_piece];
@@ -82,11 +90,11 @@ impl MoveOrdering {
                 .all(|row| row.iter().all(|&s| s == 0))
     }
 
-    pub fn populate_hash_move(move_obj: &mut Move) {
+    pub fn populate_hash_move(move_obj: &mut ScoredMove) {
         move_obj.score = 1_000_000;
     }
 
-    pub fn sort_next_best_move(moves: &mut [Move], starting_index: usize) {
+    pub fn sort_next_best_move(moves: &mut [ScoredMove], starting_index: usize) {
         if let Some((best_offset, _)) = moves[starting_index..]
             .iter()
             .enumerate()
@@ -109,7 +117,7 @@ impl Default for MoveOrdering {
 pub static MOVE_ORDERING: LazyLock<Mutex<MoveOrdering>> =
     LazyLock::new(|| Mutex::new(MoveOrdering::new()));
 
-pub fn populate_move_scores(moves: &mut [Move], board_state: &BoardState, ply: usize) {
+pub fn populate_move_scores(moves: &mut [ScoredMove], board_state: &BoardState, ply: usize) {
     let move_ordering = MOVE_ORDERING.lock().unwrap();
     for move_obj in moves.iter_mut() {
         move_ordering.populate_move_score(move_obj, board_state, ply);
@@ -136,7 +144,7 @@ pub fn is_move_heuristic_empty() -> bool {
     move_ordering.is_move_heuristic_empty()
 }
 
-pub fn populate_hash_move(move_obj: &mut Move) {
+pub fn populate_hash_move(move_obj: &mut ScoredMove) {
     MoveOrdering::populate_hash_move(move_obj);
 }
 
@@ -148,22 +156,28 @@ mod tests {
     #[test]
     fn should_sort_moves_by_score() {
         let mut moves = vec![
-            Move {
-                source: Square::E2,
-                target: Square::E4,
-                move_type: MoveType::Quiet,
+            ScoredMove {
+                mv: Move {
+                    source: Square::E2,
+                    target: Square::E4,
+                    move_type: MoveType::Quiet,
+                },
                 score: 100,
             },
-            Move {
-                source: Square::D2,
-                target: Square::D4,
-                move_type: MoveType::Quiet,
+            ScoredMove {
+                mv: Move {
+                    source: Square::D2,
+                    target: Square::D4,
+                    move_type: MoveType::Quiet,
+                },
                 score: 300,
             },
-            Move {
-                source: Square::G1,
-                target: Square::F3,
-                move_type: MoveType::Quiet,
+            ScoredMove {
+                mv: Move {
+                    source: Square::G1,
+                    target: Square::F3,
+                    move_type: MoveType::Quiet,
+                },
                 score: 200,
             },
         ];
@@ -176,22 +190,28 @@ mod tests {
     #[test]
     fn should_not_change_order_if_already_sorted() {
         let mut moves = vec![
-            Move {
-                source: Square::D2,
-                target: Square::D4,
-                move_type: MoveType::Quiet,
+            ScoredMove {
+                mv: Move {
+                    source: Square::D2,
+                    target: Square::D4,
+                    move_type: MoveType::Quiet,
+                },
                 score: 300,
             },
-            Move {
-                source: Square::G1,
-                target: Square::F3,
-                move_type: MoveType::Quiet,
+            ScoredMove {
+                mv: Move {
+                    source: Square::G1,
+                    target: Square::F3,
+                    move_type: MoveType::Quiet,
+                },
                 score: 200,
             },
-            Move {
-                source: Square::E2,
-                target: Square::E4,
-                move_type: MoveType::Quiet,
+            ScoredMove {
+                mv: Move {
+                    source: Square::E2,
+                    target: Square::E4,
+                    move_type: MoveType::Quiet,
+                },
                 score: 100,
             },
         ];

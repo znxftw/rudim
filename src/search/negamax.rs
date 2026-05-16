@@ -103,7 +103,7 @@ fn search_internal(
     let mut moves = board_state.moves.clone();
     for i in 0..moves.len() {
         move_ordering::MoveOrdering::sort_next_best_move(&mut moves, i);
-        let move_obj = moves[i];
+        let move_obj = moves[i].mv;
 
         if cancellation_token.load(Ordering::Relaxed) {
             break;
@@ -311,7 +311,7 @@ fn populate_move_scores(
         && hash_move != crate::common::moves::Move::NO_MOVE
     {
         for move_obj in &mut moves {
-            if *move_obj == hash_move {
+            if move_obj.mv == hash_move {
                 move_ordering::populate_hash_move(move_obj);
                 break;
             }

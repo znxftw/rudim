@@ -34,7 +34,7 @@ pub fn search(
 
     for i in 0..moves.len() {
         move_ordering::MoveOrdering::sort_next_best_move(&mut moves, i);
-        let move_obj = moves[i];
+        let move_obj = moves[i].mv;
 
         if cancellation_token.load(Ordering::Relaxed) {
             break;
