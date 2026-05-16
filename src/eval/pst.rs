@@ -9,8 +9,8 @@ use std::sync::LazyLock;
 pub struct PieceSquareTableEvaluation;
 
 impl PieceSquareTableEvaluation {
-    pub fn evaluate(board_state: &BoardState) -> i32 {
-        let mut score = 0;
+    pub fn evaluate(board_state: &BoardState) -> i16 {
+        let mut score: i16 = 0;
 
         score += Self::score_position(board_state);
         score += PawnStructureEvaluation::evaluate(board_state);
@@ -22,7 +22,7 @@ impl PieceSquareTableEvaluation {
         }
     }
 
-    fn score_position(board_state: &BoardState) -> i32 {
+    fn score_position(board_state: &BoardState) -> i16 {
         let mut positional_score = 0;
         let mid_game_phase = board_state.clipped_phase();
         let end_game_phase = game_phase::TOTAL_PHASE - mid_game_phase;
@@ -34,21 +34,21 @@ impl PieceSquareTableEvaluation {
             while white_board.0 > 0 {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
-                positional_score += (mid_game_positions()[piece_idx][square] * mid_game_phase)
-                    + (end_game_positions()[piece_idx][square] * end_game_phase);
+                positional_score += (mid_game_positions()[piece_idx][square] as i32 * mid_game_phase)
+                    + (end_game_positions()[piece_idx][square] as i32 * end_game_phase);
             }
 
             while black_board.0 > 0 {
                 let square = black_board.get_lsb() as usize;
                 black_board.clear_bit(square);
                 let mirrored_square = Self::mirror_square(square);
-                positional_score -= (mid_game_positions()[piece_idx][mirrored_square]
+                positional_score -= (mid_game_positions()[piece_idx][mirrored_square] as i32
                     * mid_game_phase)
-                    + (end_game_positions()[piece_idx][mirrored_square] * end_game_phase);
+                    + (end_game_positions()[piece_idx][mirrored_square] as i32 * end_game_phase);
             }
         }
 
-        (positional_score as f64 * game_phase::PHASE_FACTOR) as i32
+        (positional_score as f64 * game_phase::PHASE_FACTOR) as i16
     }
 
     fn mirror_square(square: usize) -> usize {
@@ -64,7 +64,7 @@ pub fn init() {
 }
 
 #[inline(always)]
-fn mid_game_positions() -> &'static [[i32; 64]; 6] {
+fn mid_game_positions() -> &'static [[i16; 64]; 6] {
     #[cfg(debug_assertions)]
     {
         LazyLock::force(&MID_GAME_POSITIONS)
@@ -78,7 +78,7 @@ fn mid_game_positions() -> &'static [[i32; 64]; 6] {
 }
 
 #[inline(always)]
-fn end_game_positions() -> &'static [[i32; 64]; 6] {
+fn end_game_positions() -> &'static [[i16; 64]; 6] {
     #[cfg(debug_assertions)]
     {
         LazyLock::force(&END_GAME_POSITIONS)
@@ -91,7 +91,7 @@ fn end_game_positions() -> &'static [[i32; 64]; 6] {
     }
 }
 
-static MID_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
+static MID_GAME_POSITIONS: LazyLock<[[i16; 64]; 6]> = LazyLock::new(|| {
     let piece_values = [82, 337, 365, 477, 1025, 0];
     // Values borrowed from Rofchade
     // http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19
@@ -146,7 +146,7 @@ static MID_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
     tables
 });
 
-static END_GAME_POSITIONS: LazyLock<[[i32; 64]; 6]> = LazyLock::new(|| {
+static END_GAME_POSITIONS: LazyLock<[[i16; 64]; 6]> = LazyLock::new(|| {
     let piece_values = [94, 281, 297, 512, 936, 0];
     let mut tables = [
         // Pawn

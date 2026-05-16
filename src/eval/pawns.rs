@@ -3,31 +3,31 @@ use crate::common::constants;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 
-const DOUBLED_PAWN_PENALTY: i32 = 10;
-const ISOLATED_PAWN_PENALTY: i32 = 20;
+const DOUBLED_PAWN_PENALTY: i16 = 10;
+const ISOLATED_PAWN_PENALTY: i16 = 20;
 
 // Passed pawn bonus indexed by row (0 = rank 8, 7 = rank 1).
-const PASSED_PAWN_BONUS: [i32; 8] = [0, 100, 70, 50, 30, 20, 10, 0];
+const PASSED_PAWN_BONUS: [i16; 8] = [0, 100, 70, 50, 30, 20, 10, 0];
 
 pub struct PawnStructureEvaluation;
 
 impl PawnStructureEvaluation {
     // Returns score from white's perspective (positive = good for white)
-    pub fn evaluate(board_state: &BoardState) -> i32 {
+    pub fn evaluate(board_state: &BoardState) -> i16 {
         let white_pawns = board_state.pieces[Side::White as usize][Piece::Pawn as usize].0;
         let black_pawns = board_state.pieces[Side::Black as usize][Piece::Pawn as usize].0;
 
-        let mut score = 0;
+        let mut score: i16 = 0;
         score += Self::score_doubled_pawns(white_pawns, black_pawns);
         score += Self::score_pawn_features(white_pawns, black_pawns);
         score
     }
 
-    fn score_doubled_pawns(white_pawns: u64, black_pawns: u64) -> i32 {
+    fn score_doubled_pawns(white_pawns: u64, black_pawns: u64) -> i16 {
         let mut score = 0;
         for &mask in &FILE_MASKS {
-            let white_count = (white_pawns & mask).count_ones() as i32;
-            let black_count = (black_pawns & mask).count_ones() as i32;
+            let white_count = (white_pawns & mask).count_ones() as i16;
+            let black_count = (black_pawns & mask).count_ones() as i16;
             if white_count > 1 {
                 score -= (white_count - 1) * DOUBLED_PAWN_PENALTY;
             }
@@ -38,7 +38,7 @@ impl PawnStructureEvaluation {
         score
     }
 
-    fn score_pawn_features(white_pawns: u64, black_pawns: u64) -> i32 {
+    fn score_pawn_features(white_pawns: u64, black_pawns: u64) -> i16 {
         let mut score = 0;
         let mut wp = white_pawns;
         while wp != 0 {

@@ -13,7 +13,7 @@ pub enum TranspositionEntryType {
 
 #[derive(Debug, Clone, Copy)]
 pub struct TranspositionTableEntry {
-    pub score: i32,
+    pub score: i16,
     pub hash: u64,
     pub depth: u8,
     pub best_move: Move,
@@ -58,10 +58,10 @@ impl TranspositionTable {
     pub fn get_entry(
         &self,
         hash: u64,
-        alpha: i32,
-        beta: i32,
+        alpha: i16,
+        beta: i16,
         depth: u8,
-    ) -> (bool, i32, Option<Move>) {
+    ) -> (bool, i16, Option<Move>) {
         let entry = match self.entries[(hash as usize) & (self.capacity - 1)] {
             Some(e) => e,
             None => return (false, 0, None),
@@ -97,7 +97,7 @@ impl TranspositionTable {
     pub fn submit_entry(
         &mut self,
         hash: u64,
-        score: i32,
+        score: i16,
         depth: u8,
         best_move: Move,
         entry_type: TranspositionEntryType,
@@ -162,22 +162,22 @@ impl TranspositionTable {
         pv
     }
 
-    pub fn adjust_score(score: i32, ply: i32) -> i32 {
+    pub fn adjust_score(score: i16, ply: i32) -> i16 {
         if !Self::is_close_to_checkmate(score) {
             return score;
         }
-        score + if score > 0 { ply } else { -ply }
+        score + if score > 0 { ply as i16 } else { -ply as i16 }
     }
 
-    pub fn retrieve_score(score: i32, ply: i32) -> i32 {
+    pub fn retrieve_score(score: i16, ply: i32) -> i16 {
         if !Self::is_close_to_checkmate(score) {
             return score;
         }
-        score + if score > 0 { -ply } else { ply }
+        score + if score > 0 { -ply as i16 } else { ply as i16 }
     }
 
-    fn is_close_to_checkmate(score: i32) -> bool {
-        MAX_CENTIPAWN_EVAL - score.abs() <= MAX_PLY as i32
+    fn is_close_to_checkmate(score: i16) -> bool {
+        (MAX_CENTIPAWN_EVAL as i32 - (score as i32).abs()) <= MAX_PLY as i32
     }
 }
 

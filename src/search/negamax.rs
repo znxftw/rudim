@@ -17,7 +17,7 @@ pub fn reset_state() {
     SEARCH_DEPTH.store(0, Ordering::Relaxed);
 }
 
-pub fn search(board_state: &mut BoardState, depth: u8, cancellation_token: &AtomicBool) -> i32 {
+pub fn search(board_state: &mut BoardState, depth: u8, cancellation_token: &AtomicBool) -> i16 {
     SEARCH_DEPTH.store(depth, Ordering::Relaxed);
     NODES.store(0, Ordering::Relaxed);
     quiescence::reset_nodes();
@@ -25,8 +25,8 @@ pub fn search(board_state: &mut BoardState, depth: u8, cancellation_token: &Atom
     search_internal(
         board_state,
         depth,
-        i32::MIN + 1,
-        i32::MAX - 1,
+        i16::MIN + 1,
+        i16::MAX - 1,
         true,
         cancellation_token,
     )
@@ -35,11 +35,11 @@ pub fn search(board_state: &mut BoardState, depth: u8, cancellation_token: &Atom
 fn search_internal(
     board_state: &mut BoardState,
     depth: u8,
-    mut alpha: i32,
-    beta: i32,
+    mut alpha: i16,
+    beta: i16,
     allow_null_move: bool,
     cancellation_token: &AtomicBool,
-) -> i32 {
+) -> i16 {
     let ply = SEARCH_DEPTH.load(Ordering::Relaxed) - depth;
     let is_pv_node = beta > 1 + alpha; // beta - alpha > 1 overflow
 
@@ -176,7 +176,7 @@ fn search_internal(
 
     if number_of_legal_moves == 0 {
         if board_state.is_in_check(board_state.side_to_move) {
-            return -constants::MAX_CENTIPAWN_EVAL + ply as i32;
+            return -constants::MAX_CENTIPAWN_EVAL + ply as i16;
         }
         return 0;
     }
@@ -198,12 +198,12 @@ fn search_internal(
 fn search_deeper(
     board_state: &mut BoardState,
     depth: u8,
-    alpha: i32,
-    beta: i32,
+    alpha: i16,
+    beta: i16,
     cancellation_token: &AtomicBool,
     found_pv: bool,
     allow_null_move: bool,
-) -> i32 {
+) -> i16 {
     if found_pv {
         principal_variation_search(
             board_state,
@@ -228,11 +228,11 @@ fn search_deeper(
 fn principal_variation_search(
     board_state: &mut BoardState,
     depth: u8,
-    alpha: i32,
-    beta: i32,
+    alpha: i16,
+    beta: i16,
     allow_null_move: bool,
     cancellation_token: &AtomicBool,
-) -> i32 {
+) -> i16 {
     let mut score = -search_internal(
         board_state,
         depth - 1,
@@ -255,11 +255,11 @@ fn principal_variation_search(
 }
 
 fn alpha_update(
-    score: i32,
+    score: i16,
     move_obj: crate::common::moves::Move,
     board_state: &mut BoardState,
     depth: u8,
-    alpha: &mut i32,
+    alpha: &mut i16,
     found_pv: &mut bool,
     entry_type: &mut TranspositionEntryType,
 ) {
@@ -274,12 +274,12 @@ fn alpha_update(
 }
 
 fn beta_cutoff(
-    beta: i32,
+    beta: i16,
     move_obj: crate::common::moves::Move,
     ply: usize,
     board_state: &BoardState,
     depth: u8,
-) -> i32 {
+) -> i16 {
     {
         let mut table = tt::TT.lock().unwrap();
         table.submit_entry(

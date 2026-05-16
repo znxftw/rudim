@@ -9,7 +9,7 @@ use std::time::Instant;
 #[derive(Debug, Clone, Copy)]
 struct IterativeState {
     best_move: Move,
-    score: i32,
+    score: i16,
     nodes: i32,
 }
 
@@ -25,7 +25,7 @@ pub fn best_move() -> Move {
     STATE.lock().unwrap().best_move
 }
 
-pub fn score() -> i32 {
+pub fn score() -> i16 {
     STATE.lock().unwrap().score
 }
 

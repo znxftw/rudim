@@ -8,10 +8,10 @@ static NODES: AtomicI32 = AtomicI32::new(0);
 
 pub fn search(
     board_state: &mut BoardState,
-    mut alpha: i32,
-    beta: i32,
+    mut alpha: i16,
+    beta: i16,
     cancellation_token: &AtomicBool,
-) -> i32 {
+) -> i16 {
     NODES.fetch_add(1, Ordering::Relaxed);
 
     if board_state.is_draw() {
