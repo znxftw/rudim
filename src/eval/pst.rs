@@ -34,7 +34,8 @@ impl PieceSquareTableEvaluation {
             while white_board.0 > 0 {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
-                positional_score += (mid_game_positions()[piece_idx][square] as i32 * mid_game_phase)
+                positional_score += (mid_game_positions()[piece_idx][square] as i32
+                    * mid_game_phase)
                     + (end_game_positions()[piece_idx][square] as i32 * end_game_phase);
             }
 
