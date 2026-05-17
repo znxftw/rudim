@@ -100,10 +100,7 @@ impl BoardState {
 
         while attacks.0 > 0 {
             let target = attacks.get_lsb() as usize;
-            // TODO: revisit, is this check redundant? (enemy_occ and self_occ cannot both be 1)
-            if self.occupancies[self.side_to_move as usize].get_bit(target) == 0 {
-                self.add_pawn_move(source, target, false, false);
-            }
+            self.add_pawn_move(source, target, false, false);
             attacks.clear_bit(target);
         }
     }
