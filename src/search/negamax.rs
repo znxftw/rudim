@@ -73,7 +73,7 @@ fn search_internal(
     if !is_pv_node && !in_check {
         let eval = crate::eval::pst::PieceSquareTableEvaluation::evaluate(board_state);
         // TODO: tune
-        let margin = 120 * depth as i16;
+        let margin = 150 * depth as i16;
         if eval.saturating_sub(margin) >= beta {
             return eval;
         }
