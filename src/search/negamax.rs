@@ -41,7 +41,7 @@ fn search_internal(
     cancellation_token: &AtomicBool,
 ) -> i16 {
     let ply = SEARCH_DEPTH.load(Ordering::Relaxed) - depth;
-    let is_pv_node = beta > 1 + alpha; // beta - alpha > 1 overflow
+    let is_pv_node = beta > 1 + alpha;
     let in_check = board_state.is_in_check(board_state.side_to_move);
 
     NODES.fetch_add(1, Ordering::Relaxed);
@@ -68,7 +68,7 @@ fn search_internal(
         return quiescence::search(board_state, alpha, beta, cancellation_token);
     }
 
-    // Reverse Futility Pruning
+    // PRUNE: Reverse Futility Pruning
     // TODO: tune conditions
     if !is_pv_node && !in_check {
         let eval = crate::eval::pst::PieceSquareTableEvaluation::evaluate(board_state);
@@ -79,6 +79,7 @@ fn search_internal(
         }
     }
 
+    // PRUNE: Null Move Pruning
     if crate::search::nmp::can_prune(is_pv_node, board_state, allow_null_move, depth, in_check) {
         board_state.make_null_move();
         let reduction = crate::search::nmp::get_reduction(depth);
@@ -139,6 +140,7 @@ fn search_internal(
 
         let mut score;
 
+        // REDUCTION: Late Move Reductions
         if needs_lmr {
             let reduction = crate::search::lmr::get_reduction(depth, number_of_legal_moves);
             score = -search_internal(
