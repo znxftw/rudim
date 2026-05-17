@@ -136,7 +136,6 @@ impl TranspositionTable {
                 break;
             }
 
-            // TODO: revisit, is this needed?
             if entry.best_move == Move::NO_MOVE {
                 break;
             }
