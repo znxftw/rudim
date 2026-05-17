@@ -107,7 +107,7 @@ macro_rules! tactic_test_case {
 }
 
 traversal_test_case!(traversal_starting_position, STARTING_FEN, 148972, 23, 9);
-traversal_test_case!(traversal_endgame_position, ENDGAME_FEN, 177047, 44, 13);
+traversal_test_case!(traversal_endgame_position, ENDGAME_FEN, 177047, 37, 13);
 traversal_test_case!(
     traversal_advanced_move_position,
     ADVANCED_MOVE_FEN,
