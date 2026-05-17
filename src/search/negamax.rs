@@ -68,6 +68,17 @@ fn search_internal(
         return quiescence::search(board_state, alpha, beta, cancellation_token);
     }
 
+    // Reverse Futility Pruning
+    // TODO: tune conditions
+    if depth <= 4 && !is_pv_node && !in_check {
+        let eval = crate::eval::pst::PieceSquareTableEvaluation::evaluate(board_state);
+        // TODO: tune
+        let margin = 150 * depth as i16;
+        if eval.saturating_sub(margin) >= beta {
+            return eval.saturating_sub(margin);
+        }
+    }
+
     if crate::search::nmp::can_prune(is_pv_node, board_state, allow_null_move, depth, in_check) {
         board_state.make_null_move();
         let reduction = crate::search::nmp::get_reduction(depth);
