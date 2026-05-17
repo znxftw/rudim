@@ -16,20 +16,20 @@ fn benchmark_find_best_move(c: &mut Criterion) {
     ensure_initialized();
 
     let cases = [
-        ("AdvancedMove", ADVANCED_MOVE_FEN, 6),
-        ("AdvancedMove", ADVANCED_MOVE_FEN, 7),
-        ("Starting", STARTING_FEN, 6),
-        ("Starting", STARTING_FEN, 7),
-        ("Endgame", ENDGAME_FEN, 6),
-        ("Endgame", ENDGAME_FEN, 7),
+        ("AdvancedMove", ADVANCED_MOVE_FEN, 9),
+        ("AdvancedMove", ADVANCED_MOVE_FEN, 10),
+        ("Starting", STARTING_FEN, 8),
+        ("Starting", STARTING_FEN, 9),
+        ("Endgame", ENDGAME_FEN, 11),
+        ("Endgame", ENDGAME_FEN, 12),
         ("KiwiPete", KIWI_PETE_FEN, 6),
         ("KiwiPete", KIWI_PETE_FEN, 7),
     ];
 
     let mut group = c.benchmark_group("find_best_move");
-    group.sample_size(10);
+    group.sample_size(1000);
     group.warm_up_time(Duration::from_secs(3));
-    group.measurement_time(Duration::from_secs(12));
+    group.measurement_time(Duration::from_secs(25));
 
     for (name, fen, depth) in cases {
         group.bench_with_input(
