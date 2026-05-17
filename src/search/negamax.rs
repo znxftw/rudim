@@ -42,6 +42,7 @@ fn search_internal(
 ) -> i16 {
     let ply = SEARCH_DEPTH.load(Ordering::Relaxed) - depth;
     let is_pv_node = beta > 1 + alpha; // beta - alpha > 1 overflow
+    let in_check = board_state.is_in_check(board_state.side_to_move);
 
     NODES.fetch_add(1, Ordering::Relaxed);
 
@@ -67,7 +68,7 @@ fn search_internal(
         return quiescence::search(board_state, alpha, beta, cancellation_token);
     }
 
-    if can_prune_null_move(is_pv_node, board_state, allow_null_move, depth) {
+    if can_prune_null_move(is_pv_node, board_state, allow_null_move, depth, in_check) {
         board_state.make_null_move();
         let score = -search_internal(
             board_state,
@@ -115,7 +116,14 @@ fn search_internal(
             continue;
         }
 
-        let needs_lmr = crate::search::lmr::needs_reduction(depth, number_of_legal_moves);
+        let gives_check = board_state.is_in_check(board_state.side_to_move);
+        let is_tactical = move_obj.is_capture() || move_obj.is_promotion() || gives_check;
+        let needs_lmr = crate::search::lmr::needs_reduction(
+            depth,
+            number_of_legal_moves,
+            is_tactical,
+            in_check,
+        );
 
         let mut score;
 
@@ -175,7 +183,7 @@ fn search_internal(
     }
 
     if number_of_legal_moves == 0 {
-        if board_state.is_in_check(board_state.side_to_move) {
+        if in_check {
             return -constants::MAX_CENTIPAWN_EVAL + ply as i16;
         }
         return 0;
@@ -326,10 +334,11 @@ fn can_prune_null_move(
     board_state: &BoardState,
     allow_null_move: bool,
     depth: u8,
+    in_check: bool,
 ) -> bool {
     allow_null_move
         && !is_pv_node
-        && !board_state.is_in_check(board_state.side_to_move)
+        && !in_check
         && depth >= 2
         && board_state.phase > crate::common::game_phase::ONLY_PAWNS
 }
