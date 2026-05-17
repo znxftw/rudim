@@ -68,11 +68,12 @@ fn search_internal(
         return quiescence::search(board_state, alpha, beta, cancellation_token);
     }
 
-    if can_prune_null_move(is_pv_node, board_state, allow_null_move, depth, in_check) {
+    if crate::search::nmp::can_prune(is_pv_node, board_state, allow_null_move, depth, in_check) {
         board_state.make_null_move();
+        let reduction = crate::search::nmp::get_reduction(depth);
         let score = -search_internal(
             board_state,
-            depth.saturating_sub(3),
+            depth.saturating_sub(reduction),
             -beta,
             -beta + 1,
             false,
@@ -327,18 +328,4 @@ fn populate_move_scores(
     }
 
     board_state.moves = moves;
-}
-
-fn can_prune_null_move(
-    is_pv_node: bool,
-    board_state: &BoardState,
-    allow_null_move: bool,
-    depth: u8,
-    in_check: bool,
-) -> bool {
-    allow_null_move
-        && !is_pv_node
-        && !in_check
-        && depth >= 2
-        && board_state.phase > crate::common::game_phase::ONLY_PAWNS
 }
