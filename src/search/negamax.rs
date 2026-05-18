@@ -57,6 +57,8 @@ fn search_internal(
     ctx: &mut SearchContext,
 ) -> i16 {
     let ply = SEARCH_DEPTH.load(Ordering::Relaxed) - depth;
+    ctx.pv_table.clear(ply as usize);
+
     let is_pv_node = beta > 1 + alpha;
     let in_check = board_state.is_in_check(board_state.side_to_move);
 
@@ -69,8 +71,6 @@ fn search_internal(
     if ply as usize >= constants::MAX_PLY {
         return quiescence::search(board_state, alpha, beta, cancellation_token);
     }
-
-    ctx.pv_table.clear(ply as usize);
 
     let (has_value, tt_score, tt_best) = {
         let table = tt::TT.lock().unwrap();
