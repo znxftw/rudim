@@ -50,5 +50,5 @@ jobs:
           ./fastchess-linux-x86-64/fastchess \
             -engine cmd=./target/release/rudim name="Current Rudim" \
             -engine cmd=./stable-rudim/Rudim name="Stable Rudim" \
-            -games 250 -each tc=2+0.1 -concurrency 4 \
+            -games 250 -each tc=10+0.1 -concurrency 4 \
             -openings file=8moves_v3.pgn format=pgn
