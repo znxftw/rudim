@@ -3,8 +3,9 @@ use crate::common::constants;
 use crate::common::moves::Move;
 use crate::common::tt::{self, TranspositionEntryType};
 use crate::eval::move_ordering;
+use crate::eval::pst::PieceSquareTableEvaluation;
 use crate::search::pv_table::PvTable;
-use crate::search::quiescence;
+use crate::search::{lmr, nmp, quiescence};
 use std::sync::atomic::{AtomicBool, AtomicI32, AtomicU8, Ordering};
 
 static NODES: AtomicI32 = AtomicI32::new(0);
@@ -78,7 +79,7 @@ fn search_internal(
 
     if has_value {
         if let Some(best) = tt_best
-            && best != crate::common::moves::Move::NO_MOVE
+            && best != Move::NO_MOVE
         {
             board_state.best_move = best;
         }
@@ -92,7 +93,7 @@ fn search_internal(
     // PRUNE: Reverse Futility Pruning
     // TODO: tune conditions
     if !is_pv_node && !in_check {
-        let eval = crate::eval::pst::PieceSquareTableEvaluation::evaluate(board_state);
+        let eval = PieceSquareTableEvaluation::evaluate(board_state);
         // TODO: tune
         let margin = 150 * depth as i16;
         if eval.saturating_sub(margin) >= beta {
@@ -101,7 +102,7 @@ fn search_internal(
     }
 
     // PRUNE: Null Move Pruning
-    if crate::search::nmp::can_prune(
+    if nmp::can_prune(
         is_pv_node,
         board_state,
         ctx.allow_null_move,
@@ -109,7 +110,7 @@ fn search_internal(
         in_check,
     ) {
         board_state.make_null_move();
-        let reduction = crate::search::nmp::get_reduction(depth);
+        let reduction = nmp::get_reduction(depth);
         let score = -search_internal(
             board_state,
             depth.saturating_sub(reduction),
@@ -131,7 +132,7 @@ fn search_internal(
                 board_state.board_hash,
                 tt::TranspositionTable::adjust_score(beta, ply as i32),
                 depth,
-                crate::common::moves::Move::NO_MOVE,
+                Move::NO_MOVE,
                 TranspositionEntryType::Beta,
             );
             return beta;
@@ -169,18 +170,13 @@ fn search_internal(
 
         let gives_check = board_state.is_in_check(board_state.side_to_move);
         let is_tactical = move_obj.is_capture() || move_obj.is_promotion() || gives_check;
-        let needs_lmr = crate::search::lmr::needs_reduction(
-            depth,
-            number_of_legal_moves,
-            is_tactical,
-            in_check,
-        );
+        let needs_lmr = lmr::needs_reduction(depth, number_of_legal_moves, is_tactical, in_check);
 
         let mut score;
         let next_on_pv = ctx.on_pv_path && Some(move_obj) == pv_move;
         // REDUCTION: Late Move Reductions
         if needs_lmr {
-            let reduction = crate::search::lmr::get_reduction(depth, number_of_legal_moves);
+            let reduction = lmr::get_reduction(depth, number_of_legal_moves);
             score = -search_internal(
                 board_state,
                 depth.saturating_sub(1 + reduction),
@@ -342,7 +338,7 @@ fn principal_variation_search(
 
 fn alpha_update(
     score: i16,
-    move_obj: crate::common::moves::Move,
+    move_obj: Move,
     board_state: &mut BoardState,
     depth: u8,
     alpha: &mut i16,
@@ -359,13 +355,7 @@ fn alpha_update(
     *found_pv = true;
 }
 
-fn beta_cutoff(
-    beta: i16,
-    move_obj: crate::common::moves::Move,
-    ply: usize,
-    board_state: &BoardState,
-    depth: u8,
-) -> i16 {
+fn beta_cutoff(beta: i16, move_obj: Move, ply: usize, board_state: &BoardState, depth: u8) -> i16 {
     {
         let mut table = tt::TT.lock().unwrap();
         table.submit_entry(
