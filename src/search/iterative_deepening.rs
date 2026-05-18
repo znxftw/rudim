@@ -102,10 +102,44 @@ pub fn search(
             .join(" ");
 
         if *debug_mode {
+            let score_str = format_score(score_now);
             println!(
-                "info depth {} score cp {} nodes {} time {} nps {} pv {}",
-                current_depth, score_now, nodes_traversed_now, time_ms, nps, pv_string
+                "info depth {} score {} nodes {} time {} nps {} pv {}",
+                current_depth, score_str, nodes_traversed_now, time_ms, nps, pv_string
             );
         }
+    }
+}
+
+pub fn format_score(score: i16) -> String {
+    let score_abs = (score as i32).abs();
+    if (crate::common::constants::MAX_CENTIPAWN_EVAL as i32 - score_abs)
+        <= crate::common::constants::MAX_PLY as i32
+    {
+        let d = crate::common::constants::MAX_CENTIPAWN_EVAL as i32 - score_abs;
+        let y = (d + 1) / 2;
+        let sign = if score < 0 { -1 } else { 1 };
+        format!("mate {}", y * sign)
+    } else {
+        format!("cp {}", score)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_score() {
+        assert_eq!(format_score(100), "cp 100");
+        assert_eq!(format_score(-500), "cp -500");
+        assert_eq!(
+            format_score(crate::common::constants::MAX_CENTIPAWN_EVAL - 1),
+            "mate 1"
+        );
+        assert_eq!(
+            format_score(crate::common::constants::MAX_CENTIPAWN_EVAL - 3),
+            "mate 2"
+        );
     }
 }
