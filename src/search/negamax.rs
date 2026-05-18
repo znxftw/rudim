@@ -1,5 +1,6 @@
 use crate::board::state::BoardState;
 use crate::common::constants;
+use crate::common::moves::Move;
 use crate::common::tt::{self, TranspositionEntryType};
 use crate::eval::move_ordering;
 use crate::search::quiescence;
@@ -320,25 +321,9 @@ fn beta_cutoff(
     beta
 }
 
-fn populate_move_scores(
-    board_state: &mut BoardState,
-    ply: usize,
-    hash_move: Option<crate::common::moves::Move>,
-) {
+fn populate_move_scores(board_state: &mut BoardState, ply: usize, hash_move: Option<Move>) {
     // TODO: non-clone impl? mutable borrow?
     let mut moves = board_state.moves.clone();
-    move_ordering::populate_move_scores(&mut moves, board_state, ply);
-
-    if let Some(hash_move) = hash_move
-        && hash_move != crate::common::moves::Move::NO_MOVE
-    {
-        for move_obj in &mut moves {
-            if move_obj.mv == hash_move {
-                move_ordering::populate_hash_move(move_obj);
-                break;
-            }
-        }
-    }
-
+    move_ordering::populate_move_scores(&mut moves, board_state, ply, hash_move);
     board_state.moves = moves;
 }

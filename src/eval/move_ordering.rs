@@ -117,10 +117,22 @@ impl Default for MoveOrdering {
 pub static MOVE_ORDERING: LazyLock<Mutex<MoveOrdering>> =
     LazyLock::new(|| Mutex::new(MoveOrdering::new()));
 
-pub fn populate_move_scores(moves: &mut [ScoredMove], board_state: &BoardState, ply: usize) {
+pub fn populate_move_scores(
+    moves: &mut [ScoredMove],
+    board_state: &BoardState,
+    ply: usize,
+    hash_move: Option<Move>,
+) {
     let move_ordering = MOVE_ORDERING.lock().unwrap();
     for move_obj in moves.iter_mut() {
-        move_ordering.populate_move_score(move_obj, board_state, ply);
+        if let Some(hash_mv) = hash_move
+            && hash_mv != Move::NO_MOVE
+            && move_obj.mv == hash_mv
+        {
+            MoveOrdering::populate_hash_move(move_obj);
+        } else {
+            move_ordering.populate_move_score(move_obj, board_state, ply);
+        }
     }
 }
 
