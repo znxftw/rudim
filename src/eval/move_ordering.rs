@@ -94,6 +94,10 @@ impl MoveOrdering {
         move_obj.score = 1_000_000;
     }
 
+    pub fn populate_pv_move(move_obj: &mut ScoredMove) {
+        move_obj.score = 2_000_000;
+    }
+
     pub fn sort_next_best_move(moves: &mut [ScoredMove], starting_index: usize) {
         if let Some((best_offset, _)) = moves[starting_index..]
             .iter()
@@ -122,10 +126,16 @@ pub fn populate_move_scores(
     board_state: &BoardState,
     ply: usize,
     hash_move: Option<Move>,
+    pv_move: Option<Move>,
 ) {
     let move_ordering = MOVE_ORDERING.lock().unwrap();
     for move_obj in moves.iter_mut() {
-        if let Some(hash_mv) = hash_move
+        if let Some(pv_mv) = pv_move
+            && pv_mv != Move::NO_MOVE
+            && move_obj.mv == pv_mv
+        {
+            MoveOrdering::populate_pv_move(move_obj);
+        } else if let Some(hash_mv) = hash_move
             && hash_mv != Move::NO_MOVE
             && move_obj.mv == hash_mv
         {
@@ -158,6 +168,10 @@ pub fn is_move_heuristic_empty() -> bool {
 
 pub fn populate_hash_move(move_obj: &mut ScoredMove) {
     MoveOrdering::populate_hash_move(move_obj);
+}
+
+pub fn populate_pv_move(move_obj: &mut ScoredMove) {
+    MoveOrdering::populate_pv_move(move_obj);
 }
 
 #[cfg(test)]

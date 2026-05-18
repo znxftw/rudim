@@ -3,6 +3,7 @@ use crate::common::constants;
 use crate::common::moves::Move;
 use crate::common::tt::{self, TranspositionEntryType};
 use crate::eval::move_ordering;
+use crate::search::pv_table::PvTable;
 use crate::search::quiescence;
 use std::sync::atomic::{AtomicBool, AtomicI32, AtomicU8, Ordering};
 
@@ -18,18 +19,31 @@ pub fn reset_state() {
     SEARCH_DEPTH.store(0, Ordering::Relaxed);
 }
 
-pub fn search(board_state: &mut BoardState, depth: u8, cancellation_token: &AtomicBool) -> i16 {
+pub fn search(
+    board_state: &mut BoardState,
+    depth: u8,
+    cancellation_token: &AtomicBool,
+    previous_pv: &[Move],
+    pv_table: &mut PvTable,
+) -> i16 {
     SEARCH_DEPTH.store(depth, Ordering::Relaxed);
     NODES.store(0, Ordering::Relaxed);
     quiescence::reset_nodes();
+
+    let mut ctx = SearchContext {
+        allow_null_move: true,
+        on_pv_path: true,
+        previous_pv,
+        pv_table,
+    };
 
     search_internal(
         board_state,
         depth,
         i16::MIN + 1,
         i16::MAX - 1,
-        true,
         cancellation_token,
+        &mut ctx,
     )
 }
 
@@ -38,8 +52,8 @@ fn search_internal(
     depth: u8,
     mut alpha: i16,
     beta: i16,
-    allow_null_move: bool,
     cancellation_token: &AtomicBool,
+    ctx: &mut SearchContext,
 ) -> i16 {
     let ply = SEARCH_DEPTH.load(Ordering::Relaxed) - depth;
     let is_pv_node = beta > 1 + alpha;
@@ -50,6 +64,12 @@ fn search_internal(
     if board_state.is_draw() {
         return 0;
     }
+
+    if ply as usize >= constants::MAX_PLY {
+        return quiescence::search(board_state, alpha, beta, cancellation_token);
+    }
+
+    ctx.pv_table.clear(ply as usize);
 
     let (has_value, tt_score, tt_best) = {
         let table = tt::TT.lock().unwrap();
@@ -81,7 +101,13 @@ fn search_internal(
     }
 
     // PRUNE: Null Move Pruning
-    if crate::search::nmp::can_prune(is_pv_node, board_state, allow_null_move, depth, in_check) {
+    if crate::search::nmp::can_prune(
+        is_pv_node,
+        board_state,
+        ctx.allow_null_move,
+        depth,
+        in_check,
+    ) {
         board_state.make_null_move();
         let reduction = crate::search::nmp::get_reduction(depth);
         let score = -search_internal(
@@ -89,8 +115,13 @@ fn search_internal(
             depth.saturating_sub(reduction),
             -beta,
             -beta + 1,
-            false,
             cancellation_token,
+            &mut SearchContext {
+                allow_null_move: false,
+                on_pv_path: false,
+                previous_pv: ctx.previous_pv,
+                pv_table: &mut *ctx.pv_table,
+            },
         );
         board_state.undo_null_move();
 
@@ -107,11 +138,17 @@ fn search_internal(
         }
     }
 
+    let pv_move = if ctx.on_pv_path && (ply as usize) < ctx.previous_pv.len() {
+        Some(ctx.previous_pv[ply as usize])
+    } else {
+        None
+    };
+
     let mut found_pv = false;
     let mut entry_type = TranspositionEntryType::Alpha;
 
     board_state.generate_moves();
-    populate_move_scores(board_state, ply as usize, tt_best);
+    populate_move_scores(board_state, ply as usize, tt_best, pv_move);
 
     let mut number_of_legal_moves = 0;
 
@@ -140,7 +177,7 @@ fn search_internal(
         );
 
         let mut score;
-
+        let next_on_pv = ctx.on_pv_path && Some(move_obj) == pv_move;
         // REDUCTION: Late Move Reductions
         if needs_lmr {
             let reduction = crate::search::lmr::get_reduction(depth, number_of_legal_moves);
@@ -149,11 +186,22 @@ fn search_internal(
                 depth.saturating_sub(1 + reduction),
                 -alpha - 1,
                 -alpha,
-                allow_null_move,
                 cancellation_token,
+                &mut SearchContext {
+                    allow_null_move: ctx.allow_null_move,
+                    on_pv_path: false,
+                    previous_pv: ctx.previous_pv,
+                    pv_table: &mut *ctx.pv_table,
+                },
             );
 
             if score > alpha {
+                let mut child_ctx = SearchContext {
+                    allow_null_move: ctx.allow_null_move,
+                    on_pv_path: next_on_pv,
+                    previous_pv: ctx.previous_pv,
+                    pv_table: &mut *ctx.pv_table,
+                };
                 score = search_deeper(
                     board_state,
                     depth,
@@ -161,10 +209,16 @@ fn search_internal(
                     beta,
                     cancellation_token,
                     found_pv,
-                    allow_null_move,
+                    &mut child_ctx,
                 );
             }
         } else {
+            let mut child_ctx = SearchContext {
+                allow_null_move: ctx.allow_null_move,
+                on_pv_path: next_on_pv,
+                previous_pv: ctx.previous_pv,
+                pv_table: &mut *ctx.pv_table,
+            };
             score = search_deeper(
                 board_state,
                 depth,
@@ -172,7 +226,7 @@ fn search_internal(
                 beta,
                 cancellation_token,
                 found_pv,
-                allow_null_move,
+                &mut child_ctx,
             );
         }
 
@@ -194,6 +248,7 @@ fn search_internal(
                 &mut found_pv,
                 &mut entry_type,
             );
+            ctx.pv_table.update(ply as usize, move_obj);
         }
     }
 
@@ -225,25 +280,23 @@ fn search_deeper(
     beta: i16,
     cancellation_token: &AtomicBool,
     found_pv: bool,
-    allow_null_move: bool,
+    ctx: &mut SearchContext,
 ) -> i16 {
     if found_pv {
-        principal_variation_search(
-            board_state,
-            depth,
-            alpha,
-            beta,
-            allow_null_move,
-            cancellation_token,
-        )
+        principal_variation_search(board_state, depth, alpha, beta, cancellation_token, ctx)
     } else {
         -search_internal(
             board_state,
             depth - 1,
             -beta,
             -alpha,
-            allow_null_move,
             cancellation_token,
+            &mut SearchContext {
+                allow_null_move: ctx.allow_null_move,
+                on_pv_path: ctx.on_pv_path,
+                previous_pv: ctx.previous_pv,
+                pv_table: &mut *ctx.pv_table,
+            },
         )
     }
 }
@@ -253,16 +306,21 @@ fn principal_variation_search(
     depth: u8,
     alpha: i16,
     beta: i16,
-    allow_null_move: bool,
     cancellation_token: &AtomicBool,
+    ctx: &mut SearchContext,
 ) -> i16 {
     let mut score = -search_internal(
         board_state,
         depth - 1,
         -alpha - 1,
         -alpha,
-        allow_null_move,
         cancellation_token,
+        &mut SearchContext {
+            allow_null_move: ctx.allow_null_move,
+            on_pv_path: ctx.on_pv_path,
+            previous_pv: ctx.previous_pv,
+            pv_table: &mut *ctx.pv_table,
+        },
     );
     if score > alpha && score < beta {
         score = -search_internal(
@@ -270,8 +328,13 @@ fn principal_variation_search(
             depth - 1,
             -beta,
             -alpha,
-            allow_null_move,
             cancellation_token,
+            &mut SearchContext {
+                allow_null_move: ctx.allow_null_move,
+                on_pv_path: ctx.on_pv_path,
+                previous_pv: ctx.previous_pv,
+                pv_table: &mut *ctx.pv_table,
+            },
         );
     }
     score
@@ -321,9 +384,21 @@ fn beta_cutoff(
     beta
 }
 
-fn populate_move_scores(board_state: &mut BoardState, ply: usize, hash_move: Option<Move>) {
+fn populate_move_scores(
+    board_state: &mut BoardState,
+    ply: usize,
+    hash_move: Option<Move>,
+    pv_move: Option<Move>,
+) {
     // TODO: non-clone impl? mutable borrow?
     let mut moves = board_state.moves.clone();
-    move_ordering::populate_move_scores(&mut moves, board_state, ply, hash_move);
+    move_ordering::populate_move_scores(&mut moves, board_state, ply, hash_move, pv_move);
     board_state.moves = moves;
+}
+
+pub struct SearchContext<'a> {
+    pub allow_null_move: bool,
+    pub on_pv_path: bool,
+    pub previous_pv: &'a [Move],
+    pub pv_table: &'a mut PvTable,
 }

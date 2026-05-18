@@ -30,7 +30,7 @@ pub fn search(
     board_state.generate_moves();
 
     let mut moves = board_state.moves.clone();
-    move_ordering::populate_move_scores(&mut moves, board_state, MAX_PLY - 1, None);
+    move_ordering::populate_move_scores(&mut moves, board_state, MAX_PLY - 1, None, None);
 
     for i in 0..moves.len() {
         move_ordering::MoveOrdering::sort_next_best_move(&mut moves, i);

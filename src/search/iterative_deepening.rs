@@ -1,6 +1,6 @@
 use crate::board::state::BoardState;
 use crate::common::moves::Move;
-use crate::common::tt;
+use crate::search::pv_table::PvTable;
 use crate::search::{negamax, quiescence};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{LazyLock, Mutex};
@@ -53,10 +53,19 @@ pub fn search(
         state.nodes = 0;
     }
 
+    let mut previous_pv = Vec::new();
+
     for current_depth in 1..=depth {
         let timer = Instant::now();
+        let mut pv_table = PvTable::new();
 
-        let current_score = negamax::search(board_state, current_depth, cancellation_token);
+        let current_score = negamax::search(
+            board_state,
+            current_depth,
+            cancellation_token,
+            &previous_pv,
+            &mut pv_table,
+        );
 
         {
             let mut state = STATE.lock().unwrap();
@@ -66,6 +75,8 @@ pub fn search(
         if cancellation_token.load(Ordering::Relaxed) {
             break;
         }
+
+        previous_pv = pv_table.line().to_vec();
 
         {
             let mut state = STATE.lock().unwrap();
@@ -85,11 +96,7 @@ pub fn search(
         };
         let nps = (nodes_total as f64 / time_ms * 1000.0) as i32;
 
-        let pv = {
-            let table = tt::TT.lock().unwrap();
-            table.collect_principal_variation(board_state)
-        };
-        let pv_string = pv
+        let pv_string = previous_pv
             .iter()
             .map(|m| {
                 let promotion = m

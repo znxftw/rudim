@@ -1,4 +1,3 @@
-use crate::board::state::BoardState;
 use crate::common::constants::{MAX_CENTIPAWN_EVAL, MAX_PLY};
 use crate::common::moves::Move;
 use std::sync::LazyLock;
@@ -118,49 +117,6 @@ impl TranspositionTable {
         });
     }
 
-    pub fn collect_principal_variation(&self, board_state: &mut BoardState) -> Vec<Move> {
-        let mut pv = Vec::new();
-
-        loop {
-            let hash = board_state.board_hash;
-            let entry = match self.entries[(hash as usize) & (self.capacity - 1)] {
-                Some(e) => e,
-                None => break,
-            };
-
-            if entry.hash != hash || entry.entry_type != TranspositionEntryType::Exact {
-                break;
-            }
-
-            if pv.contains(&entry.best_move) {
-                break;
-            }
-
-            if entry.best_move == Move::NO_MOVE {
-                break;
-            }
-
-            board_state.make_move(entry.best_move);
-            if board_state.is_in_check(board_state.side_to_move.other()) {
-                board_state.unmake_move(entry.best_move);
-                break;
-            }
-
-            pv.push(entry.best_move);
-
-            if board_state.is_draw() {
-                break;
-            }
-        }
-
-        // Unmake moves in reverse order
-        for m in pv.iter().rev() {
-            board_state.unmake_move(*m);
-        }
-
-        pv
-    }
-
     pub fn adjust_score(score: i16, ply: i32) -> i16 {
         if !Self::is_close_to_checkmate(score) {
             return score;
@@ -190,7 +146,6 @@ pub static TT: LazyLock<Mutex<TranspositionTable>> = LazyLock::new(|| {
 mod tests {
     // TODO: revisit, improve tests for more accurate scenarios
     use super::*;
-    use crate::board::state::BoardState;
     use crate::common::move_type::MoveType;
     use crate::common::square::Square;
 
@@ -236,27 +191,5 @@ mod tests {
 
         let retrieved = TranspositionTable::retrieve_score(adjusted, 10);
         assert_eq!(retrieved, mate_score);
-    }
-
-    #[test]
-    fn test_collect_principal_variation_stops_at_draw() {
-        let mut tt = TranspositionTable::new(1024);
-        let mut board = BoardState::parse_fen("7k/8/8/8/8/4n3/3B4/4K3 w - - 0 1");
-
-        let first_move = Move::new(Square::D2, Square::E3, MoveType::Capture);
-        let root_hash = board.board_hash;
-        tt.submit_entry(root_hash, 0, 4, first_move, TranspositionEntryType::Exact);
-
-        board.make_move(first_move);
-        assert!(board.is_draw(), "K+B vs K should be recognized as draw");
-        let draw_hash = board.board_hash;
-
-        let second_move = Move::new(Square::H8, Square::G8, MoveType::Quiet);
-        tt.submit_entry(draw_hash, 0, 3, second_move, TranspositionEntryType::Exact);
-
-        board.unmake_move(first_move);
-
-        let pv = tt.collect_principal_variation(&mut board);
-        assert_eq!(pv, vec![first_move]);
     }
 }
