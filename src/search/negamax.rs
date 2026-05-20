@@ -77,7 +77,8 @@ fn search_internal(
         table.get_entry(board_state.board_hash, alpha, beta, depth)
     };
 
-    if has_value {
+    // TODO: determine improvement for not returning in PV nodes
+    if has_value && !is_pv_node {
         if let Some(best) = tt_best
             && best != Move::NO_MOVE
         {
