@@ -4,7 +4,6 @@ use crate::common::constants;
 use crate::common::game_phase;
 use crate::common::side::Side;
 use crate::eval::pawns::PawnStructureEvaluation;
-use std::sync::LazyLock;
 
 pub struct PieceSquareTableEvaluation;
 
@@ -35,18 +34,17 @@ impl PieceSquareTableEvaluation {
             while white_board.0 > 0 {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
-                positional_score += (mid_game_positions()[piece_idx][square] as i32
-                    * mid_game_phase)
-                    + (end_game_positions()[piece_idx][square] as i32 * end_game_phase);
+                positional_score += (MID_GAME_POSITIONS[piece_idx][square] as i32 * mid_game_phase)
+                    + (END_GAME_POSITIONS[piece_idx][square] as i32 * end_game_phase);
             }
 
             while black_board.0 > 0 {
                 let square = black_board.get_lsb() as usize;
                 black_board.clear_bit(square);
                 let mirrored_square = Self::mirror_square(square);
-                positional_score -= (mid_game_positions()[piece_idx][mirrored_square] as i32
+                positional_score -= (MID_GAME_POSITIONS[piece_idx][mirrored_square] as i32
                     * mid_game_phase)
-                    + (end_game_positions()[piece_idx][mirrored_square] as i32 * end_game_phase);
+                    + (END_GAME_POSITIONS[piece_idx][mirrored_square] as i32 * end_game_phase);
             }
         }
 
@@ -60,40 +58,7 @@ impl PieceSquareTableEvaluation {
     }
 }
 
-pub fn init() {
-    let _ = LazyLock::force(&MID_GAME_POSITIONS);
-    let _ = LazyLock::force(&END_GAME_POSITIONS);
-}
-
-#[inline(always)]
-fn mid_game_positions() -> &'static [[i16; 64]; 6] {
-    #[cfg(debug_assertions)]
-    {
-        LazyLock::force(&MID_GAME_POSITIONS)
-    }
-    #[cfg(not(debug_assertions))]
-    {
-        // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
-        // get() will hence always return a value.
-        unsafe { LazyLock::get(&MID_GAME_POSITIONS).unwrap_unchecked() }
-    }
-}
-
-#[inline(always)]
-fn end_game_positions() -> &'static [[i16; 64]; 6] {
-    #[cfg(debug_assertions)]
-    {
-        LazyLock::force(&END_GAME_POSITIONS)
-    }
-    #[cfg(not(debug_assertions))]
-    {
-        // SAFETY: `rudim::init()` must be called at program startup, which forces this LazyLock to initialize.
-        // get() will hence always return a value.
-        unsafe { LazyLock::get(&END_GAME_POSITIONS).unwrap_unchecked() }
-    }
-}
-
-static MID_GAME_POSITIONS: LazyLock<[[i16; 64]; 6]> = LazyLock::new(|| {
+static MID_GAME_POSITIONS: [[i16; 64]; 6] = {
     let piece_values = [82, 337, 365, 477, 1025, 0];
     // Values borrowed from Rofchade
     // http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19
@@ -140,15 +105,19 @@ static MID_GAME_POSITIONS: LazyLock<[[i16; 64]; 6]> = LazyLock::new(|| {
         ],
     ];
 
-    for (piece, table) in tables.iter_mut().enumerate() {
-        for val in table.iter_mut() {
-            *val += piece_values[piece];
+    let mut piece = 0;
+    while piece < 6 {
+        let mut square = 0;
+        while square < 64 {
+            tables[piece][square] += piece_values[piece];
+            square += 1;
         }
+        piece += 1;
     }
     tables
-});
+};
 
-static END_GAME_POSITIONS: LazyLock<[[i16; 64]; 6]> = LazyLock::new(|| {
+static END_GAME_POSITIONS: [[i16; 64]; 6] = {
     let piece_values = [94, 281, 297, 512, 936, 0];
     let mut tables = [
         // Pawn
@@ -192,13 +161,17 @@ static END_GAME_POSITIONS: LazyLock<[[i16; 64]; 6]> = LazyLock::new(|| {
         ],
     ];
 
-    for (piece, table) in tables.iter_mut().enumerate() {
-        for val in table.iter_mut() {
-            *val += piece_values[piece];
+    let mut piece = 0;
+    while piece < 6 {
+        let mut square = 0;
+        while square < 64 {
+            tables[piece][square] += piece_values[piece];
+            square += 1;
         }
+        piece += 1;
     }
     tables
-});
+};
 
 #[cfg(test)]
 mod tests {

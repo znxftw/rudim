@@ -10,5 +10,4 @@ pub mod uci;
 pub fn init() {
     bitboard::lookups::init();
     common::zobrist::init();
-    eval::pst::init();
 }
