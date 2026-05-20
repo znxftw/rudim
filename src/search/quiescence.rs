@@ -41,6 +41,7 @@ pub fn search(
         }
 
         if !move_obj.is_capture() {
+            // TODO: this is not assured with PV and hash moves
             break; // once sorted, remaining moves are quiet
         }
 

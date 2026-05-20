@@ -46,7 +46,6 @@ jobs:
 
       - name: Run Tournaments
         run: |
-          # 2+0.1 Tournament
           ./fastchess-linux-x86-64/fastchess \
             -engine cmd=./target/release/rudim name="Current Rudim" \
             -engine cmd=./stable-rudim/Rudim name="Stable Rudim" \
