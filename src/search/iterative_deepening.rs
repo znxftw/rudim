@@ -54,10 +54,10 @@ pub fn search(
     }
 
     let mut previous_pv = Vec::new();
+    let mut pv_table = PvTable::new();
 
     for current_depth in 1..=depth {
         let timer = Instant::now();
-        let mut pv_table = PvTable::new();
 
         let current_score = negamax::search(
             board_state,
