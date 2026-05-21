@@ -1,5 +1,5 @@
 use crate::board::state::BoardState;
-use crate::common::constants::{MAX_PLY, PIECES, SQUARES};
+use crate::common::constants::{HASH_MOVE_SCORE, MAX_PLY, PIECES, PV_MOVE_SCORE, SQUARES};
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
@@ -91,11 +91,11 @@ impl MoveOrdering {
     }
 
     pub fn populate_hash_move(move_obj: &mut ScoredMove) {
-        move_obj.score = 1_000_000;
+        move_obj.score = HASH_MOVE_SCORE;
     }
 
     pub fn populate_pv_move(move_obj: &mut ScoredMove) {
-        move_obj.score = 2_000_000;
+        move_obj.score = PV_MOVE_SCORE;
     }
 
     pub fn sort_next_best_move(moves: &mut [ScoredMove], starting_index: usize) {

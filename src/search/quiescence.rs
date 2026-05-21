@@ -1,5 +1,5 @@
 use crate::board::state::BoardState;
-use crate::common::constants::MAX_PLY;
+use crate::common::constants::{HASH_MOVE_SCORE, MAX_PLY};
 use crate::common::scored_moves::MoveList;
 use crate::eval::move_ordering;
 use crate::eval::pst::PieceSquareTableEvaluation;
@@ -42,8 +42,12 @@ pub fn search(
         }
 
         if !move_obj.is_capture() {
-            // TODO: this is not assured with PV and hash moves
-            break; // once sorted, remaining moves are quiet
+            if moves[i].score >= HASH_MOVE_SCORE {
+                continue;
+            } else {
+                // Quiet Moves will be after PV, Hash and all captures - skip them
+                break;
+            }
         }
 
         board_state.make_move(move_obj);

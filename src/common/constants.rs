@@ -10,3 +10,5 @@ pub const MAX_CENTIPAWN_EVAL: i16 = 31000;
 pub const MAX_PLY: usize = 64;
 pub const BUFFER_TIME: u64 = 50;
 pub const MAX_SEARCH_DEPTH: u8 = 64;
+pub const HASH_MOVE_SCORE: i32 = 1_000_000;
+pub const PV_MOVE_SCORE: i32 = 2_000_000;
