@@ -98,7 +98,6 @@ impl BoardState {
         if self.occupancies[Side::White as usize].get_bit(square as usize) == 1 {
             piece as i32
         } else {
-            // TODO: revisit this abstraction
             6 + piece as i32
         }
     }

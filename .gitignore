@@ -12,3 +12,6 @@ Thumbs.db
 # Swap/backup files
 *.swp
 *.*~
+
+
+venv/
