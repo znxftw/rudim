@@ -247,6 +247,7 @@ mod tests {
     use crate::board::state::BoardState;
     use crate::common::helpers::STARTING_FEN;
     use crate::common::move_type::MoveType;
+    use crate::common::scored_moves::MoveList;
 
     #[test]
     fn test_should_make_and_undo_null_move_correctly() {
@@ -310,11 +311,12 @@ mod tests {
 
         for (fen, move_str) in cases {
             let mut board_state = BoardState::parse_fen(fen);
-            board_state.generate_moves();
+            let mut move_list = MoveList::new();
+            board_state.generate_moves(&mut move_list);
 
             let parsed_move = Move::parse_long_algebraic(move_str).unwrap();
             let mut found_move = Move::NO_MOVE;
-            for m in &board_state.moves {
+            for m in move_list.iter() {
                 if m.mv.source == parsed_move.source
                     && m.mv.target == parsed_move.target
                     && (parsed_move.move_type == MoveType::Quiet
@@ -377,11 +379,12 @@ mod tests {
         let moves: Vec<&str> = moves_str.split_whitespace().collect();
         let mut board_state = BoardState::default();
         for move_str in moves {
-            board_state.generate_moves();
+            let mut move_list = MoveList::new();
+            board_state.generate_moves(&mut move_list);
             let parsed_move = Move::parse_long_algebraic(move_str)
                 .unwrap_or_else(|| panic!("Failed to parse move: '{}'", move_str));
             let mut found_move = Move::NO_MOVE;
-            for m in &board_state.moves {
+            for m in move_list.iter() {
                 if m.mv.source == parsed_move.source && m.mv.target == parsed_move.target {
                     found_move = m.mv;
                     break;
@@ -401,10 +404,11 @@ mod tests {
         let moves: Vec<&str> = moves_str.split_whitespace().collect();
         let mut board = BoardState::default();
         for (i, move_str) in moves.iter().enumerate() {
-            board.generate_moves();
+            let mut move_list = MoveList::new();
+            board.generate_moves(&mut move_list);
             let parsed = Move::parse_long_algebraic(move_str).unwrap();
             let mut found = Move::NO_MOVE;
-            for m in &board.moves {
+            for m in move_list.iter() {
                 if m.mv.source == parsed.source && m.mv.target == parsed.target {
                     found = m.mv;
                     break;
@@ -594,9 +598,9 @@ mod tests {
             target: Square::C3,
             move_type: MoveType::Quiet,
         });
-        board.generate_moves();
-        let double_push = board
-            .moves
+        let mut move_list = MoveList::new();
+        board.generate_moves(&mut move_list);
+        let double_push = move_list
             .iter()
             .copied()
             .find(|m| m.mv.source == Square::F7 && m.mv.target == Square::F5)

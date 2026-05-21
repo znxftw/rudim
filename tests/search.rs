@@ -18,9 +18,10 @@ fn reset_global_state() {
 }
 
 fn find_move_from_move_list(board: &mut BoardState, expected_move: Move) -> Move {
-    board.generate_moves();
+    let mut move_list = rudim::common::scored_moves::MoveList::new();
+    board.generate_moves(&mut move_list);
 
-    for m in &board.moves {
+    for m in move_list.iter() {
         if m.mv.source == expected_move.source
             && m.mv.target == expected_move.target
             && (expected_move.move_type == MoveType::Quiet

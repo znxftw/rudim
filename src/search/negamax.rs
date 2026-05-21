@@ -1,6 +1,7 @@
 use crate::board::state::BoardState;
 use crate::common::constants;
 use crate::common::moves::Move;
+use crate::common::scored_moves::MoveList;
 use crate::common::tt::{self, TranspositionEntryType};
 use crate::eval::move_ordering;
 use crate::eval::pst::PieceSquareTableEvaluation;
@@ -149,12 +150,12 @@ fn search_internal(
     let mut found_pv = false;
     let mut entry_type = TranspositionEntryType::Alpha;
 
-    board_state.generate_moves();
-    populate_move_scores(board_state, ply as usize, tt_best, pv_move);
+    let mut moves = MoveList::new();
+    board_state.generate_moves(&mut moves);
+    move_ordering::populate_move_scores(&mut moves, board_state, ply as usize, tt_best, pv_move);
 
     let mut number_of_legal_moves = 0;
 
-    let mut moves = board_state.moves.clone();
     for i in 0..moves.len() {
         move_ordering::MoveOrdering::sort_next_best_move(&mut moves, i);
         let move_obj = moves[i].mv;
@@ -373,18 +374,6 @@ fn beta_cutoff(beta: i16, move_obj: Move, ply: usize, board_state: &BoardState, 
     }
 
     beta
-}
-
-fn populate_move_scores(
-    board_state: &mut BoardState,
-    ply: usize,
-    hash_move: Option<Move>,
-    pv_move: Option<Move>,
-) {
-    // TODO: non-clone impl? mutable borrow?
-    let mut moves = board_state.moves.clone();
-    move_ordering::populate_move_scores(&mut moves, board_state, ply, hash_move, pv_move);
-    board_state.moves = moves;
 }
 
 pub struct SearchContext<'a> {

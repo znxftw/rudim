@@ -1,5 +1,6 @@
 use crate::board::state::BoardState;
 use crate::common::constants::MAX_PLY;
+use crate::common::scored_moves::MoveList;
 use crate::eval::move_ordering;
 use crate::eval::pst::PieceSquareTableEvaluation;
 use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
@@ -27,9 +28,9 @@ pub fn search(
         alpha = eval;
     }
 
-    board_state.generate_moves();
+    let mut moves = MoveList::new();
+    board_state.generate_moves(&mut moves);
 
-    let mut moves = board_state.moves.clone();
     move_ordering::populate_move_scores(&mut moves, board_state, MAX_PLY - 1, None, None);
 
     for i in 0..moves.len() {

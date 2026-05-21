@@ -1,5 +1,6 @@
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
+use crate::common::scored_moves::MoveList;
 use crate::uci::{UciClient, cli, reset_global, set_ready};
 
 impl UciClient {
@@ -68,10 +69,11 @@ impl UciClient {
     }
 
     fn find_move_from_move_list(&mut self, move_obj: Move) -> Move {
-        let mut board = self.board.lock().unwrap();
-        board.generate_moves();
+        let board = self.board.lock().unwrap();
+        let mut move_list = MoveList::new();
+        board.generate_moves(&mut move_list);
 
-        for m in &board.moves {
+        for m in move_list.iter() {
             if m.mv.source == move_obj.source
                 && m.mv.target == move_obj.target
                 && (move_obj.move_type == MoveType::Quiet
@@ -92,8 +94,9 @@ mod tests {
     use serial_test::serial;
 
     fn find_move_from_move_list(board: &mut BoardState, move_obj: Move) -> Move {
-        board.generate_moves();
-        for m in &board.moves {
+        let mut move_list = MoveList::new();
+        board.generate_moves(&mut move_list);
+        for m in move_list.iter() {
             if m.mv.source == move_obj.source
                 && m.mv.target == move_obj.target
                 && (move_obj.move_type == MoveType::Quiet

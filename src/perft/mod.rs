@@ -1,5 +1,6 @@
 use crate::board::state::BoardState;
 use crate::common::helpers::{ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
+use crate::common::scored_moves::MoveList;
 
 #[derive(Clone, Copy)]
 pub struct PerftData {
@@ -112,11 +113,10 @@ pub fn traverse(board_state: &mut BoardState, depth: u8) -> u64 {
     }
 
     let mut nodes = 0;
-    board_state.generate_moves();
+    let mut moves = MoveList::new();
+    board_state.generate_moves(&mut moves);
 
-    let moves = board_state.moves.clone();
-
-    for move_ in moves {
+    for move_ in moves.iter() {
         board_state.make_move(move_.mv);
         if !board_state.is_in_check(board_state.side_to_move.other()) {
             nodes += traverse(board_state, depth - 1);

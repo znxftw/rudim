@@ -9,7 +9,6 @@ use crate::common::constants::{PIECES, SIDES, SIDES_WITH_BOTH, SQUARES};
 use crate::common::game_phase::{add_phase, remove_phase};
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
-use crate::common::scored_moves::ScoredMove;
 use crate::common::side::Side;
 use crate::common::square::Square;
 use std::fmt;
@@ -34,7 +33,6 @@ pub struct BoardState {
     pub side_to_move: Side,
     pub en_passant_square: Square,
     pub castle: Castle,
-    pub moves: Vec<ScoredMove>,
     pub move_count: i32,
     pub best_move: Move,
     pub phase: i32,
@@ -52,7 +50,6 @@ impl BoardState {
             side_to_move: Side::White,
             en_passant_square: Square::NoSquare,
             castle: Castle::NONE,
-            moves: Vec::with_capacity(32),
             move_count: 0,
             best_move: Move::NO_MOVE,
             phase: 0,
@@ -168,7 +165,6 @@ impl PartialEq for BoardState {
             && self.side_to_move == other.side_to_move
             && self.en_passant_square == other.en_passant_square
             && self.castle == other.castle
-            && self.moves == other.moves
     }
 }
 
