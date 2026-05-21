@@ -214,7 +214,9 @@ impl BoardState {
         }
         self.history.has_hash_appeared_twice(
             self.board_hash,
-            (self.move_count - self.half_move_clock as i32) as usize,
+            self.history
+                .index
+                .saturating_sub(self.half_move_clock as usize),
         )
     }
 

@@ -15,10 +15,14 @@ impl BoardState {
         parse_side_to_move(&mut board, sections[1]);
         parse_castling(&mut board, sections[2]);
         parse_en_passant(&mut board, sections[3]);
-        // parse_ply(&mut board, sections[4]); // TODO: pending ply
+        if sections.len() > 4 {
+            parse_ply(&mut board, sections[4]);
+        }
+        if sections.len() > 5 {
+            parse_move_count(&mut board, sections[5]);
+        }
         board.board_hash = zobrist::get_board_hash(&board);
 
-        board.board_hash = crate::common::zobrist::get_board_hash(&board);
         board
     }
 
@@ -70,6 +74,24 @@ fn parse_en_passant(board: &mut BoardState, fen: &str) {
     let rank = (bytes[1] - b'1') as usize;
     let sq_index = (7 - rank) * 8 + file;
     board.en_passant_square = Square::from(sq_index);
+}
+
+fn parse_ply(board: &mut BoardState, halfmove: &str) {
+    if let Ok(clock) = halfmove.parse::<u8>() {
+        board.half_move_clock = clock;
+    }
+}
+
+fn parse_move_count(board: &mut BoardState, fullmove: &str) {
+    if let Ok(fm) = fullmove.parse::<i32>() {
+        let plies = (fm.max(1) - 1) * 2;
+        board.move_count = plies
+            + if board.side_to_move == Side::White {
+                0
+            } else {
+                1
+            };
+    }
 }
 
 pub fn symbol_to_piece(symbol: char) -> Piece {
