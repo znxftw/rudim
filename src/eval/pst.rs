@@ -1,8 +1,12 @@
 use crate::bitboard::Bitboard;
+use crate::bitboard::lookups::{
+    get_bishop_attacks_from_table, get_rook_attacks_from_table, knight_attacks,
+};
 use crate::board::state::BoardState;
 use crate::common::constants;
 use crate::common::game_phase;
 use crate::common::side::Side;
+use crate::common::square::Square;
 use crate::eval::pawns::PawnStructureEvaluation;
 
 pub struct PieceSquareTableEvaluation;
@@ -14,6 +18,7 @@ impl PieceSquareTableEvaluation {
 
         score += Self::score_position(board_state);
         score += PawnStructureEvaluation::evaluate(board_state);
+        score += Self::score_mobility(board_state);
 
         if board_state.side_to_move == Side::White {
             score
@@ -55,6 +60,50 @@ impl PieceSquareTableEvaluation {
         let row = square >> 3;
         let col = square & 7;
         ((7 - row) << 3) + col
+    }
+
+    fn score_mobility(board_state: &BoardState) -> i16 {
+        let mut mobility = 0;
+        let occupancy = board_state.occupancies[Side::Both as usize];
+        let white_pieces = board_state.occupancies[Side::White as usize].0;
+        let black_pieces = board_state.occupancies[Side::Black as usize].0;
+
+        for piece_idx in 1..5 {
+            let mut white_board = Bitboard(board_state.pieces[Side::White as usize][piece_idx].0);
+            while white_board.0 > 0 {
+                let square = white_board.get_lsb() as usize;
+                white_board.clear_bit(square);
+                let attacks = match piece_idx {
+                    1 => knight_attacks()[square],
+                    2 => get_bishop_attacks_from_table(Square::from(square), occupancy).0,
+                    3 => get_rook_attacks_from_table(Square::from(square), occupancy).0,
+                    4 => {
+                        get_bishop_attacks_from_table(Square::from(square), occupancy).0
+                            | get_rook_attacks_from_table(Square::from(square), occupancy).0
+                    }
+                    _ => 0,
+                };
+                mobility += (attacks & !white_pieces).count_ones() as i16;
+            }
+
+            let mut black_board = Bitboard(board_state.pieces[Side::Black as usize][piece_idx].0);
+            while black_board.0 > 0 {
+                let square = black_board.get_lsb() as usize;
+                black_board.clear_bit(square);
+                let attacks = match piece_idx {
+                    1 => knight_attacks()[square],
+                    2 => get_bishop_attacks_from_table(Square::from(square), occupancy).0,
+                    3 => get_rook_attacks_from_table(Square::from(square), occupancy).0,
+                    4 => {
+                        get_bishop_attacks_from_table(Square::from(square), occupancy).0
+                            | get_rook_attacks_from_table(Square::from(square), occupancy).0
+                    }
+                    _ => 0,
+                };
+                mobility -= (attacks & !black_pieces).count_ones() as i16;
+            }
+        }
+        mobility
     }
 }
 
@@ -199,20 +248,20 @@ mod tests {
     fn should_return_consistent_score_for_endgame() {
         let board_state = BoardState::parse_fen(helpers::ENDGAME_FEN);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
-        assert_eq!(-3, actual_score);
+        assert_eq!(-4, actual_score);
     }
 
     #[test]
     fn should_return_consistent_score_for_kiwipete() {
         let board_state = BoardState::parse_fen(helpers::KIWI_PETE_FEN);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
-        assert_eq!(56, actual_score);
+        assert_eq!(61, actual_score);
     }
 
     #[test]
     fn should_return_consistent_score_for_advanced_move() {
         let board_state = BoardState::parse_fen(helpers::ADVANCED_MOVE_FEN);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
-        assert_eq!(605, actual_score);
+        assert_eq!(606, actual_score);
     }
 }
