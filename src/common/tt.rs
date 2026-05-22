@@ -19,8 +19,10 @@ pub struct TranspositionTableEntry {
     pub entry_type: TranspositionEntryType,
 }
 
+// TODO: bucketed instead of 2-tier
 pub struct TranspositionTable {
-    entries: Vec<Option<TranspositionTableEntry>>,
+    depth_replaced_entries: Vec<Option<TranspositionTableEntry>>,
+    always_replaced_entries: Vec<Option<TranspositionTableEntry>>,
     capacity: usize,
 }
 
@@ -34,24 +36,36 @@ impl TranspositionTable {
             "Capacity must be a power of two"
         );
         Self {
-            entries: vec![None; capacity],
+            depth_replaced_entries: vec![None; capacity],
+            always_replaced_entries: vec![None; capacity],
             capacity,
         }
     }
 
     pub fn clear(&mut self) {
-        for entry in self.entries.iter_mut() {
+        for entry in self.depth_replaced_entries.iter_mut() {
+            *entry = None;
+        }
+        for entry in self.always_replaced_entries.iter_mut() {
             *entry = None;
         }
     }
 
     pub fn get_hash_move(&self, hash: u64) -> Option<Move> {
-        let entry = self.entries[(hash as usize) & (self.capacity - 1)]?;
-        if entry.hash == hash && entry.entry_type == TranspositionEntryType::Exact {
-            Some(entry.best_move)
-        } else {
-            None
+        let index = (hash as usize) & (self.capacity - 1);
+        if let Some(e) = self.depth_replaced_entries[index]
+            && e.hash == hash
+            && e.entry_type == TranspositionEntryType::Exact
+        {
+            return Some(e.best_move);
         }
+        if let Some(e) = self.always_replaced_entries[index]
+            && e.hash == hash
+            && e.entry_type == TranspositionEntryType::Exact
+        {
+            return Some(e.best_move);
+        }
+        None
     }
 
     pub fn get_entry(
@@ -61,14 +75,25 @@ impl TranspositionTable {
         beta: i16,
         depth: u8,
     ) -> (bool, i16, Option<Move>) {
-        let entry = match self.entries[(hash as usize) & (self.capacity - 1)] {
+        let index = (hash as usize) & (self.capacity - 1);
+
+        let mut found_entry = None;
+        if let Some(e) = self.depth_replaced_entries[index]
+            && e.hash == hash
+        {
+            found_entry = Some(e);
+        }
+        if found_entry.is_none()
+            && let Some(e) = self.always_replaced_entries[index]
+            && e.hash == hash
+        {
+            found_entry = Some(e);
+        }
+
+        let entry = match found_entry {
             Some(e) => e,
             None => return (false, 0, None),
         };
-
-        if entry.hash != hash {
-            return (false, 0, None);
-        }
 
         if entry.depth < depth {
             return (false, 0, Some(entry.best_move));
@@ -102,19 +127,24 @@ impl TranspositionTable {
         entry_type: TranspositionEntryType,
     ) {
         let index = (hash as usize) & (self.capacity - 1);
-        if let Some(existing) = self.entries[index]
-            && existing.depth >= depth
-        {
-            return;
-        }
-
-        self.entries[index] = Some(TranspositionTableEntry {
+        let new_entry = Some(TranspositionTableEntry {
             hash,
             score,
             depth,
             best_move,
             entry_type,
         });
+
+        if let Some(existing) = self.depth_replaced_entries[index] {
+            if existing.depth >= depth {
+                self.always_replaced_entries[index] = new_entry;
+            } else {
+                self.always_replaced_entries[index] = self.depth_replaced_entries[index];
+                self.depth_replaced_entries[index] = new_entry;
+            }
+        } else {
+            self.depth_replaced_entries[index] = new_entry;
+        }
     }
 
     pub fn adjust_score(score: i16, ply: i32) -> i16 {
