@@ -12,7 +12,7 @@ pub struct MoveOrdering {
 }
 
 #[rustfmt::skip]
-static MVV_LVA: [[i32; 7]; 7] = [
+const MVV_LVA: [[i32; 7]; 7] = [
     // P , N , B , R , Q , K , None
     [ 15_000, 14_000, 13_000, 12_000, 11_000, 10_000, 0 ], // P
     [ 25_000, 24_000, 23_000, 22_000, 21_000, 20_000, 0 ], // N
