@@ -21,16 +21,20 @@ pub fn reset_state() {
     SEARCH_DEPTH.store(0, Ordering::Relaxed);
 }
 
+pub fn reset_nodes() {
+    NODES.store(0, Ordering::Relaxed);
+}
+
 pub fn search(
     board_state: &mut BoardState,
     depth: u8,
+    alpha: i16,
+    beta: i16,
     cancellation_token: &AtomicBool,
     previous_pv: &[Move],
     pv_table: &mut PvTable,
 ) -> i16 {
     SEARCH_DEPTH.store(depth, Ordering::Relaxed);
-    NODES.store(0, Ordering::Relaxed);
-    quiescence::reset_nodes();
 
     let mut ctx = SearchContext {
         allow_null_move: true,
@@ -42,8 +46,8 @@ pub fn search(
     search_internal(
         board_state,
         depth,
-        i16::MIN + 1,
-        i16::MAX - 1,
+        alpha,
+        beta,
         cancellation_token,
         &mut ctx,
     )

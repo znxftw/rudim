@@ -12,3 +12,4 @@ pub const BUFFER_TIME: u64 = 50;
 pub const MAX_SEARCH_DEPTH: u8 = 64;
 pub const HASH_MOVE_SCORE: i32 = 1_000_000;
 pub const PV_MOVE_SCORE: i32 = 2_000_000;
+pub const ASPIRATION_WINDOW_MARGIN: i16 = 50;
