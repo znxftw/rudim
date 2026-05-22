@@ -19,12 +19,12 @@ Rudim currently implements these core engine capabilities:
 
 ### Search
 
-- Iterative Deepening
+- Iterative Deepening with Aspiration Windows
 - Negamax + Alpha-Beta Pruning
 - Principal Variation Search
 - Quiescence Search
 - Transposition Table
-- Move Ordering (MVV-LVA, Killer, History, Hash)
+- Move Ordering (MVV-LVA, Killer, History, Hash, PV)
 - Null Move Pruning
 - Late Move Reductions
 - Reverse Futility Pruning
@@ -35,9 +35,9 @@ Rudim currently implements these core engine capabilities:
 - Pawn Structure (Doubled, Isolated, Passed)
 - Draw Detection
 
-### UCI Support
+### Other
 
-- UCI Protocol
+- UCI Protocol support
 
 ## Prerequisites
 
