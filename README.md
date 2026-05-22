@@ -13,27 +13,31 @@ Rudim currently implements these core engine capabilities:
 
 ### Board Representation
 
-- Bitboard-based board representation & Magic bitboards
-- Incremental make/unmake move pipeline with board history with a pseudo-legal move generator
-- Zobrist hashing and transposition table integration
+- Bitboards, Magic Bitboards
+- Make/Unmake Move (pseudo-legal movegen)
+- Zobrist Hashing
 
 ### Search
 
-- Iterative deepening search
-- Negamax with alpha-beta pruning and principal variation search
-- Quiescence search
-- Move ordering heuristics (MVV-LVA, killer moves, history heuristic, hash move)
-- Null-move pruning
-- Late Move Reduction
+- Iterative Deepening
+- Negamax + Alpha-Beta Pruning
+- Principal Variation Search
+- Quiescence Search
+- Transposition Table
+- Move Ordering (MVV-LVA, Killer, History, Hash)
+- Null Move Pruning
+- Late Move Reductions
+- Reverse Futility Pruning
 
 ### Evaluation
 
-- Rofchade Piece Square Tables and Simple Pawn Structure Evaluations
-- Draw detection (three-fold repetition, fifty-move rule handling and basic insufficient material)
+- Piece-Square Tables
+- Pawn Structure (Doubled, Isolated, Passed)
+- Draw Detection
 
 ### UCI Support
 
-- UCI protocol command handling (`uci`, `isready`, `position`, `go`, `stop`, `ucinewgame`, `debug`, `quit`)
+- UCI Protocol
 
 ## Prerequisites
 
