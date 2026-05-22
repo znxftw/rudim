@@ -5,14 +5,11 @@ use crate::common::side::Side;
 
 const DOUBLED_PAWN_PENALTY: i16 = 10;
 const ISOLATED_PAWN_PENALTY: i16 = 20;
-
-// Passed pawn bonus indexed by row (0 = rank 8, 7 = rank 1).
-const PASSED_PAWN_BONUS: [i16; 8] = [0, 100, 70, 50, 30, 20, 10, 0];
+const PASSED_PAWN_BONUS: i16 = 50;
 
 pub struct PawnStructureEvaluation;
 
 impl PawnStructureEvaluation {
-    // Returns score from white's perspective (positive = good for white)
     pub fn evaluate(board_state: &BoardState) -> i16 {
         let white_pawns = board_state.pieces[Side::White as usize][Piece::Pawn as usize].0;
         let black_pawns = board_state.pieces[Side::Black as usize][Piece::Pawn as usize].0;
@@ -48,7 +45,7 @@ impl PawnStructureEvaluation {
                 score -= ISOLATED_PAWN_PENALTY;
             }
             if (black_pawns & PASSED_PAWN_MASKS[Side::White as usize][sq]) == 0 {
-                score += PASSED_PAWN_BONUS[sq >> 3];
+                score += PASSED_PAWN_BONUS;
             }
         }
 
@@ -60,7 +57,7 @@ impl PawnStructureEvaluation {
                 score += ISOLATED_PAWN_PENALTY;
             }
             if (white_pawns & PASSED_PAWN_MASKS[Side::Black as usize][sq]) == 0 {
-                score -= PASSED_PAWN_BONUS[7 - (sq >> 3)];
+                score -= PASSED_PAWN_BONUS;
             }
         }
         score
@@ -161,14 +158,14 @@ mod tests {
     fn should_penalise_white_doubled_pawns() {
         let board_state = BoardState::parse_fen("8/8/8/4P3/4P3/8/8/K6k w - - 0 1");
         let score = PawnStructureEvaluation::evaluate(&board_state);
-        assert_eq!(30, score);
+        assert_eq!(50, score);
     }
 
     #[test]
     fn should_penalise_black_doubled_pawns() {
         let board_state = BoardState::parse_fen("K6k/8/8/4p3/4p3/8/8/8 w - - 0 1");
         let score = PawnStructureEvaluation::evaluate(&board_state);
-        assert_eq!(-30, score);
+        assert_eq!(-50, score);
     }
 
     #[test]

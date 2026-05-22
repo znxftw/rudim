@@ -213,6 +213,6 @@ mod tests {
     fn should_return_consistent_score_for_advanced_move() {
         let board_state = BoardState::parse_fen(helpers::ADVANCED_MOVE_FEN);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
-        assert_eq!(605, actual_score);
+        assert_eq!(555, actual_score);
     }
 }
