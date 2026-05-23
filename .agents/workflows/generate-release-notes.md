@@ -14,17 +14,17 @@ This workflow guides the agent through generating release notes for the Rudim ch
 
 ## 2. Categorize and Format Commits
 
-Categorize the commits into the following sections based on the commit message content:
+Categorize the commits into the sections below. **Keep entries ultra-concise, punchy, and brief.** Avoid verbose explanations, listing modified files, or adding implementation details. Condense the entries into simple noun phrases or short action statements.
 
 - **Features**: New functionality, search improvements (e.g., LMR, RFP, PV tables).
 - **Fixes**: Bug fixes, logic corrections (e.g., UCI reporting fixes, draw checks).
 - **Maintenance**: Search & evaluation optimizations, refactors, docs, CI/CD changes.
 
-Format the list using a clean, concise style with lowercase bullet points, grouping related commits and listing their short hashes in parentheses.
+Format the list using a clean, lowercase style with short bullet points, grouping related commits and listing their short hashes in parentheses. If a feature or fix was completely reverted within the same commit range, omit or combine them to keep the notes clean.
 
 **Example Format:**
-- implemented reverse futility pruning (hash1, hash2)
-- added a pv table (hash3)
+- reverse futility pruning (hash1, hash2)
+- pv table (hash3)
 
 ## 3. Calculate Search Statistics
 
