@@ -19,6 +19,7 @@ pub struct TranspositionTableEntry {
     pub entry_type: TranspositionEntryType,
 }
 
+// TODO: profile, tune
 // TODO: bucketed instead of 2-tier
 pub struct TranspositionTable {
     depth_replaced_entries: Vec<Option<TranspositionTableEntry>>,
