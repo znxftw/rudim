@@ -1,10 +1,10 @@
 use crate::board::state::BoardState;
 use crate::common::constants;
 use crate::common::moves::Move;
-use crate::common::scored_moves::MoveList;
 use crate::common::tt::{self, TranspositionEntryType};
 use crate::eval::move_ordering;
 use crate::eval::pst::PieceSquareTableEvaluation;
+use crate::search::move_picker::MovePicker;
 use crate::search::pv_table::PvTable;
 use crate::search::{lmr, nmp, quiescence};
 use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
@@ -144,16 +144,10 @@ fn search_internal(
     let mut found_pv = false;
     let mut entry_type = TranspositionEntryType::Alpha;
 
-    let mut moves = MoveList::new();
-    board_state.generate_moves(&mut moves);
-    move_ordering::populate_move_scores(&mut moves, board_state, ply as usize, tt_best, pv_move);
-
+    let mut move_picker = MovePicker::new(pv_move, tt_best, ply as usize);
     let mut number_of_legal_moves = 0;
 
-    for i in 0..moves.len() {
-        move_ordering::MoveOrdering::sort_next_best_move(&mut moves, i);
-        let move_obj = moves[i].mv;
-
+    while let Some(move_obj) = move_picker.next(board_state) {
         if ctx.cancellation_token.load(Ordering::Relaxed) {
             break;
         }
@@ -261,7 +255,13 @@ fn search_internal(
             board_state.board_hash,
             tt::TranspositionTable::adjust_score(alpha, ply as i32),
             depth,
-            board_state.best_move,
+            // TODO: revalidate this, was causing OOB in movegen
+            // from brucemoreland -  "Sometimes I don't get a best move, like if everything failed low (returned a score <= alpha)"
+            if entry_type == TranspositionEntryType::Alpha {
+                Move::NO_MOVE
+            } else {
+                board_state.best_move
+            },
             entry_type,
         );
     }
