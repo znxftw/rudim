@@ -32,7 +32,8 @@ impl BoardState {
         let mut first_gain = SEE_PIECE_VALUES[captured as usize];
         if mv.is_promotion() {
             let prom_piece = mv.move_type.promotion_piece();
-            first_gain += SEE_PIECE_VALUES[prom_piece as usize] - SEE_PIECE_VALUES[Piece::Pawn as usize];
+            first_gain +=
+                SEE_PIECE_VALUES[prom_piece as usize] - SEE_PIECE_VALUES[Piece::Pawn as usize];
         }
 
         // Initialize minimax list
@@ -79,12 +80,15 @@ impl BoardState {
 
             // Value gained in this step is the value of the piece captured in the previous step
             let mut step_gain = SEE_PIECE_VALUES[last_captured_piece as usize];
-            
+
             // Check for pawn promotions during recapture
             if piece == Piece::Pawn {
                 let target_rank = target as usize / 8;
-                if (side == Side::White && target_rank == 0) || (side == Side::Black && target_rank == 7) {
-                    step_gain += SEE_PIECE_VALUES[Piece::Queen as usize] - SEE_PIECE_VALUES[Piece::Pawn as usize];
+                if (side == Side::White && target_rank == 0)
+                    || (side == Side::Black && target_rank == 7)
+                {
+                    step_gain += SEE_PIECE_VALUES[Piece::Queen as usize]
+                        - SEE_PIECE_VALUES[Piece::Pawn as usize];
                 }
             }
 
@@ -108,7 +112,7 @@ impl BoardState {
 
         // 7. Back-propagate scores using minimax decision tree
         for i in (1..depth).rev() {
-            gain[i - 1] = gain[i - 1] - std::cmp::max(0, gain[i]);
+            gain[i - 1] -= std::cmp::max(0, gain[i]);
         }
 
         gain[0]
@@ -118,18 +122,18 @@ impl BoardState {
         let white_pawns = self.pieces[Side::White as usize][Piece::Pawn as usize].0;
         let black_pawns = self.pieces[Side::Black as usize][Piece::Pawn as usize].0;
         let knights = self.pieces[Side::White as usize][Piece::Knight as usize].0
-                    | self.pieces[Side::Black as usize][Piece::Knight as usize].0;
+            | self.pieces[Side::Black as usize][Piece::Knight as usize].0;
         let bishops = self.pieces[Side::White as usize][Piece::Bishop as usize].0
-                    | self.pieces[Side::Black as usize][Piece::Bishop as usize].0;
+            | self.pieces[Side::Black as usize][Piece::Bishop as usize].0;
         let rooks = self.pieces[Side::White as usize][Piece::Rook as usize].0
-                  | self.pieces[Side::Black as usize][Piece::Rook as usize].0;
+            | self.pieces[Side::Black as usize][Piece::Rook as usize].0;
         let queens = self.pieces[Side::White as usize][Piece::Queen as usize].0
-                   | self.pieces[Side::Black as usize][Piece::Queen as usize].0;
+            | self.pieces[Side::Black as usize][Piece::Queen as usize].0;
         let kings = self.pieces[Side::White as usize][Piece::King as usize].0
-                  | self.pieces[Side::Black as usize][Piece::King as usize].0;
+            | self.pieces[Side::Black as usize][Piece::King as usize].0;
 
         let pawn_attacks = (pawn_attacks()[Side::Black as usize][sq as usize] & white_pawns)
-                         | (pawn_attacks()[Side::White as usize][sq as usize] & black_pawns);
+            | (pawn_attacks()[Side::White as usize][sq as usize] & black_pawns);
         let knight_attacks = knight_attacks()[sq as usize] & knights;
         let bishop_attacks = get_bishop_attacks_from_table(sq, occupancy).0 & (bishops | queens);
         let rook_attacks = get_rook_attacks_from_table(sq, occupancy).0 & (rooks | queens);
@@ -140,18 +144,20 @@ impl BoardState {
 
     fn update_xrays(&self, attackers: &mut Bitboard, target: Square, occupancy: Bitboard) {
         let bishops = self.pieces[Side::White as usize][Piece::Bishop as usize].0
-                    | self.pieces[Side::Black as usize][Piece::Bishop as usize].0;
+            | self.pieces[Side::Black as usize][Piece::Bishop as usize].0;
         let rooks = self.pieces[Side::White as usize][Piece::Rook as usize].0
-                  | self.pieces[Side::Black as usize][Piece::Rook as usize].0;
+            | self.pieces[Side::Black as usize][Piece::Rook as usize].0;
         let queens = self.pieces[Side::White as usize][Piece::Queen as usize].0
-                   | self.pieces[Side::Black as usize][Piece::Queen as usize].0;
+            | self.pieces[Side::Black as usize][Piece::Queen as usize].0;
 
         // Diagonal X-rays
-        let diagonal_attackers = get_bishop_attacks_from_table(target, occupancy).0 & (bishops | queens) & occupancy.0;
+        let diagonal_attackers =
+            get_bishop_attacks_from_table(target, occupancy).0 & (bishops | queens) & occupancy.0;
         attackers.0 |= diagonal_attackers;
 
         // Orthogonal X-rays
-        let orthogonal_attackers = get_rook_attacks_from_table(target, occupancy).0 & (rooks | queens) & occupancy.0;
+        let orthogonal_attackers =
+            get_rook_attacks_from_table(target, occupancy).0 & (rooks | queens) & occupancy.0;
         attackers.0 |= orthogonal_attackers;
     }
 
@@ -180,7 +186,7 @@ mod tests {
         // FEN: k7/8/8/8/3q4/8/3R4/K7 w - - 0 1
         let board = BoardState::parse_fen("k7/8/8/8/3q4/8/3R4/K7 w - - 0 1");
         let mv = Move::new(Square::D2, Square::D4, MoveType::Capture);
-        
+
         let score = board.see(mv);
         assert_eq!(score, 900); // White gains Black Queen
     }
@@ -191,7 +197,7 @@ mod tests {
         // FEN: k7/8/8/4p3/3q4/8/3R4/K7 w - - 0 1
         let board = BoardState::parse_fen("k7/8/8/4p3/3q4/8/3R4/K7 w - - 0 1");
         let mv = Move::new(Square::D2, Square::D4, MoveType::Capture);
-        
+
         let score = board.see(mv);
         assert_eq!(score, 400); // 900 (Queen) - 500 (Rook) = 400
     }
@@ -202,7 +208,7 @@ mod tests {
         // FEN: k7/8/4p3/3b4/8/2N5/8/K7 w - - 0 1
         let board = BoardState::parse_fen("k7/8/4p3/3b4/8/2N5/8/K7 w - - 0 1");
         let mv = Move::new(Square::C3, Square::D5, MoveType::Capture);
-        
+
         let score = board.see(mv);
         assert_eq!(score, 0); // 300 (Bishop) - 300 (Knight) = 0
     }
@@ -214,7 +220,7 @@ mod tests {
         // Capture sequence: White Rxd4 (+900), Black Rxd4 (+500), White Rxd4 (+500)
         let board = BoardState::parse_fen("k7/8/3r4/8/3q4/8/3R4/3R3K w - - 0 1");
         let mv = Move::new(Square::D2, Square::D4, MoveType::Capture);
-        
+
         let score = board.see(mv);
         assert_eq!(score, 900); // White Rook on d1 defends, White ends up ahead by Queen
     }
@@ -225,7 +231,7 @@ mod tests {
         // FEN: k7/8/8/5n2/3p4/8/3R4/K7 w - - 0 1
         let board = BoardState::parse_fen("k7/8/8/5n2/3p4/8/3R4/K7 w - - 0 1");
         let mv = Move::new(Square::D2, Square::D4, MoveType::Capture);
-        
+
         let score = board.see(mv);
         assert_eq!(score, -400); // 100 (Pawn) - 500 (Rook) = -400
     }
