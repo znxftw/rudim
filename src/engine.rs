@@ -6,6 +6,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 static IS_READY: AtomicBool = AtomicBool::new(false);
 
 pub fn reset() {
+    // TODO: some of these need to be reset in between searches - expose another reset_intermediate()
     IS_READY.store(false, Ordering::Relaxed);
     move_ordering::reset_move_heuristic();
     iterative_deepening::reset_state();
