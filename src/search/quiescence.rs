@@ -41,6 +41,11 @@ pub fn search(
             break;
         }
 
+        // Prune captures that lose material according to Static Exchange Evaluation
+        if board_state.see(move_obj) < 0 {
+            continue;
+        }
+
         board_state.make_move(move_obj);
         if board_state.is_in_check(board_state.side_to_move.other()) {
             board_state.unmake_move(move_obj);

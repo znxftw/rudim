@@ -41,10 +41,15 @@ fn assert_traversal(position: &str, expected_nodes: i32, expected_score: i16, de
     let cancellation_token = AtomicBool::new(false);
     let mut debug_mode = false;
 
-    board_state.find_best_move(depth, &cancellation_token, &mut debug_mode);
+    let best_move = board_state.find_best_move(depth, &cancellation_token, &mut debug_mode);
 
-    assert_eq!(expected_nodes, iterative_deepening::nodes());
-    assert_eq!(expected_score, iterative_deepening::score());
+    let actual_nodes = iterative_deepening::nodes();
+    let actual_score = iterative_deepening::score();
+    println!("Position: {}, Depth: {}, Best Move: {:?}, Nodes: {} (expected: {}), Score: {} (expected: {})", 
+             position, depth, best_move, actual_nodes, expected_nodes, actual_score, expected_score);
+
+    assert_eq!(expected_nodes, actual_nodes);
+    assert_eq!(expected_score, actual_score);
 }
 
 fn assert_tactic_best_move(fen: &str, move_lan: &str) {
@@ -107,16 +112,16 @@ macro_rules! tactic_test_case {
     };
 }
 
-traversal_test_case!(traversal_starting_position, STARTING_FEN, 160931, 35, 9);
-traversal_test_case!(traversal_endgame_position, ENDGAME_FEN, 117797, 37, 13);
+traversal_test_case!(traversal_starting_position, STARTING_FEN, 149108, 35, 9);
+traversal_test_case!(traversal_endgame_position, ENDGAME_FEN, 141543, 37, 13);
 traversal_test_case!(
     traversal_advanced_move_position,
     ADVANCED_MOVE_FEN,
-    89422,
+    96763,
     1751,
     11
 );
-traversal_test_case!(traversal_kiwi_pete_position, KIWI_PETE_FEN, 127717, -56, 8);
+traversal_test_case!(traversal_kiwi_pete_position, KIWI_PETE_FEN, 102688, -56, 8);
 
 tactic_test_case!(
     tactic_random_puzzle_position,
