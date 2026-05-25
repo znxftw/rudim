@@ -249,7 +249,7 @@ fn search_internal(
         return 0;
     }
 
-    {
+    if !ctx.cancellation_token.load(Ordering::Relaxed) {
         let mut table = tt::TT.lock().unwrap();
         table.submit_entry(
             board_state.board_hash,
