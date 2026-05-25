@@ -75,6 +75,7 @@ fn search_internal(
 
     // TODO: determine improvement for not returning in PV nodes
     if has_value && !is_pv_node {
+        // TODO: might be wrong - TT scores unadjusted scores but returns alpha / beta - mates might be wrong
         return tt::TranspositionTable::retrieve_score(tt_score, ply as i32);
     }
 
