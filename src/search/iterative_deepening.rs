@@ -120,7 +120,7 @@ pub fn search(
 
         {
             let mut state = STATE.lock().unwrap();
-            state.best_move = board_state.best_move;
+            state.best_move = previous_pv.first().copied().unwrap_or(Move::NO_MOVE);
             let nodes_traversed = negamax::nodes() + quiescence::nodes();
             state.nodes += nodes_traversed;
         }

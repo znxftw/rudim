@@ -37,7 +37,6 @@ mod tests {
                 crate::common::castle::Castle::NONE,
                 0,
                 0,
-                Move::NO_MOVE,
             );
         }
 

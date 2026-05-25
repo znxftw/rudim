@@ -53,9 +53,7 @@ impl BoardState {
             original_castling_rights,
             original_board_hash,
             original_half_move_clock,
-            self.best_move,
         );
-        self.best_move = Move::NO_MOVE;
         self.move_count += 1;
     }
 
@@ -178,7 +176,6 @@ impl BoardState {
         self.board_hash = history.board_hash;
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
-        self.best_move = history.best_move;
         self.move_count -= 1;
     }
 
@@ -227,7 +224,6 @@ impl BoardState {
             self.castle,
             self.board_hash,
             self.half_move_clock,
-            self.best_move,
         );
         self.update_en_passant(Move::NO_MOVE);
         self.flip_side_to_move();

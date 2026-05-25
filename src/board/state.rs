@@ -7,7 +7,6 @@ use crate::board::history::History;
 use crate::common::castle::Castle;
 use crate::common::constants::{PIECES, SIDES, SIDES_WITH_BOTH, SQUARES};
 use crate::common::game_phase::{add_phase, remove_phase};
-use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
@@ -34,7 +33,6 @@ pub struct BoardState {
     pub en_passant_square: Square,
     pub castle: Castle,
     pub move_count: i32,
-    pub best_move: Move,
     pub phase: i32,
     pub board_hash: u64,
     pub half_move_clock: u8,
@@ -51,7 +49,6 @@ impl BoardState {
             en_passant_square: Square::NoSquare,
             castle: Castle::NONE,
             move_count: 0,
-            best_move: Move::NO_MOVE,
             phase: 0,
             board_hash: 0,
             half_move_clock: 0,

@@ -53,6 +53,8 @@ fn search_internal(
 ) -> i16 {
     ctx.pv_table.clear(ply as usize);
 
+    let mut best_move = Move::NO_MOVE;
+
     let is_pv_node = beta > 1 + alpha;
     let in_check = board_state.is_in_check(board_state.side_to_move);
 
@@ -73,11 +75,6 @@ fn search_internal(
 
     // TODO: determine improvement for not returning in PV nodes
     if has_value && !is_pv_node {
-        if let Some(best) = tt_best
-            && best != Move::NO_MOVE
-        {
-            board_state.best_move = best;
-        }
         return tt::TranspositionTable::retrieve_score(tt_score, ply as i32);
     }
 
@@ -235,9 +232,11 @@ fn search_internal(
                 board_state,
                 depth,
                 &mut alpha,
-                &mut found_pv,
-                &mut entry_type,
+                &mut best_move,
             );
+            entry_type = TranspositionEntryType::Exact;
+            found_pv = true;
+
             ctx.pv_table.update(ply as usize, move_obj);
         }
     }
@@ -255,13 +254,7 @@ fn search_internal(
             board_state.board_hash,
             tt::TranspositionTable::adjust_score(alpha, ply as i32),
             depth,
-            // TODO: revalidate this, was causing OOB in movegen
-            // from brucemoreland -  "Sometimes I don't get a best move, like if everything failed low (returned a score <= alpha)"
-            if entry_type == TranspositionEntryType::Alpha {
-                Move::NO_MOVE
-            } else {
-                board_state.best_move
-            },
+            best_move,
             entry_type,
         );
     }
@@ -339,23 +332,21 @@ fn principal_variation_search(
     score
 }
 
+#[inline(always)]
 fn alpha_update(
     score: i16,
     move_obj: Move,
     board_state: &mut BoardState,
     depth: u8,
     alpha: &mut i16,
-    found_pv: &mut bool,
-    entry_type: &mut TranspositionEntryType,
+    best_move: &mut Move,
 ) {
-    *entry_type = TranspositionEntryType::Exact;
     if !move_obj.is_capture() {
         let piece = board_state.get_piece_on(move_obj.source) as usize;
         move_ordering::add_history_move(piece, move_obj, depth);
     }
     *alpha = score;
-    board_state.best_move = move_obj;
-    *found_pv = true;
+    *best_move = move_obj;
 }
 
 fn beta_cutoff(beta: i16, move_obj: Move, ply: usize, board_state: &BoardState, depth: u8) -> i16 {

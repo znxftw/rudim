@@ -1,5 +1,4 @@
 use crate::common::castle::Castle;
-use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::square::Square;
 
@@ -12,7 +11,6 @@ pub struct BoardHistory {
     pub castling_rights: Castle,
     pub board_hash: u64,
     pub half_move_clock: u8,
-    pub best_move: Move,
 }
 
 impl Default for BoardHistory {
@@ -23,7 +21,6 @@ impl Default for BoardHistory {
             castling_rights: Castle::NONE,
             board_hash: 0,
             half_move_clock: 0,
-            best_move: Move::NO_MOVE,
         }
     }
 }
@@ -49,7 +46,6 @@ impl History {
         original_castling_rights: Castle,
         board_hash: u64,
         half_move_clock: u8,
-        best_move: Move,
     ) {
         if self.index < HISTORY_SIZE {
             self.entries[self.index] = BoardHistory {
@@ -58,7 +54,6 @@ impl History {
                 castling_rights: original_castling_rights,
                 board_hash,
                 half_move_clock,
-                best_move,
             };
             self.index += 1;
         } else {
@@ -111,21 +106,12 @@ impl Default for History {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::common::move_type::MoveType;
 
     #[test]
     fn test_history_save_restore() {
         let mut history = History::new();
-        let best_move = Move::new(Square::E2, Square::E4, MoveType::Quiet);
 
-        history.save(
-            Piece::Pawn,
-            Square::E3,
-            Castle::WHITE_SHORT,
-            123456789,
-            42,
-            best_move,
-        );
+        history.save(Piece::Pawn, Square::E3, Castle::WHITE_SHORT, 123456789, 42);
 
         assert!(!history.is_empty());
         assert_eq!(history.index, 1);
@@ -136,21 +122,13 @@ mod tests {
         assert_eq!(restored.castling_rights, Castle::WHITE_SHORT);
         assert_eq!(restored.board_hash, 123456789);
         assert_eq!(restored.half_move_clock, 42);
-        assert_eq!(restored.best_move, best_move);
         assert!(history.is_empty());
     }
 
     #[test]
     fn test_history_clear() {
         let mut history = History::new();
-        history.save(
-            Piece::None,
-            Square::NoSquare,
-            Castle::NONE,
-            0,
-            0,
-            Move::NO_MOVE,
-        );
+        history.save(Piece::None, Square::NoSquare, Castle::NONE, 0, 0);
         assert!(!history.is_empty());
         history.clear();
         assert!(history.is_empty());
@@ -162,30 +140,9 @@ mod tests {
         let mut history = History::new();
         let hash = 0xDEADBEEF;
 
-        history.save(
-            Piece::None,
-            Square::NoSquare,
-            Castle::NONE,
-            hash,
-            0,
-            Move::NO_MOVE,
-        );
-        history.save(
-            Piece::None,
-            Square::NoSquare,
-            Castle::NONE,
-            0x123,
-            0,
-            Move::NO_MOVE,
-        );
-        history.save(
-            Piece::None,
-            Square::NoSquare,
-            Castle::NONE,
-            hash,
-            0,
-            Move::NO_MOVE,
-        );
+        history.save(Piece::None, Square::NoSquare, Castle::NONE, hash, 0);
+        history.save(Piece::None, Square::NoSquare, Castle::NONE, 0x123, 0);
+        history.save(Piece::None, Square::NoSquare, Castle::NONE, hash, 0);
 
         assert!(history.has_hash_appeared_twice(hash, 0));
         assert!(!history.has_hash_appeared_twice(0x123, 0));
@@ -197,6 +154,7 @@ mod tests {
         use crate::board::state::BoardState;
         use crate::common::helpers::STARTING_FEN;
         use crate::common::move_type::MoveType;
+        use crate::common::moves::Move;
 
         let mut board_state = BoardState::parse_fen(STARTING_FEN);
         let original_state_pieces = board_state.pieces;
