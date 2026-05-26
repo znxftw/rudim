@@ -1,7 +1,7 @@
 use crate::bitboard::Bitboard;
 use crate::bitboard::lookups::{
-    PAWN_ATTACKS, get_bishop_attacks_from_table, get_queen_attacks_from_table,
-    get_rook_attacks_from_table, king_attacks, knight_attacks,
+    get_bishop_attacks_from_table, get_queen_attacks_from_table, get_rook_attacks_from_table,
+    king_attacks, knight_attacks, pawn_attacks,
 };
 use crate::board::state::BoardState;
 use crate::common::castle::Castle;
@@ -120,7 +120,7 @@ impl BoardState {
             return;
         }
         let ep_bit = 1u64 << (self.en_passant_square as usize);
-        let attacks = Bitboard(PAWN_ATTACKS[self.side_to_move as usize][source] & ep_bit);
+        let attacks = Bitboard(pawn_attacks()[self.side_to_move as usize][source] & ep_bit);
         if attacks.0 > 0 {
             let target = attacks.get_lsb() as usize;
             self.add_pawn_move(source, target, true, false, move_list, gen_type);
@@ -134,7 +134,8 @@ impl BoardState {
         gen_type: MoveGenType,
     ) {
         let enemy_occ = self.occupancies[self.side_to_move.other() as usize];
-        let mut attacks = Bitboard(PAWN_ATTACKS[self.side_to_move as usize][source] & enemy_occ.0);
+        let mut attacks =
+            Bitboard(pawn_attacks()[self.side_to_move as usize][source] & enemy_occ.0);
 
         while attacks.0 > 0 {
             let target = attacks.get_lsb() as usize;

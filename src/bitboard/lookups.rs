@@ -22,6 +22,10 @@ fn rook_masks() -> &'static [u64; SQUARES] {
     &ROOK_MASKS
 }
 #[inline(always)]
+pub fn pawn_attacks() -> &'static [[u64; SQUARES]; 2] {
+    &PAWN_ATTACKS
+}
+#[inline(always)]
 pub fn knight_attacks() -> &'static [u64; SQUARES] {
     &KNIGHT_ATTACKS
 }
@@ -77,7 +81,7 @@ mod tests {
 
     #[test]
     fn pawn_table_matches_computed_for_all_squares() {
-        for (sq, item) in PAWN_ATTACKS[Side::White as usize]
+        for (sq, item) in pawn_attacks()[Side::White as usize]
             .iter()
             .enumerate()
             .take(SQUARES)
@@ -89,7 +93,7 @@ mod tests {
                 "White pawn mismatch at sq={sq}"
             );
         }
-        for (sq, item) in PAWN_ATTACKS[Side::Black as usize]
+        for (sq, item) in pawn_attacks()[Side::Black as usize]
             .iter()
             .enumerate()
             .take(SQUARES)
