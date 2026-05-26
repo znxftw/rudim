@@ -1,7 +1,7 @@
 use crate::bitboard::Bitboard;
 use crate::bitboard::lookups::{
-    get_bishop_attacks_from_table, get_rook_attacks_from_table, king_attacks, knight_attacks,
-    pawn_attacks,
+    PAWN_ATTACKS, get_bishop_attacks_from_table, get_rook_attacks_from_table, king_attacks,
+    knight_attacks,
 };
 use crate::board::history::History;
 use crate::common::castle::Castle;
@@ -125,7 +125,7 @@ impl BoardState {
             return true;
         }
 
-        if pawn_attacks()[defending_side as usize][sq]
+        if PAWN_ATTACKS[defending_side as usize][sq]
             & self.pieces[attacking_side as usize][Piece::Pawn as usize].0
             != 0
         {
