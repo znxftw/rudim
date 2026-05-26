@@ -1,10 +1,6 @@
 name: Tournament
 
 on:
-  workflow_run:
-    workflows: ["Tests"]
-    types: [completed]
-    branches: [main]
   workflow_dispatch:
 
 jobs:
