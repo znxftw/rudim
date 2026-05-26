@@ -1,9 +1,5 @@
 use crate::bitboard::Bitboard;
-use crate::bitboard::attacks::{
-    get_bishop_attacks, get_king_attacks, get_knight_attacks, get_pawn_attacks, get_rook_attacks,
-};
-use crate::common::constants::{MAX_BISHOP_MASK, MAX_ROOK_MASK, SQUARES};
-use crate::common::side::Side;
+use crate::common::constants::SQUARES;
 use crate::common::square::Square;
 
 include!(concat!(env!("OUT_DIR"), "/lookups_gen.rs"));
@@ -48,9 +44,11 @@ pub fn get_bishop_attacks_from_table(square: Square, occupancy: Bitboard) -> Bit
     let sq = square as usize;
     let bits = bishop_mask_bits()[sq];
     let mask = bishop_masks()[sq];
-    let index = (occupancy.0 & mask)
-        .wrapping_mul(crate::bitboard::magics::BISHOP_MAGICS[sq])
-        .wrapping_shr(64 - bits) as usize;
+    let index = crate::bitboard::magics::get_magic_index(
+        Bitboard(occupancy.0 & mask),
+        crate::bitboard::magics::BISHOP_MAGICS[sq],
+        bits,
+    );
     Bitboard(bishop_attacks()[sq][index])
 }
 
@@ -59,9 +57,11 @@ pub fn get_rook_attacks_from_table(square: Square, occupancy: Bitboard) -> Bitbo
     let sq = square as usize;
     let bits = rook_mask_bits()[sq];
     let mask = rook_masks()[sq];
-    let index = (occupancy.0 & mask)
-        .wrapping_mul(crate::bitboard::magics::ROOK_MAGICS[sq])
-        .wrapping_shr(64 - bits) as usize;
+    let index = crate::bitboard::magics::get_magic_index(
+        Bitboard(occupancy.0 & mask),
+        crate::bitboard::magics::ROOK_MAGICS[sq],
+        bits,
+    );
     Bitboard(rook_attacks()[sq][index])
 }
 
@@ -76,20 +76,37 @@ pub fn get_queen_attacks_from_table(square: Square, occupancy: Bitboard) -> Bitb
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::bitboard::attacks::{get_bishop_attacks, get_queen_attacks, get_rook_attacks};
+    use crate::{
+        bitboard::attacks::{
+            get_bishop_attacks, get_king_attacks, get_knight_attacks, get_pawn_attacks,
+            get_queen_attacks, get_rook_attacks,
+        },
+        common::side::Side,
+    };
 
     #[test]
     fn pawn_table_matches_computed_for_all_squares() {
-        for sq in 0..SQUARES {
+        for (sq, item) in PAWN_ATTACKS[Side::White as usize]
+            .iter()
+            .enumerate()
+            .take(SQUARES)
+        {
             let square = Square::from(sq);
             assert_eq!(
                 get_pawn_attacks(square, Side::White).0,
-                PAWN_ATTACKS[Side::White as usize][sq],
+                *item,
                 "White pawn mismatch at sq={sq}"
             );
+        }
+        for (sq, item) in PAWN_ATTACKS[Side::Black as usize]
+            .iter()
+            .enumerate()
+            .take(SQUARES)
+        {
+            let square = Square::from(sq);
             assert_eq!(
                 get_pawn_attacks(square, Side::Black).0,
-                PAWN_ATTACKS[Side::Black as usize][sq],
+                *item,
                 "Black pawn mismatch at sq={sq}"
             );
         }

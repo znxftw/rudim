@@ -141,6 +141,11 @@ pub const ROOK_MAGICS: [u64; 64] = [
     1157930883880079490,
 ];
 
+#[inline(always)]
+pub const fn get_magic_index(occupancy: Bitboard, magic: u64, bits: u32) -> usize {
+    occupancy.0.wrapping_mul(magic).wrapping_shr(64 - bits) as usize
+}
+
 pub fn get_bishop_mask(square: Square) -> Bitboard {
     let mut result_board = 0u64;
     let occupancy_board = Bitboard(0);
@@ -301,10 +306,11 @@ pub fn find_magic_number(square: Square, bits_in_mask: i32, is_bishop: bool) -> 
         let mut failure_flag = false;
 
         for index in 0..max_index {
-            let magic_index = ((occupancy_mappings[index]
-                .0
-                .wrapping_mul(potential_magic_number))
-                >> (64 - bits_in_mask)) as usize;
+            let magic_index = get_magic_index(
+                occupancy_mappings[index],
+                potential_magic_number,
+                bits_in_mask as u32,
+            );
 
             if magic_attacks[magic_index].0 == 0xFFFF_FFFF_FFFF_FFFF {
                 magic_attacks[magic_index] = attacks[index];

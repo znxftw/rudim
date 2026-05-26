@@ -17,6 +17,7 @@ pub mod common {
     }
 }
 
+// TODO: Clean? Circular Dependency if included
 pub mod bitboard {
     #![allow(dead_code)]
     #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -63,94 +64,83 @@ fn main() {
     println!("cargo:rerun-if-changed=src/common/constants.rs");
     println!("cargo:rerun-if-changed=src/common/random.rs");
 
+    use bitboard::Bitboard;
+    use bitboard::attacks::{
+        get_bishop_attacks, get_king_attacks, get_knight_attacks, get_pawn_attacks,
+        get_rook_attacks,
+    };
+    use bitboard::magics::{
+        BISHOP_MAGICS, ROOK_MAGICS, get_bishop_mask, get_magic_index, get_occupancy_mapping,
+        get_rook_mask,
+    };
+    use common::side::Side;
+    use common::square::Square;
+
     // 1. Compute basic arrays
     let mut bishop_mask_bits = [0u32; 64];
-    for sq in 0..64 {
-        bishop_mask_bits[sq] = bitboard::magics::get_bishop_mask(common::square::Square::from(sq))
-            .0
-            .count_ones();
+    for (sq, item) in bishop_mask_bits.iter_mut().enumerate() {
+        *item = get_bishop_mask(Square::from(sq)).0.count_ones();
     }
 
     let mut rook_mask_bits = [0u32; 64];
-    for sq in 0..64 {
-        rook_mask_bits[sq] = bitboard::magics::get_rook_mask(common::square::Square::from(sq))
-            .0
-            .count_ones();
+    for (sq, item) in rook_mask_bits.iter_mut().enumerate() {
+        *item = get_rook_mask(Square::from(sq)).0.count_ones();
     }
 
     let mut bishop_masks = [0u64; 64];
-    for sq in 0..64 {
-        bishop_masks[sq] = bitboard::magics::get_bishop_mask(common::square::Square::from(sq)).0;
+    for (sq, item) in bishop_masks.iter_mut().enumerate() {
+        *item = get_bishop_mask(Square::from(sq)).0;
     }
 
     let mut rook_masks = [0u64; 64];
-    for sq in 0..64 {
-        rook_masks[sq] = bitboard::magics::get_rook_mask(common::square::Square::from(sq)).0;
+    for (sq, item) in rook_masks.iter_mut().enumerate() {
+        *item = get_rook_mask(Square::from(sq)).0;
     }
 
     let mut pawn_attacks = [[0u64; 64]; 2];
-    for sq in 0..64 {
-        pawn_attacks[common::side::Side::White as usize][sq] = bitboard::attacks::get_pawn_attacks(
-            common::square::Square::from(sq),
-            common::side::Side::White,
-        )
-        .0;
-        pawn_attacks[common::side::Side::Black as usize][sq] = bitboard::attacks::get_pawn_attacks(
-            common::square::Square::from(sq),
-            common::side::Side::Black,
-        )
-        .0;
+    for (sq, item) in pawn_attacks[Side::White as usize].iter_mut().enumerate() {
+        *item = get_pawn_attacks(Square::from(sq), Side::White).0;
+    }
+    for (sq, item) in pawn_attacks[Side::Black as usize].iter_mut().enumerate() {
+        *item = get_pawn_attacks(Square::from(sq), Side::Black).0;
     }
 
     let mut knight_attacks = [0u64; 64];
-    for sq in 0..64 {
-        knight_attacks[sq] =
-            bitboard::attacks::get_knight_attacks(common::square::Square::from(sq)).0;
+    for (sq, item) in knight_attacks.iter_mut().enumerate() {
+        *item = get_knight_attacks(Square::from(sq)).0;
     }
 
     let mut king_attacks = [0u64; 64];
-    for sq in 0..64 {
-        king_attacks[sq] = bitboard::attacks::get_king_attacks(common::square::Square::from(sq)).0;
+    for (sq, item) in king_attacks.iter_mut().enumerate() {
+        *item = get_king_attacks(Square::from(sq)).0;
     }
 
     // 2. Compute sliding attack tables
     let mut bishop_attacks = [[0u64; 512]; 64];
     for sq in 0..64 {
-        let mask = bitboard::magics::get_bishop_mask(common::square::Square::from(sq));
+        let mask = get_bishop_mask(Square::from(sq));
         let bits = bishop_mask_bits[sq];
         let index_count = 1usize << bits;
 
         for index in 0..index_count {
-            let occupancy = bitboard::magics::get_occupancy_mapping(index, bits as i32, mask);
-            let magic_index = occupancy
-                .0
-                .wrapping_mul(bitboard::magics::BISHOP_MAGICS[sq])
-                .wrapping_shr(64 - bits) as usize;
-            bishop_attacks[sq][magic_index] = bitboard::attacks::get_bishop_attacks(
-                common::square::Square::from(sq),
-                bitboard::Bitboard(occupancy.0),
-            )
-            .0;
+            let occupancy = get_occupancy_mapping(index, bits as i32, mask);
+            let magic_index = get_magic_index(Bitboard(occupancy.0), BISHOP_MAGICS[sq], bits);
+            bishop_attacks[sq][magic_index] =
+                get_bishop_attacks(Square::from(sq), Bitboard(occupancy.0)).0;
         }
     }
 
     let mut rook_attacks = [[0u64; 4096]; 64];
     for sq in 0..64 {
-        let mask = bitboard::magics::get_rook_mask(common::square::Square::from(sq));
+        let mask = get_rook_mask(Square::from(sq));
         let bits = rook_mask_bits[sq];
         let index_count = 1usize << bits;
 
         for index in 0..index_count {
-            let occupancy = bitboard::magics::get_occupancy_mapping(index, bits as i32, mask);
-            let magic_index = occupancy
-                .0
-                .wrapping_mul(bitboard::magics::ROOK_MAGICS[sq])
-                .wrapping_shr(64 - bits) as usize;
-            rook_attacks[sq][magic_index] = bitboard::attacks::get_rook_attacks(
-                common::square::Square::from(sq),
-                bitboard::Bitboard(occupancy.0),
-            )
-            .0;
+            let occupancy = get_occupancy_mapping(index, bits as i32, mask);
+            let magic_index = get_magic_index(Bitboard(occupancy.0), ROOK_MAGICS[sq], bits);
+            rook_attacks[sq][magic_index] =
+                get_rook_attacks(Square::from(sq), Bitboard(occupancy.0)).0;
         }
     }
 
@@ -162,69 +152,19 @@ fn main() {
     use std::io::Write;
     writeln!(f, "// Generated by build.rs. Do not edit.\n").unwrap();
 
-    write!(f, "pub static BISHOP_MASK_BITS: [u32; 64] = [\n").unwrap();
-    for &bits in &bishop_mask_bits {
-        write!(f, "    {},\n", bits).unwrap();
+    macro_rules! write_table {
+        ($name:expr, $type:expr, $items:expr) => {
+            writeln!(f, "pub static {}: {} = {:?};", $name, $type, $items).unwrap();
+        };
     }
-    write!(f, "];\n\n").unwrap();
 
-    write!(f, "pub static ROOK_MASK_BITS: [u32; 64] = [\n").unwrap();
-    for &bits in &rook_mask_bits {
-        write!(f, "    {},\n", bits).unwrap();
-    }
-    write!(f, "];\n\n").unwrap();
-
-    write!(f, "pub static BISHOP_MASKS: [u64; 64] = [\n").unwrap();
-    for &mask in &bishop_masks {
-        write!(f, "    {},\n", mask).unwrap();
-    }
-    write!(f, "];\n\n").unwrap();
-
-    write!(f, "pub static ROOK_MASKS: [u64; 64] = [\n").unwrap();
-    for &mask in &rook_masks {
-        write!(f, "    {},\n", mask).unwrap();
-    }
-    write!(f, "];\n\n").unwrap();
-
-    write!(f, "pub static PAWN_ATTACKS: [[u64; 64]; 2] = [\n").unwrap();
-    for side in 0..2 {
-        write!(f, "    [\n").unwrap();
-        for &atk in &pawn_attacks[side] {
-            write!(f, "        {},\n", atk).unwrap();
-        }
-        write!(f, "    ],\n").unwrap();
-    }
-    write!(f, "];\n\n").unwrap();
-
-    write!(f, "pub static KNIGHT_ATTACKS: [u64; 64] = [\n").unwrap();
-    for &atk in &knight_attacks {
-        write!(f, "    {},\n", atk).unwrap();
-    }
-    write!(f, "];\n\n").unwrap();
-
-    write!(f, "pub static KING_ATTACKS: [u64; 64] = [\n").unwrap();
-    for &atk in &king_attacks {
-        write!(f, "    {},\n", atk).unwrap();
-    }
-    write!(f, "];\n\n").unwrap();
-
-    write!(f, "pub static BISHOP_ATTACKS: [[u64; 512]; 64] = [\n").unwrap();
-    for sq in 0..64 {
-        write!(f, "    [\n").unwrap();
-        for index in 0..512 {
-            write!(f, "        {},\n", bishop_attacks[sq][index]).unwrap();
-        }
-        write!(f, "    ],\n").unwrap();
-    }
-    write!(f, "];\n\n").unwrap();
-
-    write!(f, "pub static ROOK_ATTACKS: [[u64; 4096]; 64] = [\n").unwrap();
-    for sq in 0..64 {
-        write!(f, "    [\n").unwrap();
-        for index in 0..4096 {
-            write!(f, "        {},\n", rook_attacks[sq][index]).unwrap();
-        }
-        write!(f, "    ],\n").unwrap();
-    }
-    write!(f, "];\n").unwrap();
+    write_table!("BISHOP_MASK_BITS", "[u32; 64]", bishop_mask_bits);
+    write_table!("ROOK_MASK_BITS", "[u32; 64]", rook_mask_bits);
+    write_table!("BISHOP_MASKS", "[u64; 64]", bishop_masks);
+    write_table!("ROOK_MASKS", "[u64; 64]", rook_masks);
+    write_table!("PAWN_ATTACKS", "[[u64; 64]; 2]", pawn_attacks);
+    write_table!("KNIGHT_ATTACKS", "[u64; 64]", knight_attacks);
+    write_table!("KING_ATTACKS", "[u64; 64]", king_attacks);
+    write_table!("BISHOP_ATTACKS", "[[u64; 512]; 64]", bishop_attacks);
+    write_table!("ROOK_ATTACKS", "[[u64; 4096]; 64]", rook_attacks);
 }
