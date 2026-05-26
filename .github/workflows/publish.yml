@@ -143,6 +143,8 @@ jobs:
           cargo --version
 
       - name: Build release binary
+        env:
+          RUSTFLAGS: ${{ runner.os == 'Windows' && '-C link-args=/STACK:8388608' || '' }}
         run: cargo build --locked --release --target ${{ matrix.target }}
 
       - name: Stage binary (Unix)
