@@ -3,7 +3,6 @@ use crate::bitboard::lookups::{
     get_bishop_attacks_from_table, get_rook_attacks_from_table, knight_attacks,
 };
 use crate::board::state::BoardState;
-use crate::common::constants;
 use crate::common::game_phase;
 use crate::common::side::Side;
 use crate::common::square::Square;
@@ -32,17 +31,20 @@ impl PieceSquareTableEvaluation {
         let mid_game_phase = board_state.clipped_phase();
         let end_game_phase = game_phase::TOTAL_PHASE - mid_game_phase;
 
-        for piece_idx in 0..constants::PIECES {
-            let mut white_board = Bitboard(board_state.pieces[Side::White as usize][piece_idx].0);
-            let mut black_board = Bitboard(board_state.pieces[Side::Black as usize][piece_idx].0);
-
+        for (piece_idx, &white_board) in board_state.pieces[Side::White as usize].iter().enumerate()
+        {
+            let mut white_board = white_board;
             while white_board.0 > 0 {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
                 positional_score += (MID_GAME_POSITIONS[piece_idx][square] as i32 * mid_game_phase)
                     + (END_GAME_POSITIONS[piece_idx][square] as i32 * end_game_phase);
             }
+        }
 
+        for (piece_idx, &black_board) in board_state.pieces[Side::Black as usize].iter().enumerate()
+        {
+            let mut black_board = black_board;
             while black_board.0 > 0 {
                 let square = black_board.get_lsb() as usize;
                 black_board.clear_bit(square);
