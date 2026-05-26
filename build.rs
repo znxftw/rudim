@@ -116,7 +116,7 @@ fn main() {
     }
 
     // 2. Compute sliding attack tables
-    let mut bishop_attacks = [[0u64; 512]; 64];
+    let mut bishop_attacks = vec![[0u64; 512]; 64];
     for sq in 0..64 {
         let mask = get_bishop_mask(Square::from(sq));
         let bits = bishop_mask_bits[sq];
@@ -130,7 +130,7 @@ fn main() {
         }
     }
 
-    let mut rook_attacks = [[0u64; 4096]; 64];
+    let mut rook_attacks = vec![[0u64; 4096]; 64];
     for sq in 0..64 {
         let mask = get_rook_mask(Square::from(sq));
         let bits = rook_mask_bits[sq];
