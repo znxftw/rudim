@@ -6,7 +6,7 @@ on:
 jobs:
   precheck:
     name: Validate version and tag
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
