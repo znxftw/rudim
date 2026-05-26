@@ -15,7 +15,6 @@ name = "search_benchmark"
 harness = false
 
 [profile.dev]
-opt-level = 3
 debug = true
 debug-assertions = true
 

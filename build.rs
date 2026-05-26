@@ -1,0 +1,170 @@
+pub mod common {
+    pub mod square {
+        #![allow(dead_code)]
+        include!("src/common/square.rs");
+    }
+    pub mod side {
+        #![allow(dead_code)]
+        include!("src/common/side.rs");
+    }
+    pub mod constants {
+        #![allow(dead_code)]
+        include!("src/common/constants.rs");
+    }
+    pub mod random {
+        #![allow(dead_code)]
+        include!("src/common/random.rs");
+    }
+}
+
+// TODO: Clean? Circular Dependency if included
+pub mod bitboard {
+    #![allow(dead_code)]
+    #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct Bitboard(pub u64);
+
+    impl Bitboard {
+        #[inline]
+        pub fn get_bit(&self, square: usize) -> u8 {
+            ((self.0 >> square) & 1) as u8
+        }
+
+        #[inline]
+        pub fn set_bit(&mut self, square: usize) {
+            self.0 |= 1u64 << square;
+        }
+
+        #[inline]
+        pub fn clear_bit(&mut self, square: usize) {
+            self.0 &= !(1u64 << square);
+        }
+
+        #[inline]
+        pub fn get_lsb(&self) -> u32 {
+            self.0.trailing_zeros()
+        }
+    }
+
+    pub mod attacks {
+        #![allow(dead_code)]
+        include!("src/bitboard/attacks.rs");
+    }
+
+    pub mod magics {
+        #![allow(dead_code)]
+        include!("src/bitboard/magics.rs");
+    }
+}
+
+fn main() {
+    println!("cargo:rerun-if-changed=src/bitboard/attacks.rs");
+    println!("cargo:rerun-if-changed=src/bitboard/magics.rs");
+    println!("cargo:rerun-if-changed=src/common/square.rs");
+    println!("cargo:rerun-if-changed=src/common/side.rs");
+    println!("cargo:rerun-if-changed=src/common/constants.rs");
+    println!("cargo:rerun-if-changed=src/common/random.rs");
+
+    use bitboard::Bitboard;
+    use bitboard::attacks::{
+        get_bishop_attacks, get_king_attacks, get_knight_attacks, get_pawn_attacks,
+        get_rook_attacks,
+    };
+    use bitboard::magics::{
+        BISHOP_MAGICS, ROOK_MAGICS, get_bishop_mask, get_magic_index, get_occupancy_mapping,
+        get_rook_mask,
+    };
+    use common::side::Side;
+    use common::square::Square;
+
+    // 1. Compute basic arrays
+    let mut bishop_mask_bits = [0u32; 64];
+    for (sq, item) in bishop_mask_bits.iter_mut().enumerate() {
+        *item = get_bishop_mask(Square::from(sq)).0.count_ones();
+    }
+
+    let mut rook_mask_bits = [0u32; 64];
+    for (sq, item) in rook_mask_bits.iter_mut().enumerate() {
+        *item = get_rook_mask(Square::from(sq)).0.count_ones();
+    }
+
+    let mut bishop_masks = [0u64; 64];
+    for (sq, item) in bishop_masks.iter_mut().enumerate() {
+        *item = get_bishop_mask(Square::from(sq)).0;
+    }
+
+    let mut rook_masks = [0u64; 64];
+    for (sq, item) in rook_masks.iter_mut().enumerate() {
+        *item = get_rook_mask(Square::from(sq)).0;
+    }
+
+    let mut pawn_attacks = [[0u64; 64]; 2];
+    for (sq, item) in pawn_attacks[Side::White as usize].iter_mut().enumerate() {
+        *item = get_pawn_attacks(Square::from(sq), Side::White).0;
+    }
+    for (sq, item) in pawn_attacks[Side::Black as usize].iter_mut().enumerate() {
+        *item = get_pawn_attacks(Square::from(sq), Side::Black).0;
+    }
+
+    let mut knight_attacks = [0u64; 64];
+    for (sq, item) in knight_attacks.iter_mut().enumerate() {
+        *item = get_knight_attacks(Square::from(sq)).0;
+    }
+
+    let mut king_attacks = [0u64; 64];
+    for (sq, item) in king_attacks.iter_mut().enumerate() {
+        *item = get_king_attacks(Square::from(sq)).0;
+    }
+
+    // 2. Compute sliding attack tables
+    let mut bishop_attacks = [[0u64; 512]; 64];
+    for sq in 0..64 {
+        let mask = get_bishop_mask(Square::from(sq));
+        let bits = bishop_mask_bits[sq];
+        let index_count = 1usize << bits;
+
+        for index in 0..index_count {
+            let occupancy = get_occupancy_mapping(index, bits as i32, mask);
+            let magic_index = get_magic_index(Bitboard(occupancy.0), BISHOP_MAGICS[sq], bits);
+            bishop_attacks[sq][magic_index] =
+                get_bishop_attacks(Square::from(sq), Bitboard(occupancy.0)).0;
+        }
+    }
+
+    let mut rook_attacks = [[0u64; 4096]; 64];
+    for sq in 0..64 {
+        let mask = get_rook_mask(Square::from(sq));
+        let bits = rook_mask_bits[sq];
+        let index_count = 1usize << bits;
+
+        for index in 0..index_count {
+            let occupancy = get_occupancy_mapping(index, bits as i32, mask);
+            let magic_index = get_magic_index(Bitboard(occupancy.0), ROOK_MAGICS[sq], bits);
+            rook_attacks[sq][magic_index] =
+                get_rook_attacks(Square::from(sq), Bitboard(occupancy.0)).0;
+        }
+    }
+
+    // 3. Write lookups_gen.rs to OUT_DIR
+    let out_dir = std::env::var("OUT_DIR").unwrap();
+    let dest_path = std::path::Path::new(&out_dir).join("lookups_gen.rs");
+    let mut f = std::fs::File::create(&dest_path).unwrap();
+
+    use std::io::Write;
+    writeln!(f, "// Generated by build.rs. Do not edit.\n").unwrap();
+
+    macro_rules! write_table {
+        ($name:expr, $type:expr, $items:expr) => {
+            writeln!(f, "pub static {}: {} = {:?};", $name, $type, $items).unwrap();
+        };
+    }
+
+    write_table!("BISHOP_MASK_BITS", "[u32; 64]", bishop_mask_bits);
+    write_table!("ROOK_MASK_BITS", "[u32; 64]", rook_mask_bits);
+    write_table!("BISHOP_MASKS", "[u64; 64]", bishop_masks);
+    write_table!("ROOK_MASKS", "[u64; 64]", rook_masks);
+    write_table!("PAWN_ATTACKS", "[[u64; 64]; 2]", pawn_attacks);
+    write_table!("KNIGHT_ATTACKS", "[u64; 64]", knight_attacks);
+    write_table!("KING_ATTACKS", "[u64; 64]", king_attacks);
+    write_table!("BISHOP_ATTACKS", "[[u64; 512]; 64]", bishop_attacks);
+    write_table!("ROOK_ATTACKS", "[[u64; 4096]; 64]", rook_attacks);
+}
