@@ -15,6 +15,7 @@ Rudim currently implements these core engine capabilities:
 
 - Bitboards, Magic Bitboards
 - Make/Unmake Move (pseudo-legal movegen)
+- Phased Move Generation
 - Zobrist Hashing
 
 ### Search
@@ -23,7 +24,7 @@ Rudim currently implements these core engine capabilities:
 - Negamax + Alpha-Beta Pruning
 - Principal Variation Search
 - Quiescence Search
-- Transposition Table
+- Two-tiered Transposition Table
 - Move Ordering (MVV-LVA, Killer, History, Hash, PV)
 - Null Move Pruning
 - Late Move Reductions
@@ -33,6 +34,7 @@ Rudim currently implements these core engine capabilities:
 
 - Piece-Square Tables
 - Pawn Structure (Doubled, Isolated, Passed)
+- Mobility
 - Draw Detection
 
 ### Other
