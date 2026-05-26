@@ -1,4 +1,5 @@
 use crate::bitboard::Bitboard;
+use crate::bitboard::magics::{BISHOP_MAGICS, ROOK_MAGICS, get_magic_index};
 use crate::common::constants::SQUARES;
 use crate::common::square::Square;
 
@@ -37,18 +38,12 @@ fn rook_attacks() -> &'static [[u64; 4096]; SQUARES] {
     &ROOK_ATTACKS
 }
 
-pub fn init() {}
-
 #[inline]
 pub fn get_bishop_attacks_from_table(square: Square, occupancy: Bitboard) -> Bitboard {
     let sq = square as usize;
     let bits = bishop_mask_bits()[sq];
     let mask = bishop_masks()[sq];
-    let index = crate::bitboard::magics::get_magic_index(
-        Bitboard(occupancy.0 & mask),
-        crate::bitboard::magics::BISHOP_MAGICS[sq],
-        bits,
-    );
+    let index = get_magic_index(Bitboard(occupancy.0 & mask), BISHOP_MAGICS[sq], bits);
     Bitboard(bishop_attacks()[sq][index])
 }
 
@@ -57,11 +52,7 @@ pub fn get_rook_attacks_from_table(square: Square, occupancy: Bitboard) -> Bitbo
     let sq = square as usize;
     let bits = rook_mask_bits()[sq];
     let mask = rook_masks()[sq];
-    let index = crate::bitboard::magics::get_magic_index(
-        Bitboard(occupancy.0 & mask),
-        crate::bitboard::magics::ROOK_MAGICS[sq],
-        bits,
-    );
+    let index = get_magic_index(Bitboard(occupancy.0 & mask), ROOK_MAGICS[sq], bits);
     Bitboard(rook_attacks()[sq][index])
 }
 
