@@ -8,21 +8,21 @@ pub enum Side {
 
 impl Side {
     pub fn other(self) -> Self {
-        let x = self as usize;
-        // when single bit number, becomes x ^ 1
-        // when second bit is set, becomes x ^ 0
-        SIDES[x ^ (1 - (x >> 1))]
+        match self {
+            Side::White => Side::Black,
+            Side::Black => Side::White,
+            Side::Both => Side::Both,
+        }
     }
 }
 
-const SIDES: [Side; 3] = [Side::White, Side::Black, Side::Both];
-
 impl From<usize> for Side {
     fn from(value: usize) -> Self {
-        if value <= 2 {
-            SIDES[value]
-        } else {
-            panic!("Invalid side index: {}", value)
+        match value {
+            0 => Side::White,
+            1 => Side::Black,
+            2 => Side::Both,
+            _ => panic!("Invalid side index: {}", value),
         }
     }
 }
