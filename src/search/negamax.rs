@@ -85,12 +85,15 @@ fn search_internal(
 
     // PRUNE: Reverse Futility Pruning
     // TODO: tune conditions
-    if !is_pv_node && !in_check {
-        let eval = PieceSquareTableEvaluation::evaluate(board_state);
+    let mut static_eval = 0;
+    let has_static_eval = !is_pv_node && !in_check;
+
+    if has_static_eval {
+        static_eval = PieceSquareTableEvaluation::evaluate(board_state);
         // TODO: tune
         let margin = 150 * depth as i16;
-        if eval.saturating_sub(margin) >= beta {
-            return eval;
+        if static_eval.saturating_sub(margin) >= beta {
+            return static_eval;
         }
     }
 
@@ -144,6 +147,7 @@ fn search_internal(
 
     let mut move_picker = MovePicker::new(pv_move, tt_best, ply as usize);
     let mut number_of_legal_moves = 0;
+    let mut has_legal_moves = false;
 
     while let Some(move_obj) = move_picker.next(board_state) {
         if ctx.cancellation_token.load(Ordering::Relaxed) {
@@ -158,6 +162,20 @@ fn search_internal(
 
         let gives_check = board_state.is_in_check(board_state.side_to_move);
         let is_tactical = move_obj.is_capture() || move_obj.is_promotion() || gives_check;
+
+        has_legal_moves = true;
+
+        // PRUNE: Futility Pruning
+        if has_static_eval
+            && depth < 3
+            && !is_tactical
+            // TODO: tune
+            && static_eval.saturating_add(150 * depth as i16) <= alpha
+        {
+            board_state.unmake_move(move_obj);
+            continue;
+        }
+
         let needs_lmr = lmr::needs_reduction(depth, number_of_legal_moves, is_tactical, in_check);
 
         let mut score;
@@ -242,7 +260,7 @@ fn search_internal(
         }
     }
 
-    if number_of_legal_moves == 0 {
+    if !has_legal_moves {
         if in_check {
             return -constants::MAX_CENTIPAWN_EVAL + ply as i16;
         }
