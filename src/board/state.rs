@@ -132,6 +132,18 @@ impl BoardState {
 
         let queen_attacks = self.pieces[attacking_side][Piece::Queen];
 
+        if (self.pieces[attacking_side][Piece::Pawn] & pawn_attacks()[defending_side as usize][sq])
+            .is_not_empty()
+        {
+            return true;
+        }
+        if (self.pieces[attacking_side][Piece::Knight] & knight_attacks()[sq]).is_not_empty() {
+            return true;
+        }
+        if (self.pieces[attacking_side][Piece::King] & king_attacks()[sq]).is_not_empty() {
+            return true;
+        }
+
         if (get_bishop_attacks_from_table(square, occupancy)
             & (self.pieces[attacking_side][Piece::Bishop] | queen_attacks))
             .is_not_empty()
@@ -142,18 +154,6 @@ impl BoardState {
             & (self.pieces[attacking_side][Piece::Rook] | queen_attacks))
             .is_not_empty()
         {
-            return true;
-        }
-
-        if (self.pieces[attacking_side][Piece::Pawn] & pawn_attacks()[defending_side as usize][sq])
-            .is_not_empty()
-        {
-            return true;
-        }
-        if (self.pieces[attacking_side][Piece::Knight] & knight_attacks()[sq]).is_not_empty() {
-            return true;
-        }
-        if (self.pieces[attacking_side][Piece::King] & king_attacks()[sq]).is_not_empty() {
             return true;
         }
 
