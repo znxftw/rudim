@@ -54,9 +54,9 @@ impl BoardState {
         };
         side = side.other();
 
-        while attackers.0 > 0 {
-            let side_attackers = attackers.0 & self.occupancies[side as usize].0;
-            if side_attackers == 0 {
+        while attackers.is_not_empty() {
+            let side_attackers = attackers & self.occupancies[side as usize];
+            if side_attackers.is_empty() {
                 break;
             }
 
@@ -137,28 +137,28 @@ impl BoardState {
     }
 
     #[inline]
-    fn get_pieces(&self, piece: Piece) -> u64 {
-        self.pieces[Side::White as usize][piece as usize].0
-            | self.pieces[Side::Black as usize][piece as usize].0
+    fn get_pieces(&self, piece: Piece) -> Bitboard {
+        self.pieces[Side::White as usize][piece as usize]
+            | self.pieces[Side::Black as usize][piece as usize]
     }
 
     fn get_all_attackers(&self, sq: Square, occupancy: Bitboard) -> Bitboard {
-        let white_pawns = self.pieces[Side::White as usize][Piece::Pawn as usize].0;
-        let black_pawns = self.pieces[Side::Black as usize][Piece::Pawn as usize].0;
+        let white_pawns = self.pieces[Side::White as usize][Piece::Pawn as usize];
+        let black_pawns = self.pieces[Side::Black as usize][Piece::Pawn as usize];
         let knights = self.get_pieces(Piece::Knight);
         let bishops = self.get_pieces(Piece::Bishop);
         let rooks = self.get_pieces(Piece::Rook);
         let queens = self.get_pieces(Piece::Queen);
         let kings = self.get_pieces(Piece::King);
 
-        let pawn_attacks = (pawn_attacks()[Side::Black as usize][sq as usize] & white_pawns)
-            | (pawn_attacks()[Side::White as usize][sq as usize] & black_pawns);
-        let knight_attacks = knight_attacks()[sq as usize] & knights;
-        let bishop_attacks = get_bishop_attacks_from_table(sq, occupancy).0 & (bishops | queens);
-        let rook_attacks = get_rook_attacks_from_table(sq, occupancy).0 & (rooks | queens);
-        let king_attacks = king_attacks()[sq as usize] & kings;
+        let pawn_attacks = (white_pawns & pawn_attacks()[Side::Black as usize][sq as usize])
+            | (black_pawns & pawn_attacks()[Side::White as usize][sq as usize]);
+        let knight_attacks = knights & knight_attacks()[sq as usize];
+        let bishop_attacks = get_bishop_attacks_from_table(sq, occupancy) & (bishops | queens);
+        let rook_attacks = get_rook_attacks_from_table(sq, occupancy) & (rooks | queens);
+        let king_attacks = kings & king_attacks()[sq as usize];
 
-        Bitboard(pawn_attacks | knight_attacks | bishop_attacks | rook_attacks | king_attacks)
+        pawn_attacks | knight_attacks | bishop_attacks | rook_attacks | king_attacks
     }
 
     fn update_xrays(&self, attackers: &mut Bitboard, target: Square, occupancy: Bitboard) {
@@ -167,20 +167,20 @@ impl BoardState {
         let queens = self.get_pieces(Piece::Queen);
 
         let diagonal_attackers =
-            get_bishop_attacks_from_table(target, occupancy).0 & (bishops | queens) & occupancy.0;
-        attackers.0 |= diagonal_attackers;
+            get_bishop_attacks_from_table(target, occupancy) & (bishops | queens) & occupancy;
+        *attackers |= diagonal_attackers;
 
         let orthogonal_attackers =
-            get_rook_attacks_from_table(target, occupancy).0 & (rooks | queens) & occupancy.0;
-        attackers.0 |= orthogonal_attackers;
+            get_rook_attacks_from_table(target, occupancy) & (rooks | queens) & occupancy;
+        *attackers |= orthogonal_attackers;
     }
 
-    fn get_least_valuable_attacker(&self, side_attackers: u64, side: Side) -> (Square, Piece) {
+    fn get_least_valuable_attacker(&self, side_attackers: Bitboard, side: Side) -> (Square, Piece) {
         for piece in Piece::ALL {
-            let pieces_bb = self.pieces[side as usize][piece as usize].0;
+            let pieces_bb = self.pieces[side as usize][piece as usize];
             let intersection = side_attackers & pieces_bb;
-            if intersection > 0 {
-                let sq = Square::from(intersection.trailing_zeros() as usize);
+            if intersection.is_not_empty() {
+                let sq = Square::from(intersection.get_lsb() as usize);
                 return (sq, piece);
             }
         }

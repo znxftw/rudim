@@ -130,33 +130,35 @@ impl BoardState {
         let occupancy = self.occupancies[Side::Both as usize];
         let defending_side = attacking_side.other();
 
-        let queen_attacks = self.pieces[attacking_side as usize][Piece::Queen as usize].0;
+        let queen_attacks = self.pieces[attacking_side as usize][Piece::Queen as usize];
 
-        if get_bishop_attacks_from_table(square, occupancy).0
-            & (self.pieces[attacking_side as usize][Piece::Bishop as usize].0 | queen_attacks)
-            != 0
+        if (get_bishop_attacks_from_table(square, occupancy)
+            & (self.pieces[attacking_side as usize][Piece::Bishop as usize] | queen_attacks))
+            .is_not_empty()
         {
             return true;
         }
-        if get_rook_attacks_from_table(square, occupancy).0
-            & (self.pieces[attacking_side as usize][Piece::Rook as usize].0 | queen_attacks)
-            != 0
+        if (get_rook_attacks_from_table(square, occupancy)
+            & (self.pieces[attacking_side as usize][Piece::Rook as usize] | queen_attacks))
+            .is_not_empty()
         {
             return true;
         }
 
-        if pawn_attacks()[defending_side as usize][sq]
-            & self.pieces[attacking_side as usize][Piece::Pawn as usize].0
-            != 0
+        if (self.pieces[attacking_side as usize][Piece::Pawn as usize]
+            & pawn_attacks()[defending_side as usize][sq])
+            .is_not_empty()
         {
             return true;
         }
-        if knight_attacks()[sq] & self.pieces[attacking_side as usize][Piece::Knight as usize].0
-            != 0
+        if (self.pieces[attacking_side as usize][Piece::Knight as usize] & knight_attacks()[sq])
+            .is_not_empty()
         {
             return true;
         }
-        if king_attacks()[sq] & self.pieces[attacking_side as usize][Piece::King as usize].0 != 0 {
+        if (self.pieces[attacking_side as usize][Piece::King as usize] & king_attacks()[sq])
+            .is_not_empty()
+        {
             return true;
         }
 

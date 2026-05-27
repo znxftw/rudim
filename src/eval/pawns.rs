@@ -1,3 +1,4 @@
+use crate::bitboard::Bitboard;
 use crate::board::state::BoardState;
 use crate::common::constants;
 use crate::common::piece::Piece;
@@ -14,8 +15,8 @@ pub struct PawnStructureEvaluation;
 impl PawnStructureEvaluation {
     // Returns score from white's perspective (positive = good for white)
     pub fn evaluate(board_state: &BoardState) -> i16 {
-        let white_pawns = board_state.pieces[Side::White as usize][Piece::Pawn as usize].0;
-        let black_pawns = board_state.pieces[Side::Black as usize][Piece::Pawn as usize].0;
+        let white_pawns = board_state.pieces[Side::White as usize][Piece::Pawn as usize];
+        let black_pawns = board_state.pieces[Side::Black as usize][Piece::Pawn as usize];
 
         let mut score: i16 = 0;
         score += Self::score_doubled_pawns(white_pawns, black_pawns);
@@ -23,7 +24,7 @@ impl PawnStructureEvaluation {
         score
     }
 
-    fn score_doubled_pawns(white_pawns: u64, black_pawns: u64) -> i16 {
+    fn score_doubled_pawns(white_pawns: Bitboard, black_pawns: Bitboard) -> i16 {
         let mut score = 0;
         for &mask in &FILE_MASKS {
             let white_count = (white_pawns & mask).count_ones() as i16;
@@ -38,28 +39,28 @@ impl PawnStructureEvaluation {
         score
     }
 
-    fn score_pawn_features(white_pawns: u64, black_pawns: u64) -> i16 {
+    fn score_pawn_features(white_pawns: Bitboard, black_pawns: Bitboard) -> i16 {
         let mut score = 0;
         let mut wp = white_pawns;
-        while wp != 0 {
-            let sq = wp.trailing_zeros() as usize;
-            wp &= wp - 1;
-            if (white_pawns & ADJACENT_FILE_MASKS[sq & 7]) == 0 {
+        while wp.is_not_empty() {
+            let sq = wp.get_lsb() as usize;
+            wp.clear_lsb();
+            if (white_pawns & ADJACENT_FILE_MASKS[sq & 7]).is_empty() {
                 score -= ISOLATED_PAWN_PENALTY;
             }
-            if (black_pawns & PASSED_PAWN_MASKS[Side::White as usize][sq]) == 0 {
+            if (black_pawns & PASSED_PAWN_MASKS[Side::White as usize][sq]).is_empty() {
                 score += PASSED_PAWN_BONUS[sq >> 3];
             }
         }
 
         let mut bp = black_pawns;
-        while bp != 0 {
-            let sq = bp.trailing_zeros() as usize;
-            bp &= bp - 1;
-            if (black_pawns & ADJACENT_FILE_MASKS[sq & 7]) == 0 {
+        while bp.is_not_empty() {
+            let sq = bp.get_lsb() as usize;
+            bp.clear_lsb();
+            if (black_pawns & ADJACENT_FILE_MASKS[sq & 7]).is_empty() {
                 score += ISOLATED_PAWN_PENALTY;
             }
-            if (white_pawns & PASSED_PAWN_MASKS[Side::Black as usize][sq]) == 0 {
+            if (white_pawns & PASSED_PAWN_MASKS[Side::Black as usize][sq]).is_empty() {
                 score -= PASSED_PAWN_BONUS[7 - (sq >> 3)];
             }
         }

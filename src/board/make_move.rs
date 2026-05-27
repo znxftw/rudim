@@ -94,8 +94,8 @@ impl BoardState {
         self.en_passant_square = if m.move_type.is_double_push() {
             let t = m.target as usize;
             let adjacent = ((1u64 << (t - 1)) & !FILE_H) | ((1u64 << (t + 1)) & !FILE_A);
-            if adjacent & self.pieces[self.side_to_move.other() as usize][Piece::Pawn as usize].0
-                != 0
+            if (self.pieces[self.side_to_move.other() as usize][Piece::Pawn as usize] & adjacent)
+                .is_not_empty()
             {
                 self.en_passant_square_for(m)
             } else {
@@ -189,16 +189,16 @@ impl BoardState {
     }
 
     pub fn is_draw(&self) -> bool {
-        let num_pieces = self.occupancies[Side::Both as usize].0.count_ones();
+        let num_pieces = self.occupancies[Side::Both as usize].count_ones();
         if num_pieces == 2 {
             // Assumes a legal board with 2 Kings only
             return true;
         } else if num_pieces == 3 {
-            let knights = self.pieces[Side::White as usize][Piece::Knight as usize].0
-                | self.pieces[Side::Black as usize][Piece::Knight as usize].0;
-            let bishops = self.pieces[Side::White as usize][Piece::Bishop as usize].0
-                | self.pieces[Side::Black as usize][Piece::Bishop as usize].0;
-            if (knights | bishops) != 0 {
+            let knights = self.pieces[Side::White as usize][Piece::Knight as usize]
+                | self.pieces[Side::Black as usize][Piece::Knight as usize];
+            let bishops = self.pieces[Side::White as usize][Piece::Bishop as usize]
+                | self.pieces[Side::Black as usize][Piece::Bishop as usize];
+            if (knights | bishops).is_not_empty() {
                 return true;
             }
         }
