@@ -1,8 +1,7 @@
 use crate::board::state::BoardState;
 use crate::common::constants::MAX_PLY;
-use crate::common::scored_moves::MoveList;
-use crate::eval::move_ordering;
 use crate::eval::pst::PieceSquareTableEvaluation;
+use crate::search::move_picker::MovePicker;
 use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
 
 static NODES: AtomicI32 = AtomicI32::new(0);
@@ -28,22 +27,11 @@ pub fn search(
         alpha = eval;
     }
 
-    let mut moves = MoveList::new();
-    board_state.generate_captures(&mut moves);
+    let mut move_picker = MovePicker::new_qsearch(MAX_PLY - 1);
 
-    move_ordering::populate_move_scores(&mut moves, board_state, MAX_PLY - 1, None, None);
-
-    for i in 0..moves.len() {
-        move_ordering::MoveOrdering::sort_next_best_move(&mut moves, i);
-        let move_obj = moves[i].mv;
-
+    while let Some(move_obj) = move_picker.next(board_state) {
         if cancellation_token.load(Ordering::Relaxed) {
             break;
-        }
-
-        // Prune captures that lose material according to Static Exchange Evaluation
-        if board_state.see(move_obj) < 0 {
-            continue;
         }
 
         board_state.make_move(move_obj);
