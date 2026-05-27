@@ -176,16 +176,7 @@ impl BoardState {
     }
 
     fn get_least_valuable_attacker(&self, side_attackers: u64, side: Side) -> (Square, Piece) {
-        const ATTACKING_PIECES: [Piece; 6] = [
-            Piece::Pawn,
-            Piece::Knight,
-            Piece::Bishop,
-            Piece::Rook,
-            Piece::Queen,
-            Piece::King,
-        ];
-
-        for piece in ATTACKING_PIECES {
+        for piece in Piece::ALL {
             let pieces_bb = self.pieces[side as usize][piece as usize].0;
             let intersection = side_attackers & pieces_bb;
             if intersection > 0 {

@@ -12,6 +12,15 @@ pub enum Piece {
 
 impl Piece {
     pub const ALL_PIECES: usize = 6;
+
+    pub const ALL: [Piece; 6] = [
+        Piece::Pawn,
+        Piece::Knight,
+        Piece::Bishop,
+        Piece::Rook,
+        Piece::Queen,
+        Piece::King,
+    ];
 }
 
 impl From<usize> for Piece {

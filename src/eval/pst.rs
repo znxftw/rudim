@@ -69,16 +69,19 @@ impl PieceSquareTableEvaluation {
         let white_pieces = board_state.occupancies[Side::White as usize].0;
         let black_pieces = board_state.occupancies[Side::Black as usize].0;
 
-        for piece_idx in 1..5 {
-            let mut white_board = Bitboard(board_state.pieces[Side::White as usize][piece_idx].0);
+        for &piece in &Piece::ALL[1..5] {
+            let mut white_board =
+                Bitboard(board_state.pieces[Side::White as usize][piece as usize].0);
             while white_board.0 > 0 {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
-                let attacks = match piece_idx {
-                    1 => knight_attacks()[square],
-                    2 => get_bishop_attacks_from_table(Square::from(square), occupancy).0,
-                    3 => get_rook_attacks_from_table(Square::from(square), occupancy).0,
-                    4 => {
+                let attacks = match piece {
+                    Piece::Knight => knight_attacks()[square],
+                    Piece::Bishop => {
+                        get_bishop_attacks_from_table(Square::from(square), occupancy).0
+                    }
+                    Piece::Rook => get_rook_attacks_from_table(Square::from(square), occupancy).0,
+                    Piece::Queen => {
                         get_bishop_attacks_from_table(Square::from(square), occupancy).0
                             | get_rook_attacks_from_table(Square::from(square), occupancy).0
                     }
@@ -87,15 +90,18 @@ impl PieceSquareTableEvaluation {
                 mobility += (attacks & !white_pieces).count_ones() as i16;
             }
 
-            let mut black_board = Bitboard(board_state.pieces[Side::Black as usize][piece_idx].0);
+            let mut black_board =
+                Bitboard(board_state.pieces[Side::Black as usize][piece as usize].0);
             while black_board.0 > 0 {
                 let square = black_board.get_lsb() as usize;
                 black_board.clear_bit(square);
-                let attacks = match piece_idx {
-                    1 => knight_attacks()[square],
-                    2 => get_bishop_attacks_from_table(Square::from(square), occupancy).0,
-                    3 => get_rook_attacks_from_table(Square::from(square), occupancy).0,
-                    4 => {
+                let attacks = match piece {
+                    Piece::Knight => knight_attacks()[square],
+                    Piece::Bishop => {
+                        get_bishop_attacks_from_table(Square::from(square), occupancy).0
+                    }
+                    Piece::Rook => get_rook_attacks_from_table(Square::from(square), occupancy).0,
+                    Piece::Queen => {
                         get_bishop_attacks_from_table(Square::from(square), occupancy).0
                             | get_rook_attacks_from_table(Square::from(square), occupancy).0
                     }
