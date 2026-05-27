@@ -37,6 +37,8 @@ pub struct BoardState {
     pub board_hash: u64,
     pub half_move_clock: u8,
     pub history: History,
+    pub pst_mid: i32,
+    pub pst_end: i32,
 }
 
 impl BoardState {
@@ -53,6 +55,8 @@ impl BoardState {
             board_hash: 0,
             half_move_clock: 0,
             history: History::new(),
+            pst_mid: 0,
+            pst_end: 0,
         }
     }
 
@@ -63,11 +67,22 @@ impl BoardState {
         self.occupancies[Side::Both as usize].set_bit(sq);
         self.piece_mapping[sq] = piece;
         self.phase = add_phase(self.phase, piece);
+
+        let (mid_val, end_val) = crate::eval::pst::get_pst_values(piece, square, side);
+        self.pst_mid += mid_val;
+        self.pst_end += end_val;
     }
 
     pub fn remove_piece(&mut self, square: Square) -> Piece {
         let sq = square as usize;
         let piece = self.piece_mapping[sq];
+
+        let side = if self.occupancies[Side::White as usize].get_bit(sq) == 1 {
+            Side::White
+        } else {
+            Side::Black
+        };
+
         self.pieces[Side::White as usize][piece as usize].clear_bit(sq);
         self.pieces[Side::Black as usize][piece as usize].clear_bit(sq);
         self.occupancies[Side::White as usize].clear_bit(sq);
@@ -75,6 +90,11 @@ impl BoardState {
         self.occupancies[Side::Both as usize].clear_bit(sq);
         self.piece_mapping[sq] = Piece::None;
         self.phase = remove_phase(self.phase, piece);
+
+        let (mid_val, end_val) = crate::eval::pst::get_pst_values(piece, square, side);
+        self.pst_mid -= mid_val;
+        self.pst_end -= end_val;
+
         piece
     }
 

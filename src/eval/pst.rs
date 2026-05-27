@@ -4,9 +4,36 @@ use crate::bitboard::lookups::{
 };
 use crate::board::state::BoardState;
 use crate::common::game_phase;
+use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
 use crate::eval::pawns::PawnStructureEvaluation;
+
+pub fn mirror_square(square: usize) -> usize {
+    let row = square >> 3;
+    let col = square & 7;
+    ((7 - row) << 3) + col
+}
+
+pub fn get_pst_values(piece: Piece, square: Square, side: Side) -> (i32, i32) {
+    if piece == Piece::None {
+        return (0, 0);
+    }
+    let piece_idx = piece as usize;
+    let sq = square as usize;
+    if side == Side::White {
+        (
+            MID_GAME_POSITIONS[piece_idx][sq] as i32,
+            END_GAME_POSITIONS[piece_idx][sq] as i32,
+        )
+    } else {
+        let mirrored = mirror_square(sq);
+        (
+            -(MID_GAME_POSITIONS[piece_idx][mirrored] as i32),
+            -(END_GAME_POSITIONS[piece_idx][mirrored] as i32),
+        )
+    }
+}
 
 pub struct PieceSquareTableEvaluation;
 
@@ -27,41 +54,13 @@ impl PieceSquareTableEvaluation {
     }
 
     fn score_position(board_state: &BoardState) -> i16 {
-        let mut positional_score = 0;
         let mid_game_phase = board_state.clipped_phase();
         let end_game_phase = game_phase::TOTAL_PHASE - mid_game_phase;
 
-        for (piece_idx, &white_board) in board_state.pieces[Side::White as usize].iter().enumerate()
-        {
-            let mut white_board = white_board;
-            while white_board.0 > 0 {
-                let square = white_board.get_lsb() as usize;
-                white_board.clear_bit(square);
-                positional_score += (MID_GAME_POSITIONS[piece_idx][square] as i32 * mid_game_phase)
-                    + (END_GAME_POSITIONS[piece_idx][square] as i32 * end_game_phase);
-            }
-        }
-
-        for (piece_idx, &black_board) in board_state.pieces[Side::Black as usize].iter().enumerate()
-        {
-            let mut black_board = black_board;
-            while black_board.0 > 0 {
-                let square = black_board.get_lsb() as usize;
-                black_board.clear_bit(square);
-                let mirrored_square = Self::mirror_square(square);
-                positional_score -= (MID_GAME_POSITIONS[piece_idx][mirrored_square] as i32
-                    * mid_game_phase)
-                    + (END_GAME_POSITIONS[piece_idx][mirrored_square] as i32 * end_game_phase);
-            }
-        }
+        let positional_score =
+            (board_state.pst_mid * mid_game_phase) + (board_state.pst_end * end_game_phase);
 
         (positional_score as f64 * game_phase::PHASE_FACTOR) as i16
-    }
-
-    fn mirror_square(square: usize) -> usize {
-        let row = square >> 3;
-        let col = square & 7;
-        ((7 - row) << 3) + col
     }
 
     fn score_mobility(board_state: &BoardState) -> i16 {
@@ -265,5 +264,59 @@ mod tests {
         let board_state = BoardState::parse_fen(helpers::ADVANCED_MOVE_FEN);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
         assert_eq!(606, actual_score);
+    }
+
+    #[test]
+    fn test_incremental_pst_matches_from_scratch() {
+        let fens = vec![
+            helpers::STARTING_FEN,
+            helpers::ENDGAME_FEN,
+            helpers::KIWI_PETE_FEN,
+            helpers::ADVANCED_MOVE_FEN,
+        ];
+
+        for fen in fens {
+            let board_state = BoardState::parse_fen(fen);
+
+            // Compute PST from scratch
+            let mut scratch_mid = 0;
+            let mut scratch_end = 0;
+
+            for (piece_idx, &white_board) in
+                board_state.pieces[Side::White as usize].iter().enumerate()
+            {
+                let mut white_board = white_board;
+                while white_board.0 > 0 {
+                    let square = white_board.get_lsb() as usize;
+                    white_board.clear_bit(square);
+                    scratch_mid += MID_GAME_POSITIONS[piece_idx][square] as i32;
+                    scratch_end += END_GAME_POSITIONS[piece_idx][square] as i32;
+                }
+            }
+
+            for (piece_idx, &black_board) in
+                board_state.pieces[Side::Black as usize].iter().enumerate()
+            {
+                let mut black_board = black_board;
+                while black_board.0 > 0 {
+                    let square = black_board.get_lsb() as usize;
+                    black_board.clear_bit(square);
+                    let mirrored_square = mirror_square(square);
+                    scratch_mid -= MID_GAME_POSITIONS[piece_idx][mirrored_square] as i32;
+                    scratch_end -= END_GAME_POSITIONS[piece_idx][mirrored_square] as i32;
+                }
+            }
+
+            assert_eq!(
+                board_state.pst_mid, scratch_mid,
+                "PST mid mismatch for FEN: {}",
+                fen
+            );
+            assert_eq!(
+                board_state.pst_end, scratch_end,
+                "PST end mismatch for FEN: {}",
+                fen
+            );
+        }
     }
 }
