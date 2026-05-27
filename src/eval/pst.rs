@@ -64,13 +64,12 @@ impl PieceSquareTableEvaluation {
 
     fn score_mobility(board_state: &BoardState) -> i16 {
         let mut mobility = 0;
-        let occupancy = board_state.occupancies[Side::Both as usize];
-        let white_pieces = board_state.occupancies[Side::White as usize].0;
-        let black_pieces = board_state.occupancies[Side::Black as usize].0;
+        let occupancy = board_state.occupancies[Side::Both];
+        let white_pieces = board_state.occupancies[Side::White].0;
+        let black_pieces = board_state.occupancies[Side::Black].0;
 
         for &piece in &Piece::ALL[1..5] {
-            let mut white_board =
-                Bitboard(board_state.pieces[Side::White as usize][piece as usize].0);
+            let mut white_board = Bitboard(board_state.pieces[Side::White][piece].0);
             while white_board.0 > 0 {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
@@ -89,8 +88,7 @@ impl PieceSquareTableEvaluation {
                 mobility += (attacks & !white_pieces).count_ones() as i16;
             }
 
-            let mut black_board =
-                Bitboard(board_state.pieces[Side::Black as usize][piece as usize].0);
+            let mut black_board = Bitboard(board_state.pieces[Side::Black][piece].0);
             while black_board.0 > 0 {
                 let square = black_board.get_lsb() as usize;
                 black_board.clear_bit(square);
@@ -287,9 +285,7 @@ mod tests {
             let mut scratch_mid = 0;
             let mut scratch_end = 0;
 
-            for (piece_idx, &white_board) in
-                board_state.pieces[Side::White as usize].iter().enumerate()
-            {
+            for (piece_idx, &white_board) in board_state.pieces[Side::White].0.iter().enumerate() {
                 let mut white_board = white_board;
                 while white_board.0 > 0 {
                     let square = white_board.get_lsb() as usize;
@@ -299,9 +295,7 @@ mod tests {
                 }
             }
 
-            for (piece_idx, &black_board) in
-                board_state.pieces[Side::Black as usize].iter().enumerate()
-            {
+            for (piece_idx, &black_board) in board_state.pieces[Side::Black].0.iter().enumerate() {
                 let mut black_board = black_board;
                 while black_board.0 > 0 {
                     let square = black_board.get_lsb() as usize;

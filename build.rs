@@ -1,3 +1,4 @@
+// TODO: isolate all build.rs code so that the rest of the binary can make use of other abstractions (e.g. Index for Piece)
 pub mod common {
     pub mod square {
         #![allow(dead_code)]

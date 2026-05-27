@@ -1,3 +1,40 @@
+use std::ops::{Index, IndexMut};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct PieceMap<T>(pub [T; 6]);
+
+impl<T> PieceMap<T> {
+    #[inline(always)]
+    pub const fn new(init: T) -> Self
+    where
+        T: Copy,
+    {
+        Self([init; 6])
+    }
+}
+
+impl<T> Index<Piece> for PieceMap<T> {
+    type Output = T;
+
+    #[inline(always)]
+    fn index(&self, index: Piece) -> &Self::Output {
+        match index {
+            Piece::None => panic!("Cannot index PieceMap with Piece::None"),
+            _ => &self.0[index as usize],
+        }
+    }
+}
+
+impl<T> IndexMut<Piece> for PieceMap<T> {
+    #[inline(always)]
+    fn index_mut(&mut self, index: Piece) -> &mut Self::Output {
+        match index {
+            Piece::None => panic!("Cannot index PieceMap with Piece::None"),
+            _ => &mut self.0[index as usize],
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum Piece {

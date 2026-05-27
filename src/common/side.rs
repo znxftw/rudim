@@ -1,3 +1,65 @@
+use std::ops::{Index, IndexMut};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct SideMap<T>(pub [T; 2]);
+
+impl<T> SideMap<T> {
+    #[inline(always)]
+    pub const fn new(white: T, black: T) -> Self {
+        Self([white, black])
+    }
+}
+
+impl<T> Index<Side> for SideMap<T> {
+    type Output = T;
+
+    #[inline(always)]
+    fn index(&self, index: Side) -> &Self::Output {
+        match index {
+            Side::White => &self.0[0],
+            Side::Black => &self.0[1],
+            Side::Both => panic!("Cannot index SideMap with Side::Both"),
+        }
+    }
+}
+
+impl<T> IndexMut<Side> for SideMap<T> {
+    #[inline(always)]
+    fn index_mut(&mut self, index: Side) -> &mut Self::Output {
+        match index {
+            Side::White => &mut self.0[0],
+            Side::Black => &mut self.0[1],
+            Side::Both => panic!("Cannot index SideMap with Side::Both"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct SideOccupancyMap<T>(pub [T; 3]);
+
+impl<T> SideOccupancyMap<T> {
+    #[inline(always)]
+    pub const fn new(white: T, black: T, both: T) -> Self {
+        Self([white, black, both])
+    }
+}
+
+impl<T> Index<Side> for SideOccupancyMap<T> {
+    type Output = T;
+
+    #[inline(always)]
+    fn index(&self, index: Side) -> &Self::Output {
+        &self.0[index as usize]
+    }
+}
+
+impl<T> IndexMut<Side> for SideOccupancyMap<T> {
+    #[inline(always)]
+    fn index_mut(&mut self, index: Side) -> &mut Self::Output {
+        &mut self.0[index as usize]
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum Side {

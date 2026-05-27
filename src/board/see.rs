@@ -31,7 +31,7 @@ impl BoardState {
     // impl - https://www.chessprogramming.org/SEE_-_The_Swap_Algorithm
     pub fn see(&self, mv: Move) -> i16 {
         let (source, target) = (mv.source, mv.target);
-        let mut occupancy = self.occupancies[Side::Both as usize];
+        let mut occupancy = self.occupancies[Side::Both];
         let mut side = self.side_to_move;
 
         let mut gain = [0i16; 32];
@@ -55,7 +55,7 @@ impl BoardState {
         side = side.other();
 
         while attackers.is_not_empty() {
-            let side_attackers = attackers & self.occupancies[side as usize];
+            let side_attackers = attackers & self.occupancies[side];
             if side_attackers.is_empty() {
                 break;
             }
@@ -138,13 +138,12 @@ impl BoardState {
 
     #[inline]
     fn get_pieces(&self, piece: Piece) -> Bitboard {
-        self.pieces[Side::White as usize][piece as usize]
-            | self.pieces[Side::Black as usize][piece as usize]
+        self.pieces[Side::White][piece] | self.pieces[Side::Black][piece]
     }
 
     fn get_all_attackers(&self, sq: Square, occupancy: Bitboard) -> Bitboard {
-        let white_pawns = self.pieces[Side::White as usize][Piece::Pawn as usize];
-        let black_pawns = self.pieces[Side::Black as usize][Piece::Pawn as usize];
+        let white_pawns = self.pieces[Side::White][Piece::Pawn];
+        let black_pawns = self.pieces[Side::Black][Piece::Pawn];
         let knights = self.get_pieces(Piece::Knight);
         let bishops = self.get_pieces(Piece::Bishop);
         let rooks = self.get_pieces(Piece::Rook);
@@ -177,7 +176,7 @@ impl BoardState {
 
     fn get_least_valuable_attacker(&self, side_attackers: Bitboard, side: Side) -> (Square, Piece) {
         for piece in Piece::ALL {
-            let pieces_bb = self.pieces[side as usize][piece as usize];
+            let pieces_bb = self.pieces[side][piece];
             let intersection = side_attackers & pieces_bb;
             if intersection.is_not_empty() {
                 let sq = Square::from(intersection.get_lsb() as usize);
