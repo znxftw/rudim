@@ -18,7 +18,7 @@ fn reset_global_state() {
 }
 
 fn find_move_from_move_list(board: &mut BoardState, expected_move: Move) -> Move {
-    let mut move_list = rudim::common::scored_moves::MoveList::new();
+    let mut move_list = rudim::common::move_list::MoveList::new();
     board.generate_moves(&mut move_list);
 
     for m in move_list.iter() {

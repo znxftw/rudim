@@ -1,6 +1,6 @@
 use crate::board::state::BoardState;
 use crate::common::helpers::{ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
-use crate::common::scored_moves::MoveList;
+use crate::common::move_list::MoveList;
 
 #[derive(Clone, Copy)]
 pub struct PerftData {

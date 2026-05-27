@@ -244,8 +244,8 @@ mod tests {
     use super::*;
     use crate::board::state::BoardState;
     use crate::common::helpers::STARTING_FEN;
+    use crate::common::move_list::MoveList;
     use crate::common::move_type::MoveType;
-    use crate::common::scored_moves::MoveList;
 
     #[test]
     fn test_should_make_and_undo_null_move_correctly() {

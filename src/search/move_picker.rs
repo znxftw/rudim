@@ -1,6 +1,6 @@
 use crate::board::state::BoardState;
+use crate::common::move_list::{MoveList, ScoredMove};
 use crate::common::moves::Move;
-use crate::common::scored_moves::{MoveList, ScoredMove};
 use crate::eval::move_ordering;
 
 // TODO: revisit / refactor. promotions? refactor scoring MVV_LVA etc.

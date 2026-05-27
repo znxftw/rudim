@@ -5,10 +5,10 @@ use crate::bitboard::lookups::{
 };
 use crate::board::state::BoardState;
 use crate::common::castle::Castle;
+use crate::common::move_list::{MoveList, ScoredMove};
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
-use crate::common::scored_moves::{MoveList, ScoredMove};
 use crate::common::side::Side;
 use crate::common::square::Square;
 use crate::search::iterative_deepening;

@@ -1,9 +1,9 @@
 use crate::board::state::BoardState;
 use crate::common::constants::{HASH_MOVE_SCORE, MAX_PLY, PIECES, PV_MOVE_SCORE, SQUARES};
+use crate::common::move_list::ScoredMove;
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
-use crate::common::scored_moves::ScoredMove;
 use std::sync::{LazyLock, Mutex};
 
 pub struct MoveOrdering {

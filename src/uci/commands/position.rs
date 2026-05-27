@@ -1,6 +1,6 @@
+use crate::common::move_list::MoveList;
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
-use crate::common::scored_moves::MoveList;
 use crate::uci::{UciClient, cli, reset_global, set_ready};
 
 impl UciClient {
