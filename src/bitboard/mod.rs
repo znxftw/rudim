@@ -10,42 +10,42 @@ pub struct Bitboard(pub u64);
 impl Bitboard {
     pub const EMPTY: Self = Bitboard(0);
 
-    #[inline]
+    #[inline(always)]
     pub fn get_bit(&self, square: usize) -> u8 {
         ((self.0 >> square) & 1) as u8
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_bit(&mut self, square: usize) {
         self.0 |= 1u64 << square;
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn clear_bit(&mut self, square: usize) {
         self.0 &= !(1u64 << square);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn get_lsb(&self) -> u32 {
         self.0.trailing_zeros()
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn is_empty(&self) -> bool {
         self.0 == 0
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn is_not_empty(&self) -> bool {
         self.0 != 0
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn count_ones(&self) -> u32 {
         self.0.count_ones()
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn clear_lsb(&mut self) {
         self.0 &= self.0 - 1;
     }
