@@ -14,22 +14,17 @@ impl Piece {
     pub const ALL_PIECES: usize = 6;
 }
 
-const PIECES: [Piece; 7] = [
-    Piece::Pawn,
-    Piece::Knight,
-    Piece::Bishop,
-    Piece::Rook,
-    Piece::Queen,
-    Piece::King,
-    Piece::None,
-];
-
 impl From<usize> for Piece {
     fn from(value: usize) -> Self {
-        if value <= 6 {
-            PIECES[value]
-        } else {
-            panic!("Invalid piece index: {}", value)
+        match value {
+            0 => Piece::Pawn,
+            1 => Piece::Knight,
+            2 => Piece::Bishop,
+            3 => Piece::Rook,
+            4 => Piece::Queen,
+            5 => Piece::King,
+            6 => Piece::None,
+            _ => panic!("Invalid piece index: {}", value),
         }
     }
 }
