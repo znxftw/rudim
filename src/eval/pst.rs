@@ -10,9 +10,8 @@ use crate::common::square::Square;
 use crate::eval::pawns::PawnStructureEvaluation;
 
 pub fn mirror_square(square: usize) -> usize {
-    let row = square >> 3;
-    let col = square & 7;
-    ((7 - row) << 3) + col
+    // Square Internally = 0bRRRFFF (Row / File)
+    square ^ 0b111000
 }
 
 pub fn get_pst_values(piece: Piece, square: Square, side: Side) -> (i32, i32) {
