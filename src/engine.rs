@@ -5,13 +5,16 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 static IS_READY: AtomicBool = AtomicBool::new(false);
 
-pub fn reset() {
-    // TODO: some of these need to be reset in between searches - expose another reset_intermediate()
-    IS_READY.store(false, Ordering::Relaxed);
+pub fn reset_intermediate() {
     move_ordering::reset_move_heuristic();
     iterative_deepening::reset_state();
     negamax::reset_state();
     quiescence::reset_nodes();
+}
+
+pub fn reset() {
+    IS_READY.store(false, Ordering::Relaxed);
+    reset_intermediate();
     tt::TT.lock().unwrap().clear();
 }
 

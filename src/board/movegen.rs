@@ -11,6 +11,7 @@ use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
+use crate::engine;
 use crate::search::iterative_deepening;
 use std::sync::atomic::AtomicBool;
 
@@ -27,6 +28,7 @@ impl BoardState {
         cancellation_token: &AtomicBool,
         debug_mode: &mut bool,
     ) -> Move {
+        engine::reset_intermediate();
         iterative_deepening::search(self, depth, cancellation_token, debug_mode);
         iterative_deepening::best_move()
     }
