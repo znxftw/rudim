@@ -107,22 +107,10 @@ macro_rules! tactic_test_case {
     };
 }
 
-traversal_test_case!(traversal_starting_position, STARTING_FEN, 1905549, 19, 13);
-traversal_test_case!(traversal_endgame_position, ENDGAME_FEN, 1152044, 83, 17);
-traversal_test_case!(
-    traversal_advanced_move_position,
-    ADVANCED_MOVE_FEN,
-    1835362,
-    1760,
-    16
-);
-traversal_test_case!(
-    traversal_kiwi_pete_position,
-    KIWI_PETE_FEN,
-    1467141,
-    -95,
-    12
-);
+traversal_test_case!(traversal_starting, STARTING_FEN, 1905549, 19, 13);
+traversal_test_case!(traversal_endgame, ENDGAME_FEN, 1152044, 83, 17);
+traversal_test_case!(traversal_advanced, ADVANCED_MOVE_FEN, 1835362, 1760, 16);
+traversal_test_case!(traversal_kiwi_pete, KIWI_PETE_FEN, 1467141, -95, 12);
 
 tactic_test_case!(
     tactic_random_puzzle_position,
