@@ -136,19 +136,14 @@ impl BoardState {
         (gain, next_captured)
     }
 
-    #[inline]
-    fn get_pieces(&self, piece: Piece) -> Bitboard {
-        self.pieces[Side::White][piece] | self.pieces[Side::Black][piece]
-    }
-
     fn get_all_attackers(&self, sq: Square, occupancy: Bitboard) -> Bitboard {
-        let white_pawns = self.pieces[Side::White][Piece::Pawn];
-        let black_pawns = self.pieces[Side::Black][Piece::Pawn];
-        let knights = self.get_pieces(Piece::Knight);
-        let bishops = self.get_pieces(Piece::Bishop);
-        let rooks = self.get_pieces(Piece::Rook);
-        let queens = self.get_pieces(Piece::Queen);
-        let kings = self.get_pieces(Piece::King);
+        let white_pawns = self.get_pieces(Side::White, Piece::Pawn);
+        let black_pawns = self.get_pieces(Side::Black, Piece::Pawn);
+        let knights = self.pieces[Piece::Knight];
+        let bishops = self.pieces[Piece::Bishop];
+        let rooks = self.pieces[Piece::Rook];
+        let queens = self.pieces[Piece::Queen];
+        let kings = self.pieces[Piece::King];
 
         let pawn_attacks = (white_pawns & pawn_attacks()[Side::Black as usize][sq as usize])
             | (black_pawns & pawn_attacks()[Side::White as usize][sq as usize]);
@@ -161,9 +156,9 @@ impl BoardState {
     }
 
     fn update_xrays(&self, attackers: &mut Bitboard, target: Square, occupancy: Bitboard) {
-        let bishops = self.get_pieces(Piece::Bishop);
-        let rooks = self.get_pieces(Piece::Rook);
-        let queens = self.get_pieces(Piece::Queen);
+        let bishops = self.pieces[Piece::Bishop];
+        let rooks = self.pieces[Piece::Rook];
+        let queens = self.pieces[Piece::Queen];
 
         let diagonal_attackers =
             get_bishop_attacks_from_table(target, occupancy) & (bishops | queens) & occupancy;
@@ -176,7 +171,7 @@ impl BoardState {
 
     fn get_least_valuable_attacker(&self, side_attackers: Bitboard, side: Side) -> (Square, Piece) {
         for piece in Piece::ALL {
-            let pieces_bb = self.pieces[side][piece];
+            let pieces_bb = self.get_pieces(side, piece);
             let intersection = side_attackers & pieces_bb;
             if intersection.is_not_empty() {
                 let sq = Square::from(intersection.get_lsb() as usize);

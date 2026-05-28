@@ -15,8 +15,8 @@ pub struct PawnStructureEvaluation;
 impl PawnStructureEvaluation {
     // Returns score from white's perspective (positive = good for white)
     pub fn evaluate(board_state: &BoardState) -> i16 {
-        let white_pawns = board_state.pieces[Side::White][Piece::Pawn];
-        let black_pawns = board_state.pieces[Side::Black][Piece::Pawn];
+        let white_pawns = board_state.get_pieces(Side::White, Piece::Pawn);
+        let black_pawns = board_state.get_pieces(Side::Black, Piece::Pawn);
 
         let mut score: i16 = 0;
         score += Self::score_doubled_pawns(white_pawns, black_pawns);

@@ -123,33 +123,36 @@ mod tests {
     fn should_parse_starting_fen_piece_bitboards() {
         let board = BoardState::parse_fen(STARTING_FEN);
 
-        assert_eq!(board.pieces[Side::White][Piece::Pawn].0, 71776119061217280);
         assert_eq!(
-            board.pieces[Side::White][Piece::Knight].0,
+            board.get_pieces(Side::White, Piece::Pawn).0,
+            71776119061217280
+        );
+        assert_eq!(
+            board.get_pieces(Side::White, Piece::Knight).0,
             4755801206503243776
         );
         assert_eq!(
-            board.pieces[Side::White][Piece::Bishop].0,
+            board.get_pieces(Side::White, Piece::Bishop).0,
             2594073385365405696
         );
         assert_eq!(
-            board.pieces[Side::White][Piece::Rook].0,
+            board.get_pieces(Side::White, Piece::Rook).0,
             9295429630892703744
         );
         assert_eq!(
-            board.pieces[Side::White][Piece::Queen].0,
+            board.get_pieces(Side::White, Piece::Queen).0,
             576460752303423488
         );
         assert_eq!(
-            board.pieces[Side::White][Piece::King].0,
+            board.get_pieces(Side::White, Piece::King).0,
             1152921504606846976
         );
 
-        assert_eq!(board.pieces[Side::Black][Piece::Pawn].0, 65280);
-        assert_eq!(board.pieces[Side::Black][Piece::Knight].0, 66);
-        assert_eq!(board.pieces[Side::Black][Piece::Bishop].0, 36);
-        assert_eq!(board.pieces[Side::Black][Piece::Rook].0, 129);
-        assert_eq!(board.pieces[Side::Black][Piece::Queen].0, 8);
-        assert_eq!(board.pieces[Side::Black][Piece::King].0, 16);
+        assert_eq!(board.get_pieces(Side::Black, Piece::Pawn).0, 65280);
+        assert_eq!(board.get_pieces(Side::Black, Piece::Knight).0, 66);
+        assert_eq!(board.get_pieces(Side::Black, Piece::Bishop).0, 36);
+        assert_eq!(board.get_pieces(Side::Black, Piece::Rook).0, 129);
+        assert_eq!(board.get_pieces(Side::Black, Piece::Queen).0, 8);
+        assert_eq!(board.get_pieces(Side::Black, Piece::King).0, 16);
     }
 }

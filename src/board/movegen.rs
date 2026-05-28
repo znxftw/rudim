@@ -65,7 +65,7 @@ impl BoardState {
     }
 
     fn generate_pawn_moves(&self, move_list: &mut MoveList, gen_type: MoveGenType) {
-        let mut bitboard = self.pieces[self.side_to_move][Piece::Pawn];
+        let mut bitboard = self.get_pieces(self.side_to_move, Piece::Pawn);
         while bitboard.is_not_empty() {
             let source = bitboard.get_lsb() as usize;
             match gen_type {
@@ -144,7 +144,7 @@ impl BoardState {
     }
 
     fn generate_bishop_moves(&self, move_list: &mut MoveList, gen_type: MoveGenType) {
-        let mut bitboard = self.pieces[self.side_to_move][Piece::Bishop];
+        let mut bitboard = self.get_pieces(self.side_to_move, Piece::Bishop);
         while bitboard.is_not_empty() {
             let source = bitboard.get_lsb() as usize;
             let attacks =
@@ -155,7 +155,7 @@ impl BoardState {
     }
 
     fn generate_knight_moves(&self, move_list: &mut MoveList, gen_type: MoveGenType) {
-        let mut bitboard = self.pieces[self.side_to_move][Piece::Knight];
+        let mut bitboard = self.get_pieces(self.side_to_move, Piece::Knight);
         while bitboard.is_not_empty() {
             let source = bitboard.get_lsb() as usize;
             let attacks = Bitboard(knight_attacks()[source]);
@@ -165,7 +165,7 @@ impl BoardState {
     }
 
     fn generate_rook_moves(&self, move_list: &mut MoveList, gen_type: MoveGenType) {
-        let mut bitboard = self.pieces[self.side_to_move][Piece::Rook];
+        let mut bitboard = self.get_pieces(self.side_to_move, Piece::Rook);
         while bitboard.is_not_empty() {
             let source = bitboard.get_lsb() as usize;
             let attacks =
@@ -176,7 +176,7 @@ impl BoardState {
     }
 
     fn generate_queen_moves(&self, move_list: &mut MoveList, gen_type: MoveGenType) {
-        let mut bitboard = self.pieces[self.side_to_move][Piece::Queen];
+        let mut bitboard = self.get_pieces(self.side_to_move, Piece::Queen);
         while bitboard.is_not_empty() {
             let source = bitboard.get_lsb() as usize;
             let attacks =
@@ -187,7 +187,7 @@ impl BoardState {
     }
 
     fn generate_king_moves(&self, move_list: &mut MoveList, gen_type: MoveGenType) {
-        let source = self.pieces[self.side_to_move][Piece::King].get_lsb() as usize;
+        let source = self.get_pieces(self.side_to_move, Piece::King).get_lsb() as usize;
         let attacks = Bitboard(king_attacks()[source]);
 
         self.add_attacks(source, attacks, move_list, gen_type);
