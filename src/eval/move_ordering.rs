@@ -1,5 +1,5 @@
 use crate::board::state::BoardState;
-use crate::common::constants::{HASH_MOVE_SCORE, MAX_PLY, PIECES, PV_MOVE_SCORE, SQUARES};
+use crate::common::constants::{MAX_PLY, PIECES, SQUARES};
 use crate::common::move_list::ScoredMove;
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
@@ -31,37 +31,6 @@ impl MoveOrdering {
         }
     }
 
-    pub fn populate_move_score(
-        &self,
-        move_obj: &mut ScoredMove,
-        board_state: &BoardState,
-        ply: usize,
-    ) {
-        if !move_obj.mv.is_capture() {
-            if move_obj.mv == self.killer_moves[0][ply] {
-                move_obj.score = 9000;
-            } else if move_obj.mv == self.killer_moves[1][ply] {
-                move_obj.score = 8000;
-            } else {
-                let piece = board_state.get_piece_on(move_obj.mv.source);
-                if piece != -1 {
-                    move_obj.score =
-                        self.history_moves[piece as usize][move_obj.mv.target as usize];
-                }
-            }
-            return;
-        };
-        let source_piece =
-            board_state.get_piece_on_side(move_obj.mv.source, board_state.side_to_move);
-        let target_piece: usize = if move_obj.mv.move_type == MoveType::EnPassant {
-            Piece::Pawn as usize
-        } else {
-            board_state.get_piece_on_side(move_obj.mv.target, board_state.side_to_move.other())
-        };
-
-        move_obj.score = MVV_LVA[target_piece][source_piece];
-    }
-
     pub fn add_killer_move(&mut self, move_obj: Move, ply: usize) {
         if self.killer_moves[0][ply] == move_obj {
             return;
@@ -90,14 +59,6 @@ impl MoveOrdering {
                 .all(|row| row.iter().all(|&s| s == 0))
     }
 
-    pub fn populate_hash_move(move_obj: &mut ScoredMove) {
-        move_obj.score = HASH_MOVE_SCORE;
-    }
-
-    pub fn populate_pv_move(move_obj: &mut ScoredMove) {
-        move_obj.score = PV_MOVE_SCORE;
-    }
-
     pub fn sort_next_best_move(moves: &mut [ScoredMove], starting_index: usize) {
         if let Some((best_offset, _)) = moves[starting_index..]
             .iter()
@@ -121,27 +82,33 @@ impl Default for MoveOrdering {
 pub static MOVE_ORDERING: LazyLock<Mutex<MoveOrdering>> =
     LazyLock::new(|| Mutex::new(MoveOrdering::new()));
 
-pub fn populate_move_scores(
-    moves: &mut [ScoredMove],
-    board_state: &BoardState,
-    ply: usize,
-    hash_move: Option<Move>,
-    pv_move: Option<Move>,
-) {
+pub fn populate_capture_scores(moves: &mut [ScoredMove], board_state: &BoardState) {
+    for move_obj in moves.iter_mut() {
+        let source_piece =
+            board_state.get_piece_on_side(move_obj.mv.source, board_state.side_to_move);
+        let target_piece: usize = if move_obj.mv.move_type == MoveType::EnPassant {
+            Piece::Pawn as usize
+        } else {
+            board_state.get_piece_on_side(move_obj.mv.target, board_state.side_to_move.other())
+        };
+
+        move_obj.score = MVV_LVA[target_piece][source_piece];
+    }
+}
+
+pub fn populate_quiet_scores(moves: &mut [ScoredMove], board_state: &BoardState, ply: usize) {
     let move_ordering = MOVE_ORDERING.lock().unwrap();
     for move_obj in moves.iter_mut() {
-        if let Some(pv_mv) = pv_move
-            && pv_mv != Move::NO_MOVE
-            && move_obj.mv == pv_mv
-        {
-            MoveOrdering::populate_pv_move(move_obj);
-        } else if let Some(hash_mv) = hash_move
-            && hash_mv != Move::NO_MOVE
-            && move_obj.mv == hash_mv
-        {
-            MoveOrdering::populate_hash_move(move_obj);
+        if move_obj.mv == move_ordering.killer_moves[0][ply] {
+            move_obj.score = 9000;
+        } else if move_obj.mv == move_ordering.killer_moves[1][ply] {
+            move_obj.score = 8000;
         } else {
-            move_ordering.populate_move_score(move_obj, board_state, ply);
+            let piece = board_state.get_piece_on(move_obj.mv.source);
+            if piece != -1 {
+                move_obj.score =
+                    move_ordering.history_moves[piece as usize][move_obj.mv.target as usize];
+            }
         }
     }
 }
@@ -164,14 +131,6 @@ pub fn reset_move_heuristic() {
 pub fn is_move_heuristic_empty() -> bool {
     let move_ordering = MOVE_ORDERING.lock().unwrap();
     move_ordering.is_move_heuristic_empty()
-}
-
-pub fn populate_hash_move(move_obj: &mut ScoredMove) {
-    MoveOrdering::populate_hash_move(move_obj);
-}
-
-pub fn populate_pv_move(move_obj: &mut ScoredMove) {
-    MoveOrdering::populate_pv_move(move_obj);
 }
 
 #[cfg(test)]

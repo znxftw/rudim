@@ -81,13 +81,7 @@ impl MovePicker {
                     self.current_index = 0;
 
                     board_state.generate_captures(&mut self.captures);
-                    move_ordering::populate_move_scores(
-                        &mut self.captures,
-                        board_state,
-                        self.ply,
-                        self.tt_best,
-                        self.pv_move,
-                    );
+                    move_ordering::populate_capture_scores(&mut self.captures, board_state);
 
                     // Partition in-place: good captures (SEE >= 0) to the left, bad captures (SEE < 0) to the right
                     let mut left = 0;
@@ -121,13 +115,7 @@ impl MovePicker {
                     self.quiets.clear();
                     self.current_index = 0;
                     board_state.generate_quiets(&mut self.quiets);
-                    move_ordering::populate_move_scores(
-                        &mut self.quiets,
-                        board_state,
-                        self.ply,
-                        self.tt_best,
-                        self.pv_move,
-                    );
+                    move_ordering::populate_quiet_scores(&mut self.quiets, board_state, self.ply);
                     self.phase = SearchPhase::Quiets;
                 }
                 SearchPhase::Quiets => {
