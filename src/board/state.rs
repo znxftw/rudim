@@ -5,10 +5,10 @@ use crate::bitboard::lookups::{
 };
 use crate::board::history::History;
 use crate::common::castle::Castle;
-use crate::common::constants::{PIECES, SIDES_WITH_BOTH, SQUARES};
+use crate::common::constants::{PIECES, SIDES, SQUARES};
 use crate::common::game_phase::{add_phase, remove_phase};
 use crate::common::piece::{Piece, PieceMap};
-use crate::common::side::{Side, SideOccupancyMap};
+use crate::common::side::{Side, SideMap};
 use crate::common::square::Square;
 use std::fmt;
 
@@ -27,7 +27,7 @@ pub const CASTLING_CONSTANTS: [u8; SQUARES] = [
 #[derive(Debug)]
 pub struct BoardState {
     pub pieces: PieceMap<Bitboard>,
-    pub occupancies: SideOccupancyMap<Bitboard>,
+    pub occupancies: SideMap<Bitboard>,
     pub piece_mapping: [Piece; SQUARES],
     pub side_to_move: Side,
     pub en_passant_square: Square,
@@ -45,7 +45,7 @@ impl BoardState {
     pub fn new() -> Self {
         Self {
             pieces: PieceMap([Bitboard(0); PIECES]),
-            occupancies: SideOccupancyMap([Bitboard(0); SIDES_WITH_BOTH]),
+            occupancies: SideMap([Bitboard(0); SIDES]),
             piece_mapping: [Piece::None; SQUARES],
             side_to_move: Side::White,
             en_passant_square: Square::NoSquare,
@@ -61,6 +61,11 @@ impl BoardState {
     }
 
     #[inline(always)]
+    pub fn occupancy(&self) -> Bitboard {
+        self.occupancies[Side::White] | self.occupancies[Side::Black]
+    }
+
+    #[inline(always)]
     pub fn get_pieces(&self, side: Side, piece: Piece) -> Bitboard {
         self.pieces[piece] & self.occupancies[side]
     }
@@ -69,7 +74,6 @@ impl BoardState {
         let sq = square as usize;
         self.pieces[piece].set_bit(sq);
         self.occupancies[side].set_bit(sq);
-        self.occupancies[Side::Both].set_bit(sq);
         self.piece_mapping[sq] = piece;
         self.phase = add_phase(self.phase, piece);
 
@@ -91,7 +95,6 @@ impl BoardState {
         self.pieces[piece].clear_bit(sq);
         self.occupancies[Side::White].clear_bit(sq);
         self.occupancies[Side::Black].clear_bit(sq);
-        self.occupancies[Side::Both].clear_bit(sq);
         self.piece_mapping[sq] = Piece::None;
         self.phase = remove_phase(self.phase, piece);
 
@@ -131,7 +134,7 @@ impl BoardState {
 
     pub fn is_square_attacked(&self, square: Square, attacking_side: Side) -> bool {
         let sq = square as usize;
-        let occupancy = self.occupancies[Side::Both];
+        let occupancy = self.occupancy();
         let defending_side = attacking_side.other();
 
         if (self.get_pieces(attacking_side, Piece::Pawn)
@@ -207,7 +210,7 @@ mod tests {
 
         assert_eq!(board.get_pieces(Side::White, Piece::Pawn).get_bit(sq), 1);
         assert_eq!(board.occupancies[Side::White].get_bit(sq), 1);
-        assert_eq!(board.occupancies[Side::Both].get_bit(sq), 1);
+        assert_eq!(board.occupancy().get_bit(sq), 1);
         assert_eq!(board.occupancies[Side::Black].get_bit(sq), 0);
         assert_eq!(board.piece_mapping[sq], Piece::Pawn);
         assert_eq!(board.phase, 0);
@@ -224,7 +227,7 @@ mod tests {
         assert_eq!(removed, Piece::Queen);
         assert_eq!(board.get_pieces(Side::Black, Piece::Queen).get_bit(sq), 0);
         assert_eq!(board.occupancies[Side::Black].get_bit(sq), 0);
-        assert_eq!(board.occupancies[Side::Both].get_bit(sq), 0);
+        assert_eq!(board.occupancy().get_bit(sq), 0);
         assert_eq!(board.piece_mapping[sq], Piece::None);
     }
 

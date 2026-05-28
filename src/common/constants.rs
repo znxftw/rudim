@@ -1,5 +1,4 @@
 pub const SIDES: usize = 2;
-pub const SIDES_WITH_BOTH: usize = SIDES + 1;
 pub const SQUARES: usize = 64;
 pub const PIECES: usize = 6;
 pub const MAX_RETRY_COUNT: usize = 100_000_000;

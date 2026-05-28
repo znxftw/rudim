@@ -31,7 +31,7 @@ impl BoardState {
     // impl - https://www.chessprogramming.org/SEE_-_The_Swap_Algorithm
     pub fn see(&self, mv: Move) -> i16 {
         let (source, target) = (mv.source, mv.target);
-        let mut occupancy = self.occupancies[Side::Both];
+        let mut occupancy = self.occupancy();
         let mut side = self.side_to_move;
 
         let mut gain = [0i16; 32];

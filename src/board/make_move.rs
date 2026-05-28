@@ -187,7 +187,7 @@ impl BoardState {
     }
 
     pub fn is_draw(&self) -> bool {
-        let num_pieces = self.occupancies[Side::Both].count_ones();
+        let num_pieces = self.occupancy().count_ones();
         if num_pieces == 2 {
             // Assumes a legal board with 2 Kings only
             return true;

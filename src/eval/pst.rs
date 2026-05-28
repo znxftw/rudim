@@ -63,7 +63,7 @@ impl PieceSquareTableEvaluation {
 
     fn score_mobility(board_state: &BoardState) -> i16 {
         let mut mobility = 0;
-        let occupancy = board_state.occupancies[Side::Both];
+        let occupancy = board_state.occupancy();
         let white_pieces = board_state.occupancies[Side::White].0;
         let black_pieces = board_state.occupancies[Side::Black].0;
 

@@ -82,7 +82,7 @@ impl BoardState {
     }
 
     fn generate_pawn_pushes(&self, source: usize, move_list: &mut MoveList, gen_type: MoveGenType) {
-        let both_occ = self.occupancies[Side::Both];
+        let both_occ = self.occupancy();
 
         if self.side_to_move == Side::Black {
             let one_sq = source + 8;
@@ -147,8 +147,7 @@ impl BoardState {
         let mut bitboard = self.get_pieces(self.side_to_move, Piece::Bishop);
         while bitboard.is_not_empty() {
             let source = bitboard.get_lsb() as usize;
-            let attacks =
-                get_bishop_attacks_from_table(Square::from(source), self.occupancies[Side::Both]);
+            let attacks = get_bishop_attacks_from_table(Square::from(source), self.occupancy());
             self.add_attacks(source, attacks, move_list, gen_type);
             bitboard.clear_bit(source);
         }
@@ -168,8 +167,7 @@ impl BoardState {
         let mut bitboard = self.get_pieces(self.side_to_move, Piece::Rook);
         while bitboard.is_not_empty() {
             let source = bitboard.get_lsb() as usize;
-            let attacks =
-                get_rook_attacks_from_table(Square::from(source), self.occupancies[Side::Both]);
+            let attacks = get_rook_attacks_from_table(Square::from(source), self.occupancy());
             self.add_attacks(source, attacks, move_list, gen_type);
             bitboard.clear_bit(source);
         }
@@ -179,8 +177,7 @@ impl BoardState {
         let mut bitboard = self.get_pieces(self.side_to_move, Piece::Queen);
         while bitboard.is_not_empty() {
             let source = bitboard.get_lsb() as usize;
-            let attacks =
-                get_queen_attacks_from_table(Square::from(source), self.occupancies[Side::Both]);
+            let attacks = get_queen_attacks_from_table(Square::from(source), self.occupancy());
             self.add_attacks(source, attacks, move_list, gen_type);
             bitboard.clear_bit(source);
         }
@@ -198,7 +195,7 @@ impl BoardState {
         if gen_type == MoveGenType::Captures {
             return;
         }
-        let occ = self.occupancies[Side::Both];
+        let occ = self.occupancy();
 
         if self.side_to_move == Side::White {
             if self.castle.contains(Castle::WHITE_SHORT)
