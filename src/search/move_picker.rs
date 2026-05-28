@@ -3,7 +3,6 @@ use crate::common::move_list::{MoveList, ScoredMove};
 use crate::common::moves::Move;
 use crate::eval::move_ordering;
 
-// TODO: revisit / refactor. promotions? refactor scoring MVV_LVA etc.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SearchPhase {
     PvMove,
