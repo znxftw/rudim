@@ -75,7 +75,7 @@ impl PieceSquareTableEvaluation {
                 let mut pieces_board = board_state.get_pieces(side, piece);
                 while pieces_board.is_not_empty() {
                     let square = pieces_board.get_lsb() as usize;
-                    pieces_board.clear_bit(square);
+                    pieces_board.clear_lsb();
                     let attacks = match piece {
                         Piece::Knight => Bitboard(knight_attacks()[square]),
                         Piece::Bishop => {
@@ -275,7 +275,7 @@ mod tests {
                 let mut white_board = board_state.get_pieces(Side::White, piece);
                 while white_board.is_not_empty() {
                     let square = white_board.get_lsb() as usize;
-                    white_board.clear_bit(square);
+                    white_board.clear_lsb();
                     scratch_mid += MID_GAME_POSITIONS[piece_idx][square] as i32;
                     scratch_end += END_GAME_POSITIONS[piece_idx][square] as i32;
                 }
@@ -286,7 +286,7 @@ mod tests {
                 let mut black_board = board_state.get_pieces(Side::Black, piece);
                 while black_board.is_not_empty() {
                     let square = black_board.get_lsb() as usize;
-                    black_board.clear_bit(square);
+                    black_board.clear_lsb();
                     let mirrored_square = mirror_square(square);
                     scratch_mid -= MID_GAME_POSITIONS[piece_idx][mirrored_square] as i32;
                     scratch_end -= END_GAME_POSITIONS[piece_idx][mirrored_square] as i32;

@@ -77,7 +77,7 @@ impl BoardState {
                     self.generate_pawn_attacks(source, move_list, gen_type);
                 }
             }
-            bitboard.clear_bit(source);
+            bitboard.clear_lsb();
         }
     }
 
@@ -139,7 +139,7 @@ impl BoardState {
         while attacks.is_not_empty() {
             let target = attacks.get_lsb() as usize;
             self.add_pawn_move(source, target, false, false, move_list, gen_type);
-            attacks.clear_bit(target);
+            attacks.clear_lsb();
         }
     }
 
@@ -149,7 +149,7 @@ impl BoardState {
             let source = bitboard.get_lsb() as usize;
             let attacks = get_bishop_attacks_from_table(Square::from(source), self.occupancy());
             self.add_attacks(source, attacks, move_list, gen_type);
-            bitboard.clear_bit(source);
+            bitboard.clear_lsb();
         }
     }
 
@@ -159,7 +159,7 @@ impl BoardState {
             let source = bitboard.get_lsb() as usize;
             let attacks = Bitboard(knight_attacks()[source]);
             self.add_attacks(source, attacks, move_list, gen_type);
-            bitboard.clear_bit(source);
+            bitboard.clear_lsb();
         }
     }
 
@@ -169,7 +169,7 @@ impl BoardState {
             let source = bitboard.get_lsb() as usize;
             let attacks = get_rook_attacks_from_table(Square::from(source), self.occupancy());
             self.add_attacks(source, attacks, move_list, gen_type);
-            bitboard.clear_bit(source);
+            bitboard.clear_lsb();
         }
     }
 
@@ -179,7 +179,7 @@ impl BoardState {
             let source = bitboard.get_lsb() as usize;
             let attacks = get_queen_attacks_from_table(Square::from(source), self.occupancy());
             self.add_attacks(source, attacks, move_list, gen_type);
-            bitboard.clear_bit(source);
+            bitboard.clear_lsb();
         }
     }
 
@@ -246,20 +246,20 @@ impl BoardState {
         while attacks.is_not_empty() {
             let target = attacks.get_lsb() as usize;
             if self.occupancies[self.side_to_move].get_bit(target) == 1 {
-                attacks.clear_bit(target);
+                attacks.clear_lsb();
                 continue;
             }
             let is_capture = self.is_square_capture(target);
             if gen_type == MoveGenType::Captures && !is_capture {
-                attacks.clear_bit(target);
+                attacks.clear_lsb();
                 continue;
             }
             if gen_type == MoveGenType::Quiets && is_capture {
-                attacks.clear_bit(target);
+                attacks.clear_lsb();
                 continue;
             }
             self.add_move_to_moves_list(source, target, move_list);
-            attacks.clear_bit(target);
+            attacks.clear_lsb();
         }
     }
 
