@@ -2,6 +2,7 @@ use crate::bitboard::lookups::{
     get_bishop_attacks_from_table, get_rook_attacks_from_table, knight_attacks,
 };
 use crate::board::state::BoardState;
+use crate::common::constants::{PIECES, SQUARES};
 use crate::common::game_phase;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
@@ -68,7 +69,7 @@ impl PieceSquareTableEvaluation {
 
         for &piece in &Piece::ALL[1..5] {
             let mut white_board = board_state.get_pieces(Side::White, piece);
-            while white_board.0 > 0 {
+            while white_board.is_not_empty() {
                 let square = white_board.get_lsb() as usize;
                 white_board.clear_bit(square);
                 let attacks = match piece {
@@ -87,7 +88,7 @@ impl PieceSquareTableEvaluation {
             }
 
             let mut black_board = board_state.get_pieces(Side::Black, piece);
-            while black_board.0 > 0 {
+            while black_board.is_not_empty() {
                 let square = black_board.get_lsb() as usize;
                 black_board.clear_bit(square);
                 let attacks = match piece {
@@ -109,7 +110,7 @@ impl PieceSquareTableEvaluation {
     }
 }
 
-static MID_GAME_POSITIONS: [[i16; 64]; 6] = {
+static MID_GAME_POSITIONS: [[i16; SQUARES]; PIECES] = {
     let piece_values = [82, 337, 365, 477, 1025, 0];
     // Values borrowed from Rofchade
     // http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19
