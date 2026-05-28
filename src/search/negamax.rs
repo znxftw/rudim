@@ -54,6 +54,7 @@ fn search_internal(
     ctx.pv_table.clear(ply as usize);
 
     let mut best_move = Move::NO_MOVE;
+    let mut best_score = -constants::MAX_CENTIPAWN_EVAL;
 
     let is_pv_node = beta > 1 + alpha;
     let in_check = board_state.is_in_check(board_state.side_to_move);
@@ -70,13 +71,12 @@ fn search_internal(
 
     let (has_value, tt_score, tt_best) = {
         let table = tt::TT.lock().unwrap();
-        table.get_entry(board_state.board_hash, alpha, beta, depth)
+        table.get_entry(board_state.board_hash, alpha, beta, depth, ply)
     };
 
     // TODO: determine improvement for not returning in PV nodes
     if has_value && !is_pv_node {
-        // TODO: might be wrong - TT scores unadjusted scores but returns alpha / beta - mates might be wrong
-        return tt::TranspositionTable::retrieve_score(tt_score, ply as i32);
+        return tt_score;
     }
 
     if depth == 0 {
@@ -127,12 +127,12 @@ fn search_internal(
             let mut table = tt::TT.lock().unwrap();
             table.submit_entry(
                 board_state.board_hash,
-                tt::TranspositionTable::adjust_score(beta, ply as i32),
+                tt::TranspositionTable::adjust_score(score, ply as i32),
                 depth,
                 Move::NO_MOVE,
                 TranspositionEntryType::Beta,
             );
-            return beta;
+            return score;
         }
     }
 
@@ -240,23 +240,27 @@ fn search_internal(
 
         board_state.unmake_move(move_obj);
 
-        if score >= beta {
-            return beta_cutoff(beta, move_obj, ply as usize, board_state, depth);
+        if score > best_score {
+            best_score = score;
+
+            if score > alpha {
+                alpha_update(
+                    score,
+                    move_obj,
+                    board_state,
+                    depth,
+                    &mut alpha,
+                    &mut best_move,
+                );
+                entry_type = TranspositionEntryType::Exact;
+                found_pv = true;
+
+                ctx.pv_table.update(ply as usize, move_obj);
+            }
         }
 
-        if score > alpha {
-            alpha_update(
-                score,
-                move_obj,
-                board_state,
-                depth,
-                &mut alpha,
-                &mut best_move,
-            );
-            entry_type = TranspositionEntryType::Exact;
-            found_pv = true;
-
-            ctx.pv_table.update(ply as usize, move_obj);
+        if score >= beta {
+            return beta_cutoff(score, move_obj, ply as usize, board_state, depth);
         }
     }
 
@@ -271,14 +275,14 @@ fn search_internal(
         let mut table = tt::TT.lock().unwrap();
         table.submit_entry(
             board_state.board_hash,
-            tt::TranspositionTable::adjust_score(alpha, ply as i32),
+            tt::TranspositionTable::adjust_score(best_score, ply as i32),
             depth,
             best_move,
             entry_type,
         );
     }
 
-    alpha
+    best_score
 }
 
 fn search_deeper(
@@ -368,12 +372,12 @@ fn alpha_update(
     *best_move = move_obj;
 }
 
-fn beta_cutoff(beta: i16, move_obj: Move, ply: usize, board_state: &BoardState, depth: u8) -> i16 {
+fn beta_cutoff(score: i16, move_obj: Move, ply: usize, board_state: &BoardState, depth: u8) -> i16 {
     {
         let mut table = tt::TT.lock().unwrap();
         table.submit_entry(
             board_state.board_hash,
-            tt::TranspositionTable::adjust_score(beta, ply as i32),
+            tt::TranspositionTable::adjust_score(score, ply as i32),
             depth,
             move_obj,
             TranspositionEntryType::Beta,
@@ -384,7 +388,7 @@ fn beta_cutoff(beta: i16, move_obj: Move, ply: usize, board_state: &BoardState, 
         move_ordering::add_killer_move(move_obj, ply);
     }
 
-    beta
+    score
 }
 
 pub struct SearchContext<'a> {

@@ -75,6 +75,7 @@ impl TranspositionTable {
         alpha: i16,
         beta: i16,
         depth: u8,
+        ply: u8,
     ) -> (bool, i16, Option<Move>) {
         let index = (hash as usize) & (self.capacity - 1);
 
@@ -100,18 +101,20 @@ impl TranspositionTable {
             return (false, 0, Some(entry.best_move));
         }
 
+        let tt_score = Self::retrieve_score(entry.score, ply as i32);
+
         match entry.entry_type {
-            TranspositionEntryType::Exact => (true, entry.score, Some(entry.best_move)),
+            TranspositionEntryType::Exact => (true, tt_score, Some(entry.best_move)),
             TranspositionEntryType::Alpha => {
-                if entry.score <= alpha {
-                    (true, alpha, Some(entry.best_move))
+                if tt_score <= alpha {
+                    (true, tt_score, Some(entry.best_move))
                 } else {
                     (false, 0, Some(entry.best_move))
                 }
             }
             TranspositionEntryType::Beta => {
-                if entry.score >= beta {
-                    (true, beta, Some(entry.best_move))
+                if tt_score >= beta {
+                    (true, tt_score, Some(entry.best_move))
                 } else {
                     (false, 0, Some(entry.best_move))
                 }
@@ -188,7 +191,7 @@ mod tests {
 
         tt.submit_entry(hash, 100, 5, best_move, TranspositionEntryType::Exact);
 
-        let (found, score, m) = tt.get_entry(hash, -1000, 1000, 5);
+        let (found, score, m) = tt.get_entry(hash, -1000, 1000, 5, 0);
         assert!(found);
         assert_eq!(score, 100);
         assert_eq!(m, Some(best_move));
@@ -204,12 +207,12 @@ mod tests {
         tt.submit_entry(hash, 100, 5, m1, TranspositionEntryType::Exact);
         tt.submit_entry(hash, 200, 3, m2, TranspositionEntryType::Exact); // Should NOT overwrite
 
-        let (_, score, m) = tt.get_entry(hash, -1000, 1000, 1);
+        let (_, score, m) = tt.get_entry(hash, -1000, 1000, 1, 0);
         assert_eq!(score, 100);
         assert_eq!(m, Some(m1));
 
         tt.submit_entry(hash, 300, 10, m2, TranspositionEntryType::Exact); // Should overwrite
-        let (_, score, m) = tt.get_entry(hash, -1000, 1000, 1);
+        let (_, score, m) = tt.get_entry(hash, -1000, 1000, 1, 0);
         assert_eq!(score, 300);
         assert_eq!(m, Some(m2));
     }
