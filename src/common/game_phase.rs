@@ -10,8 +10,6 @@ pub const TOTAL_PHASE: i32 = PIECE_CONSTANTS[Piece::Pawn as usize] * 16
 
 pub const ONLY_PAWNS: i32 = PIECE_CONSTANTS[Piece::Pawn as usize] * 16;
 
-pub const PHASE_FACTOR: f64 = 1.0 / (TOTAL_PHASE as f64);
-
 pub fn add_phase(phase: i32, piece: Piece) -> i32 {
     phase + PIECE_CONSTANTS[piece as usize]
 }

@@ -1,5 +1,7 @@
+use crate::bitboard::Bitboard;
 use crate::bitboard::lookups::{
-    get_bishop_attacks_from_table, get_rook_attacks_from_table, knight_attacks,
+    get_bishop_attacks_from_table, get_queen_attacks_from_table, get_rook_attacks_from_table,
+    knight_attacks,
 };
 use crate::board::state::BoardState;
 use crate::common::constants::{PIECES, SQUARES};
@@ -58,52 +60,35 @@ impl PieceSquareTableEvaluation {
         let positional_score =
             (board_state.pst_mid * mid_game_phase) + (board_state.pst_end * end_game_phase);
 
-        (positional_score as f64 * game_phase::PHASE_FACTOR) as i16
+        (positional_score / game_phase::TOTAL_PHASE) as i16
     }
 
     fn score_mobility(board_state: &BoardState) -> i16 {
         let mut mobility = 0;
         let occupancy = board_state.occupancy();
-        let white_pieces = board_state.occupancies[Side::White].0;
-        let black_pieces = board_state.occupancies[Side::Black].0;
 
-        for &piece in &Piece::ALL[1..5] {
-            let mut white_board = board_state.get_pieces(Side::White, piece);
-            while white_board.is_not_empty() {
-                let square = white_board.get_lsb() as usize;
-                white_board.clear_bit(square);
-                let attacks = match piece {
-                    Piece::Knight => knight_attacks()[square],
-                    Piece::Bishop => {
-                        get_bishop_attacks_from_table(Square::from(square), occupancy).0
-                    }
-                    Piece::Rook => get_rook_attacks_from_table(Square::from(square), occupancy).0,
-                    Piece::Queen => {
-                        get_bishop_attacks_from_table(Square::from(square), occupancy).0
-                            | get_rook_attacks_from_table(Square::from(square), occupancy).0
-                    }
-                    _ => 0,
-                };
-                mobility += (attacks & !white_pieces).count_ones() as i16;
-            }
+        for &side in &[Side::White, Side::Black] {
+            let side_multiplier = if side == Side::White { 1 } else { -1 };
+            let own_pieces = board_state.occupancies[side];
 
-            let mut black_board = board_state.get_pieces(Side::Black, piece);
-            while black_board.is_not_empty() {
-                let square = black_board.get_lsb() as usize;
-                black_board.clear_bit(square);
-                let attacks = match piece {
-                    Piece::Knight => knight_attacks()[square],
-                    Piece::Bishop => {
-                        get_bishop_attacks_from_table(Square::from(square), occupancy).0
-                    }
-                    Piece::Rook => get_rook_attacks_from_table(Square::from(square), occupancy).0,
-                    Piece::Queen => {
-                        get_bishop_attacks_from_table(Square::from(square), occupancy).0
-                            | get_rook_attacks_from_table(Square::from(square), occupancy).0
-                    }
-                    _ => 0,
-                };
-                mobility -= (attacks & !black_pieces).count_ones() as i16;
+            for &piece in &Piece::ALL[1..5] {
+                let mut pieces_board = board_state.get_pieces(side, piece);
+                while pieces_board.is_not_empty() {
+                    let square = pieces_board.get_lsb() as usize;
+                    pieces_board.clear_bit(square);
+                    let attacks = match piece {
+                        Piece::Knight => Bitboard(knight_attacks()[square]),
+                        Piece::Bishop => {
+                            get_bishop_attacks_from_table(Square::from(square), occupancy)
+                        }
+                        Piece::Rook => get_rook_attacks_from_table(Square::from(square), occupancy),
+                        Piece::Queen => {
+                            get_queen_attacks_from_table(Square::from(square), occupancy)
+                        }
+                        _ => Bitboard::EMPTY,
+                    };
+                    mobility += side_multiplier * (attacks & !own_pieces).count_ones() as i16;
+                }
             }
         }
         mobility
@@ -169,7 +154,7 @@ static MID_GAME_POSITIONS: [[i16; SQUARES]; PIECES] = {
     tables
 };
 
-static END_GAME_POSITIONS: [[i16; 64]; 6] = {
+static END_GAME_POSITIONS: [[i16; SQUARES]; PIECES] = {
     let piece_values = [94, 281, 297, 512, 936, 0];
     let mut tables = [
         // Pawn
@@ -288,7 +273,7 @@ mod tests {
             for piece_idx in 0..PIECES {
                 let piece = Piece::from(piece_idx);
                 let mut white_board = board_state.get_pieces(Side::White, piece);
-                while white_board.0 > 0 {
+                while white_board.is_not_empty() {
                     let square = white_board.get_lsb() as usize;
                     white_board.clear_bit(square);
                     scratch_mid += MID_GAME_POSITIONS[piece_idx][square] as i32;
@@ -299,7 +284,7 @@ mod tests {
             for piece_idx in 0..PIECES {
                 let piece = Piece::from(piece_idx);
                 let mut black_board = board_state.get_pieces(Side::Black, piece);
-                while black_board.0 > 0 {
+                while black_board.is_not_empty() {
                     let square = black_board.get_lsb() as usize;
                     black_board.clear_bit(square);
                     let mirrored_square = mirror_square(square);
