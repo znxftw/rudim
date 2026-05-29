@@ -19,6 +19,7 @@ pub struct MovePicker {
     phase: SearchPhase,
     pv_move: Option<Move>,
     tt_best: Option<Move>,
+    previous_move: Option<Move>,
     captures: MoveList,
     quiets: MoveList,
     good_captures_count: usize,
@@ -28,11 +29,17 @@ pub struct MovePicker {
 }
 
 impl MovePicker {
-    pub fn new(pv_move: Option<Move>, tt_best: Option<Move>, ply: usize) -> Self {
+    pub fn new(
+        pv_move: Option<Move>,
+        tt_best: Option<Move>,
+        previous_move: Option<Move>,
+        ply: usize,
+    ) -> Self {
         Self {
             phase: SearchPhase::PvMove,
             pv_move,
             tt_best,
+            previous_move,
             captures: MoveList::new(),
             quiets: MoveList::new(),
             good_captures_count: 0,
@@ -47,6 +54,7 @@ impl MovePicker {
             phase: SearchPhase::PvMove,
             pv_move: None,
             tt_best: None,
+            previous_move: None,
             captures: MoveList::new(),
             quiets: MoveList::new(),
             good_captures_count: 0,
@@ -115,7 +123,12 @@ impl MovePicker {
                     self.quiets.clear();
                     self.current_index = 0;
                     board_state.generate_quiets(&mut self.quiets);
-                    move_ordering::populate_quiet_scores(&mut self.quiets, board_state, self.ply);
+                    move_ordering::populate_quiet_scores(
+                        &mut self.quiets,
+                        board_state,
+                        self.ply,
+                        self.previous_move,
+                    );
                     self.phase = SearchPhase::Quiets;
                 }
                 SearchPhase::Quiets => {
@@ -202,7 +215,7 @@ mod tests {
     fn test_move_picker_normal_search_all_phases() {
         let mut board = BoardState::parse_fen("k7/8/8/5n2/1p1p4/2B5/3R4/K7 w - - 0 1");
 
-        let mut picker = MovePicker::new(None, None, 0);
+        let mut picker = MovePicker::new(None, None, None, 0);
         let mut returned_moves = Vec::new();
         while let Some(mv) = picker.next(&mut board) {
             returned_moves.push(mv);

@@ -1,6 +1,7 @@
 use crate::board::state::BoardState;
 use crate::common::constants;
 use crate::common::moves::Move;
+use crate::common::piece::Piece;
 use crate::common::tt::{self, TranspositionEntryType};
 use crate::eval::move_ordering;
 use crate::eval::pst::PieceSquareTableEvaluation;
@@ -40,7 +41,7 @@ pub fn search(
         cancellation_token,
     };
 
-    search_internal(board_state, depth, 0, alpha, beta, &mut ctx)
+    search_internal(board_state, depth, 0, alpha, beta, None, &mut ctx)
 }
 
 fn search_internal(
@@ -49,6 +50,7 @@ fn search_internal(
     ply: u8,
     mut alpha: i16,
     beta: i16,
+    previous_move: Option<Move>,
     ctx: &mut SearchContext,
 ) -> i16 {
     ctx.pv_table.clear(ply as usize);
@@ -113,6 +115,7 @@ fn search_internal(
             ply + 1,
             -beta,
             -beta + 1,
+            None,
             &mut SearchContext {
                 allow_null_move: false,
                 on_pv_path: false,
@@ -145,7 +148,7 @@ fn search_internal(
     let mut found_pv = false;
     let mut entry_type = TranspositionEntryType::Alpha;
 
-    let mut move_picker = MovePicker::new(pv_move, tt_best, ply as usize);
+    let mut move_picker = MovePicker::new(pv_move, tt_best, previous_move, ply as usize);
     let mut number_of_legal_moves = 0;
     let mut has_legal_moves = false;
 
@@ -190,6 +193,7 @@ fn search_internal(
                 ply + 1,
                 -alpha - 1,
                 -alpha,
+                Some(move_obj),
                 &mut SearchContext {
                     allow_null_move: ctx.allow_null_move,
                     on_pv_path: false,
@@ -214,6 +218,7 @@ fn search_internal(
                     alpha,
                     beta,
                     found_pv,
+                    Some(move_obj),
                     &mut child_ctx,
                 );
             }
@@ -232,6 +237,7 @@ fn search_internal(
                 alpha,
                 beta,
                 found_pv,
+                Some(move_obj),
                 &mut child_ctx,
             );
         }
@@ -260,7 +266,14 @@ fn search_internal(
         }
 
         if score >= beta {
-            return beta_cutoff(score, move_obj, ply as usize, board_state, depth);
+            return beta_cutoff(
+                score,
+                move_obj,
+                ply as usize,
+                board_state,
+                depth,
+                previous_move,
+            );
         }
     }
 
@@ -285,6 +298,7 @@ fn search_internal(
     best_score
 }
 
+#[allow(clippy::too_many_arguments)]
 fn search_deeper(
     board_state: &mut BoardState,
     depth: u8,
@@ -292,10 +306,11 @@ fn search_deeper(
     alpha: i16,
     beta: i16,
     found_pv: bool,
+    previous_move: Option<Move>,
     ctx: &mut SearchContext,
 ) -> i16 {
     if found_pv {
-        principal_variation_search(board_state, depth, ply, alpha, beta, ctx)
+        principal_variation_search(board_state, depth, ply, alpha, beta, previous_move, ctx)
     } else {
         -search_internal(
             board_state,
@@ -303,6 +318,7 @@ fn search_deeper(
             ply + 1,
             -beta,
             -alpha,
+            previous_move,
             &mut SearchContext {
                 allow_null_move: ctx.allow_null_move,
                 on_pv_path: ctx.on_pv_path,
@@ -320,6 +336,7 @@ fn principal_variation_search(
     ply: u8,
     alpha: i16,
     beta: i16,
+    previous_move: Option<Move>,
     ctx: &mut SearchContext,
 ) -> i16 {
     let mut score = -search_internal(
@@ -328,6 +345,7 @@ fn principal_variation_search(
         ply + 1,
         -alpha - 1,
         -alpha,
+        previous_move,
         &mut SearchContext {
             allow_null_move: ctx.allow_null_move,
             on_pv_path: ctx.on_pv_path,
@@ -343,6 +361,7 @@ fn principal_variation_search(
             ply + 1,
             -beta,
             -alpha,
+            previous_move,
             &mut SearchContext {
                 allow_null_move: ctx.allow_null_move,
                 on_pv_path: ctx.on_pv_path,
@@ -372,7 +391,14 @@ fn alpha_update(
     *best_move = move_obj;
 }
 
-fn beta_cutoff(score: i16, move_obj: Move, ply: usize, board_state: &BoardState, depth: u8) -> i16 {
+fn beta_cutoff(
+    score: i16,
+    move_obj: Move,
+    ply: usize,
+    board_state: &BoardState,
+    depth: u8,
+    previous_move: Option<Move>,
+) -> i16 {
     {
         let mut table = tt::TT.lock().unwrap();
         table.submit_entry(
@@ -386,6 +412,15 @@ fn beta_cutoff(score: i16, move_obj: Move, ply: usize, board_state: &BoardState,
 
     if !move_obj.is_capture() {
         move_ordering::add_killer_move(move_obj, ply);
+
+        if let Some(prev_mv) = previous_move {
+            let prev_side = board_state.side_to_move.other();
+            let prev_piece = board_state.piece_mapping[prev_mv.target as usize];
+            // TODO: EP?
+            if prev_piece != Piece::None {
+                move_ordering::add_counter_move(prev_side, prev_piece, prev_mv.target, move_obj);
+            }
+        }
     }
 
     score
