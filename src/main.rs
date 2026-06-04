@@ -1,25 +1,54 @@
-use rudim::bitboard::magics;
-use rudim::perft;
-use rudim::uci;
+use std::env::args;
+use std::process::exit;
+use std::sync::atomic::AtomicBool;
+use std::time::Instant;
+
+use rudim::bitboard::magics::generate_all_magic_numbers;
+use rudim::board::state::BoardState;
+use rudim::common::helpers::{ADVANCED_MOVE_FEN, ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
+use rudim::common::tt::TT;
+use rudim::eval::move_ordering::reset_move_heuristic;
+use rudim::init;
+use rudim::perft::run_cli;
+use rudim::train::{convert_text_to_bin, run as train_run};
+use rudim::uci::cli::run as uci_run;
 
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
+    let raw_args: Vec<String> = args().collect();
 
-    match args.get(1).map(String::as_str) {
+    match raw_args.get(1).map(String::as_str) {
         Some("--generate-magics") => {
-            magics::generate_all_magic_numbers();
+            generate_all_magic_numbers();
         }
         Some("--perft") => {
-            rudim::init();
-            perft::run_cli();
+            init();
+            run_cli();
+        }
+        Some("--train") => {
+            init();
+            let dataset_path = raw_args.get(2).map(String::as_str);
+            let checkpoint_path = raw_args.get(3).map(String::as_str);
+            train_run(dataset_path, checkpoint_path);
+        }
+        Some("--convert") => {
+            if raw_args.len() < 4 {
+                eprintln!("Usage: rudim --convert <input.txt> <output.data>");
+                exit(1);
+            }
+            let input_path = &raw_args[2];
+            let output_path = &raw_args[3];
+            if let Err(e) = convert_text_to_bin(input_path, output_path) {
+                eprintln!("Error converting file: {}", e);
+                exit(1);
+            }
         }
         Some("--profile") => {
             // Intended to be used when profiling as reqd to debug CPU usage
             run_searches();
         }
         _ => {
-            rudim::init();
-            uci::cli::run();
+            init();
+            uci_run();
         }
     }
 }
@@ -27,19 +56,16 @@ fn main() {
 fn run_searches() {
     const PROFILE_DEPTH: u8 = 13;
 
-    rudim::init();
+    init();
 
     let positions = [
-        ("Starting Position", rudim::common::helpers::STARTING_FEN),
-        ("Kiwi Pete", rudim::common::helpers::KIWI_PETE_FEN),
-        ("Endgame", rudim::common::helpers::ENDGAME_FEN),
-        (
-            "Advanced Position",
-            rudim::common::helpers::ADVANCED_MOVE_FEN,
-        ),
+        ("Starting Position", STARTING_FEN),
+        ("Kiwi Pete", KIWI_PETE_FEN),
+        ("Endgame", ENDGAME_FEN),
+        ("Advanced Position", ADVANCED_MOVE_FEN),
     ];
 
-    let cancellation_token = std::sync::atomic::AtomicBool::new(false);
+    let cancellation_token = AtomicBool::new(false);
     let mut debug_mode = true;
 
     for (name, fen) in positions {
@@ -48,13 +74,13 @@ fn run_searches() {
 
         // Reset engine
         {
-            let mut tt = rudim::common::tt::TT.lock().unwrap();
+            let mut tt = TT.lock().unwrap();
             tt.clear();
         }
-        rudim::eval::move_ordering::reset_move_heuristic();
+        reset_move_heuristic();
 
-        let mut board = rudim::board::state::BoardState::parse_fen(fen);
-        let start_time = std::time::Instant::now();
+        let mut board = BoardState::parse_fen(fen);
+        let start_time = Instant::now();
         let best_move = board.find_best_move(PROFILE_DEPTH, &cancellation_token, &mut debug_mode);
         let duration = start_time.elapsed();
 

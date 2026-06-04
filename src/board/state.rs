@@ -6,10 +6,12 @@ use crate::bitboard::lookups::{
 use crate::board::history::History;
 use crate::common::castle::Castle;
 use crate::common::constants::{PIECES, SIDES, SQUARES};
-use crate::common::game_phase::{add_phase, remove_phase};
+use crate::common::game_phase::{add_phase, get_clipped_phase, remove_phase};
 use crate::common::piece::{Piece, PieceMap};
 use crate::common::side::{Side, SideMap};
 use crate::common::square::Square;
+use crate::eval::nnue::accumulator::Accumulator;
+use crate::eval::pst::get_pst_values;
 use std::fmt;
 
 #[rustfmt::skip]
@@ -39,6 +41,8 @@ pub struct BoardState {
     pub history: History,
     pub pst_mid: i32,
     pub pst_end: i32,
+    pub accumulator_white: Accumulator,
+    pub accumulator_black: Accumulator,
 }
 
 impl BoardState {
@@ -57,6 +61,8 @@ impl BoardState {
             history: History::new(),
             pst_mid: 0,
             pst_end: 0,
+            accumulator_white: Accumulator::new(),
+            accumulator_black: Accumulator::new(),
         }
     }
 
@@ -77,9 +83,12 @@ impl BoardState {
         self.piece_mapping[sq] = piece;
         self.phase = add_phase(self.phase, piece);
 
-        let (mid_val, end_val) = crate::eval::pst::get_pst_values(piece, square, side);
+        let (mid_val, end_val) = get_pst_values(piece, square, side);
         self.pst_mid += mid_val;
         self.pst_end += end_val;
+
+        // TODO: make_move + history instead?
+        self.nnue_add_piece(square, side, piece);
     }
 
     pub fn remove_piece(&mut self, square: Square) -> Piece {
@@ -98,9 +107,12 @@ impl BoardState {
         self.piece_mapping[sq] = Piece::None;
         self.phase = remove_phase(self.phase, piece);
 
-        let (mid_val, end_val) = crate::eval::pst::get_pst_values(piece, square, side);
+        let (mid_val, end_val) = get_pst_values(piece, square, side);
         self.pst_mid -= mid_val;
         self.pst_end -= end_val;
+
+        // TODO: make_move + history instead?
+        self.nnue_remove_piece(square, side, piece);
 
         piece
     }
@@ -169,7 +181,7 @@ impl BoardState {
     }
 
     pub fn clipped_phase(&self) -> i32 {
-        crate::common::game_phase::get_clipped_phase(self.phase)
+        get_clipped_phase(self.phase)
     }
 }
 
@@ -331,5 +343,98 @@ mod tests {
         board.add_piece(Square::E4, Side::White, Piece::Pawn);
         board.add_piece(Square::E8, Side::Black, Piece::Rook);
         assert!(!board.is_in_check(Side::White));
+    }
+
+    #[test]
+    fn test_accumulator_make_unmake_consistency() {
+        use crate::common::move_list::MoveList;
+        use crate::eval::nnue::GLOBAL_NETWORK;
+        use crate::eval::nnue::loader::Network;
+
+        let network = *GLOBAL_NETWORK.get_or_init(|| {
+            let mut net = Network::new_boxed();
+            net.transformer_biases.fill(3);
+            net.transformer_weights.fill(2);
+            Box::leak(net)
+        });
+
+        let mut board = BoardState::starting_position();
+
+        let expected_white = board.accumulator_white;
+        let expected_black = board.accumulator_black;
+        board.refresh_accumulator(Side::White, network);
+        board.refresh_accumulator(Side::Black, network);
+        assert_eq!(board.accumulator_white, expected_white);
+        assert_eq!(board.accumulator_black, expected_black);
+
+        let mut move_history = Vec::new();
+        for _ in 0..10 {
+            let mut moves = MoveList::new();
+            board.generate_moves(&mut moves);
+            if moves.count == 0 {
+                break;
+            }
+
+            // Find the first legal move
+            let mut legal_move = None;
+            for m_entry in moves.iter() {
+                let m = m_entry.mv;
+                board.make_move(m);
+                let is_legal = !board.is_in_check(board.side_to_move.other());
+                board.unmake_move(m);
+                if is_legal {
+                    legal_move = Some(m);
+                    break;
+                }
+            }
+
+            let Some(m) = legal_move else {
+                break;
+            };
+
+            board.make_move(m);
+            move_history.push(m);
+
+            let current_white = board.accumulator_white;
+            let current_black = board.accumulator_black;
+
+            board.refresh_accumulator(Side::White, network);
+            board.refresh_accumulator(Side::Black, network);
+
+            assert_eq!(
+                board.accumulator_white, current_white,
+                "Failed white accumulator check after move {:?}",
+                m
+            );
+            assert_eq!(
+                board.accumulator_black, current_black,
+                "Failed black accumulator check after move {:?}",
+                m
+            );
+        }
+
+        while let Some(m) = move_history.pop() {
+            board.unmake_move(m);
+
+            let current_white = board.accumulator_white;
+            let current_black = board.accumulator_black;
+
+            board.refresh_accumulator(Side::White, network);
+            board.refresh_accumulator(Side::Black, network);
+
+            assert_eq!(
+                board.accumulator_white, current_white,
+                "Failed white accumulator check after unmake {:?}",
+                m
+            );
+            assert_eq!(
+                board.accumulator_black, current_black,
+                "Failed black accumulator check after unmake {:?}",
+                m
+            );
+        }
+
+        assert_eq!(board.accumulator_white, expected_white);
+        assert_eq!(board.accumulator_black, expected_black);
     }
 }

@@ -11,6 +11,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: true
 
       - name: Setup Rust toolchain (rustup)
         run: |

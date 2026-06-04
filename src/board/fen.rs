@@ -5,6 +5,7 @@ use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
 use crate::common::zobrist;
+use crate::eval::nnue::GLOBAL_NETWORK;
 
 impl BoardState {
     pub fn parse_fen(fen: &str) -> Self {
@@ -22,6 +23,10 @@ impl BoardState {
             parse_move_count(&mut board, sections[5]);
         }
         board.board_hash = zobrist::get_board_hash(&board);
+        if let Some(network) = GLOBAL_NETWORK.get() {
+            board.refresh_accumulator(Side::White, network);
+            board.refresh_accumulator(Side::Black, network);
+        }
 
         board
     }

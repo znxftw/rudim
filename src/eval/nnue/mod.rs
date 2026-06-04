@@ -1,0 +1,104 @@
+pub mod accumulator;
+pub mod features;
+pub mod loader;
+
+use crate::board::state::BoardState;
+use crate::common::side::Side;
+use std::sync::OnceLock;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+use self::loader::Network;
+
+pub static GLOBAL_NETWORK: OnceLock<&'static Network> = OnceLock::new();
+pub static USE_NNUE: AtomicBool = AtomicBool::new(true);
+
+pub const ACC_SIZE: usize = 1024;
+pub const INPUT_SIZE: usize = 768;
+
+pub const SCALE: i32 = 400;
+
+pub fn evaluate(board: &BoardState) -> Option<i16> {
+    // TODO: clean after pst is removed
+    if !USE_NNUE.load(Ordering::Relaxed) {
+        return None;
+    }
+
+    let network = *GLOBAL_NETWORK.get_or_init(Network::get_embedded);
+
+    Some(evaluate_internal(board, network))
+}
+
+pub fn evaluate_internal(board: &BoardState, network: &Network) -> i16 {
+    let side_to_move = board.side_to_move;
+    let (acc_active, acc_passive) = if side_to_move == Side::White {
+        (&board.accumulator_white, &board.accumulator_black)
+    } else {
+        (&board.accumulator_black, &board.accumulator_white)
+    };
+
+    let mut output: i32 = 0;
+
+    for (&input, &weight) in acc_active
+        .state
+        .iter()
+        .zip(&network.output_weights[0..ACC_SIZE])
+    {
+        let val = i32::from(input).clamp(0, 255);
+        let screlu = val * val;
+        output += screlu * i32::from(weight);
+    }
+
+    for (&input, &weight) in acc_passive
+        .state
+        .iter()
+        .zip(&network.output_weights[ACC_SIZE..2 * ACC_SIZE])
+    {
+        let val = i32::from(input).clamp(0, 255);
+        let screlu = val * val;
+        output += screlu * i32::from(weight);
+    }
+
+    // QA=255, QB=64, SCALE=400
+    output /= 255;
+    output += i32::from(network.output_bias);
+    output *= SCALE;
+    output /= 255 * 64;
+
+    output.clamp(-29000, 29000) as i16
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::board::state::BoardState;
+
+    #[test]
+    fn test_nnue_forward_pass_mathematical_correctness() {
+        let mut network = Network::new_boxed();
+        network.output_bias = 10;
+        for i in 0..ACC_SIZE {
+            network.output_weights[i] = 2;
+        }
+        for i in ACC_SIZE..2 * ACC_SIZE {
+            network.output_weights[i] = 3;
+        }
+
+        let mut board = BoardState::new();
+
+        board.accumulator_white.state.fill(10);
+        board.accumulator_black.state.fill(20);
+
+        board.side_to_move = Side::White;
+        let score = evaluate_internal(&board, &network);
+
+        // Active state value: 10.clamp(0, 255) = 10. screlu = 10 * 10 = 100.
+        // Passive state value: 20.clamp(0, 255) = 20. screlu = 20 * 20 = 400.
+        // sum = 1024 * (100 * 2) + 1024 * (400 * 3) = 204800 + 1228800 = 1433600
+        // Dequantize:
+        // output = 1433600 / 255 = 5621
+        // output += 10 (bias) = 5631
+        // output *= 400 (SCALE) = 2252400
+        // output /= 16320 (QA * QB) = 138
+        assert_eq!(score, 138);
+    }
+}
