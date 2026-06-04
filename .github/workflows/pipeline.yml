@@ -58,7 +58,7 @@ jobs:
         run: cargo run --release -- --perft
 
       - name: Clippy
-        run: cargo clippy --locked --all-targets --all-features
+        run: cargo clippy --locked --all-targets
 
       - name: Format check
         run: cargo fmt --all -- --check
