@@ -1,4 +1,4 @@
-use std::mem::size_of;
+use std::alloc::{Layout, alloc_zeroed, handle_alloc_error};
 
 use crate::eval::nnue::{ACC_SIZE, INPUT_SIZE};
 
@@ -21,10 +21,13 @@ impl Network {
 
     // TODO: for tests, refactor
     pub fn new_boxed() -> Box<Self> {
-        let bytes = vec![0u8; size_of::<Self>()];
         unsafe {
-            let raw = Box::into_raw(bytes.into_boxed_slice()) as *mut Self;
-            Box::from_raw(raw)
+            let layout = Layout::new::<Self>();
+            let ptr = alloc_zeroed(layout) as *mut Self;
+            if ptr.is_null() {
+                handle_alloc_error(layout);
+            }
+            Box::from_raw(ptr)
         }
     }
 }
