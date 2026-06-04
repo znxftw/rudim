@@ -15,3 +15,8 @@ Thumbs.db
 
 
 venv/
+
+# Training outputs and datasets
+/checkpoints/
+/data/
+/resources/nnue.bin

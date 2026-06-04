@@ -1,3 +1,6 @@
+#[cfg(test)]
+use std::sync::atomic::AtomicBool;
+
 use crate::bitboard::Bitboard;
 use crate::bitboard::lookups::{
     get_bishop_attacks_from_table, get_queen_attacks_from_table, get_rook_attacks_from_table,
@@ -5,10 +8,11 @@ use crate::bitboard::lookups::{
 };
 use crate::board::state::BoardState;
 use crate::common::constants::{PIECES, SQUARES};
-use crate::common::game_phase;
+use crate::common::game_phase::TOTAL_PHASE;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
+use crate::eval::nnue;
 use crate::eval::pawns::PawnStructureEvaluation;
 
 pub fn mirror_square(square: usize) -> usize {
@@ -36,10 +40,33 @@ pub fn get_pst_values(piece: Piece, square: Square, side: Side) -> (i32, i32) {
     }
 }
 
+#[cfg(test)]
+pub static USE_NNUE: AtomicBool = AtomicBool::new(true);
+
 pub struct PieceSquareTableEvaluation;
 
 impl PieceSquareTableEvaluation {
     pub fn evaluate(board_state: &BoardState) -> i16 {
+        let use_nnue = {
+            #[cfg(test)]
+            {
+                use std::sync::atomic::Ordering;
+
+                USE_NNUE.load(Ordering::Relaxed)
+            }
+            #[cfg(not(test))]
+            {
+                true
+            }
+        };
+
+        #[allow(clippy::collapsible_if)]
+        if use_nnue {
+            if let Some(score) = nnue::evaluate(board_state) {
+                return score;
+            }
+        }
+
         let mut score: i16 = 0;
 
         score += Self::score_position(board_state);
@@ -55,12 +82,12 @@ impl PieceSquareTableEvaluation {
 
     fn score_position(board_state: &BoardState) -> i16 {
         let mid_game_phase = board_state.clipped_phase();
-        let end_game_phase = game_phase::TOTAL_PHASE - mid_game_phase;
+        let end_game_phase = TOTAL_PHASE - mid_game_phase;
 
         let positional_score =
             (board_state.pst_mid * mid_game_phase) + (board_state.pst_end * end_game_phase);
 
-        (positional_score / game_phase::TOTAL_PHASE) as i16
+        (positional_score / TOTAL_PHASE) as i16
     }
 
     fn score_mobility(board_state: &BoardState) -> i16 {
@@ -216,9 +243,11 @@ mod tests {
     use crate::board::state::BoardState;
     use crate::common::constants::PIECES;
     use crate::common::helpers;
+    use std::sync::atomic::Ordering;
 
     #[test]
     fn should_return_consistent_score_for_starting_position_white() {
+        USE_NNUE.store(false, Ordering::Relaxed);
         let fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         let board_state = BoardState::parse_fen(fen);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
@@ -227,6 +256,7 @@ mod tests {
 
     #[test]
     fn should_return_consistent_score_for_starting_position_black() {
+        USE_NNUE.store(false, Ordering::Relaxed);
         let fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
         let board_state = BoardState::parse_fen(fen);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
@@ -235,6 +265,7 @@ mod tests {
 
     #[test]
     fn should_return_consistent_score_for_endgame() {
+        USE_NNUE.store(false, Ordering::Relaxed);
         let board_state = BoardState::parse_fen(helpers::ENDGAME_FEN);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
         assert_eq!(-4, actual_score);
@@ -242,6 +273,7 @@ mod tests {
 
     #[test]
     fn should_return_consistent_score_for_kiwipete() {
+        USE_NNUE.store(false, Ordering::Relaxed);
         let board_state = BoardState::parse_fen(helpers::KIWI_PETE_FEN);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
         assert_eq!(61, actual_score);
@@ -249,6 +281,7 @@ mod tests {
 
     #[test]
     fn should_return_consistent_score_for_advanced_move() {
+        USE_NNUE.store(false, Ordering::Relaxed);
         let board_state = BoardState::parse_fen(helpers::ADVANCED_MOVE_FEN);
         let actual_score = PieceSquareTableEvaluation::evaluate(&board_state);
         assert_eq!(606, actual_score);

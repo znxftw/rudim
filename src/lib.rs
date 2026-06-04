@@ -5,8 +5,11 @@ pub mod engine;
 pub mod eval;
 pub mod perft;
 pub mod search;
+pub mod train;
 pub mod uci;
 
+use common::zobrist;
+
 pub fn init() {
-    common::zobrist::init();
+    zobrist::init();
 }
