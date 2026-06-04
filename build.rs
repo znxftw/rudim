@@ -171,14 +171,13 @@ fn main() {
     write_table!("KING_ATTACKS", "[u64; 64]", king_attacks);
     write_table!("BISHOP_ATTACKS", "[[u64; 512]; 64]", bishop_attacks);
     write_table!("ROOK_ATTACKS", "[[u64; 4096]; 64]", rook_attacks);
-
-    // Download NNUE model if it doesn't exist
     download_nnue_if_needed();
 }
 
 fn download_nnue_if_needed() {
     use std::fs::{create_dir_all, metadata, write};
     use std::path::Path;
+    use std::process::Command;
 
     let dest_path = Path::new("resources/nnue.bin");
     let expected_size = 1579072;
@@ -192,12 +191,34 @@ fn download_nnue_if_needed() {
         }
     };
 
-    // TODO: fetch from rudim-networks once v0 is published
     if needs_recreate {
-        println!(
-            "cargo:warning=Generating zero-initialized NNUE weights for 768-simple architecture..."
-        );
         create_dir_all("resources").unwrap();
-        write(dest_path, vec![0u8; expected_size]).unwrap();
+        println!(
+            "cargo:warning=Downloading NNUE weights from GitHub (znxftw/rudim-networks v0)..."
+        );
+
+        let url = "https://github.com/znxftw/rudim-networks/releases/latest/download/nnue.bin";
+        let status = Command::new("curl")
+            .arg("-L")
+            .arg("-s")
+            .arg("-f")
+            .arg("-o")
+            .arg(dest_path)
+            .arg(url)
+            .status();
+
+        let success = match status {
+            Ok(exit_status) => exit_status.success(),
+            Err(_) => false,
+        };
+
+        if !success {
+            println!(
+                "cargo:warning=Failed to download weights from GitHub. Generating zero-initialized weights instead..."
+            );
+            write(dest_path, vec![0u8; expected_size]).unwrap();
+        } else {
+            println!("cargo:warning=Successfully downloaded NNUE weights.");
+        }
     }
 }
