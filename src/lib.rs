@@ -1,6 +1,7 @@
 pub mod bitboard;
 pub mod board;
 pub mod common;
+pub mod datagen;
 pub mod engine;
 pub mod eval;
 pub mod perft;

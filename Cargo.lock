@@ -627,6 +627,7 @@ dependencies = [
  "bullet_lib",
  "bulletformat",
  "criterion",
+ "rand",
  "serial_test",
 ]
 

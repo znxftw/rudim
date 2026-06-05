@@ -1,3 +1,4 @@
+use crate::datagen;
 use crate::uci;
 use std::collections::HashMap;
 use std::io::{self, Write};
@@ -22,10 +23,60 @@ impl CliCommand for UciCommand {
     }
 }
 
+struct DatagenCommand;
+// TODO: refactor cli - split uci / cli / datagon into separate mods
+impl CliCommand for DatagenCommand {
+    fn run(&self, parameters: &[&str]) {
+        if parameters.len() < 3 {
+            write_line(
+                "Usage: datagen <output.binpack> <number_of_games> <opening_book.fen> [depth] [threads]",
+            );
+            return;
+        }
+        let output_path = parameters[0];
+        let num_games = match parameters[1].parse::<usize>() {
+            Ok(n) => n,
+            Err(_) => {
+                write_line("Error: invalid number of games");
+                return;
+            }
+        };
+        let book_path = parameters[2];
+        let depth = if parameters.len() > 3 {
+            match parameters[3].parse::<u8>() {
+                Ok(d) => d,
+                Err(_) => {
+                    write_line("Error: invalid depth");
+                    return;
+                }
+            }
+        } else {
+            8
+        };
+
+        let threads = if parameters.len() > 4 {
+            match parameters[4].parse::<usize>() {
+                Ok(t) => t,
+                Err(_) => {
+                    write_line("Error: invalid thread count");
+                    return;
+                }
+            }
+        } else {
+            std::thread::available_parallelism()
+                .map(|p| p.get())
+                .unwrap_or(4)
+        };
+
+        datagen::run(output_path, num_games, book_path, depth, threads);
+    }
+}
+
 pub fn run() {
     let mut commands: HashMap<&str, Box<dyn CliCommand>> = HashMap::new();
     commands.insert("info", Box::new(InfoCommand));
     commands.insert("uci", Box::new(UciCommand));
+    commands.insert("datagen", Box::new(DatagenCommand));
 
     let stdin = io::stdin();
 
