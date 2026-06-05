@@ -16,6 +16,16 @@ fn main() {
     let raw_args: Vec<String> = args().collect();
 
     match raw_args.get(1).map(String::as_str) {
+        Some("--randomize-weights") => {
+            use rudim::eval::nnue::loader::Network;
+            let mut network = Network::new_boxed();
+            network.randomize();
+            if let Err(e) = network.save_to_file("resources/nnue.bin") {
+                eprintln!("Error saving randomized weights: {}", e);
+                exit(1);
+            }
+            println!("Successfully randomized weights and saved to resources/nnue.bin!");
+        }
         Some("--generate-magics") => {
             generate_all_magic_numbers();
         }

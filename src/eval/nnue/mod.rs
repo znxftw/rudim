@@ -12,7 +12,7 @@ use self::loader::Network;
 pub static GLOBAL_NETWORK: OnceLock<&'static Network> = OnceLock::new();
 pub static USE_NNUE: AtomicBool = AtomicBool::new(true);
 
-pub const ACC_SIZE: usize = 1024;
+pub const ACC_SIZE: usize = 32;
 pub const INPUT_SIZE: usize = 768;
 
 pub const SCALE: i32 = 400;
@@ -93,12 +93,12 @@ mod tests {
 
         // Active state value: 10.clamp(0, 255) = 10. screlu = 10 * 10 = 100.
         // Passive state value: 20.clamp(0, 255) = 20. screlu = 20 * 20 = 400.
-        // sum = 1024 * (100 * 2) + 1024 * (400 * 3) = 204800 + 1228800 = 1433600
+        // sum = 32 * (100 * 2) + 32 * (400 * 3) = 6400 + 38400 = 44800
         // Dequantize:
-        // output = 1433600 / 255 = 5621
-        // output += 10 (bias) = 5631
-        // output *= 400 (SCALE) = 2252400
-        // output /= 16320 (QA * QB) = 138
-        assert_eq!(score, 138);
+        // output = 44800 / 255 = 175
+        // output += 10 (bias) = 185
+        // output *= 400 (SCALE) = 74000
+        // output /= 16320 (QA * QB) = 4
+        assert_eq!(score, 4);
     }
 }

@@ -180,7 +180,12 @@ fn download_nnue_if_needed() {
     use std::process::Command;
 
     let dest_path = Path::new("resources/nnue.bin");
-    let expected_size = 1579072;
+
+    let acc_size = 32;
+    let input_size = 768;
+    let struct_size: usize = (input_size * acc_size + acc_size + acc_size * 2 + 1) * 2;
+    // Align up to 64 bytes
+    let expected_size = struct_size.div_ceil(64) * 64;
 
     let needs_recreate = if !dest_path.exists() {
         true
@@ -208,13 +213,23 @@ fn download_nnue_if_needed() {
             .status();
 
         let success = match status {
-            Ok(exit_status) => exit_status.success(),
+            Ok(exit_status) => {
+                if exit_status.success() {
+                    // Validate downloaded file size
+                    match metadata(dest_path) {
+                        Ok(meta) => meta.len() == expected_size as u64,
+                        Err(_) => false,
+                    }
+                } else {
+                    false
+                }
+            }
             Err(_) => false,
         };
 
         if !success {
             println!(
-                "cargo:warning=Failed to download weights from GitHub. Generating zero-initialized weights instead..."
+                "cargo:warning=Failed to download correct weights from GitHub. Generating zero-initialized weights instead..."
             );
             write(dest_path, vec![0u8; expected_size]).unwrap();
         } else {
