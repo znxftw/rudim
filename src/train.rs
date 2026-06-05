@@ -1,7 +1,6 @@
 use std::fs::{self, File};
 use std::io::{BufRead, BufReader, Result, Write};
 use std::mem::size_of;
-use std::path::Path;
 use std::slice::from_raw_parts;
 use std::str::FromStr;
 
@@ -33,30 +32,10 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
         num_positions
     );
 
-    let batch_size = 16384.min(num_positions as usize).max(1);
-    let batches_per_superbatch = (num_positions as usize / batch_size).max(1);
-    let superbatches = 16;
-
-    let mut start_superbatch = 1;
-    let mut end_superbatch = superbatches;
-
-    #[allow(clippy::collapsible_if)]
-    if let Some(path) = checkpoint_path {
-        if let Some(filename) = Path::new(path).file_name().and_then(|s| s.to_str()) {
-            if let Some(pos) = filename.rfind('-') {
-                if let Ok(num) = filename[pos + 1..].parse::<usize>() {
-                    start_superbatch = num + 1;
-                    end_superbatch = num + superbatches;
-                }
-            }
-        }
-    }
-
-    // 2. Trainer Configuration
     let hl_size = 1024;
     let initial_lr = 0.001;
-    let final_lr = 0.001;
-    let wdl_proportion = 1.0; // 0.0 for pure value prediction
+    let final_lr = 0.00001;
+    let wdl_proportion = 0.8; // 0.0 for pure value prediction
 
     let mut trainer = ValueTrainerBuilder::default()
         .dual_perspective()
@@ -88,10 +67,10 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
         net_id: "1_simple".to_string(),
         eval_scale: 400.0,
         steps: TrainingSteps {
-            batch_size,
-            batches_per_superbatch,
-            start_superbatch,
-            end_superbatch,
+            batch_size: 16_384,
+            batches_per_superbatch: 6104,
+            start_superbatch: 1,
+            end_superbatch: 40,
         },
         wdl_scheduler: wdl::ConstantWDL {
             value: wdl_proportion,
@@ -99,7 +78,7 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
         lr_scheduler: lr::CosineDecayLR {
             initial_lr,
             final_lr,
-            final_superbatch: end_superbatch,
+            final_superbatch: 40,
         },
         save_rate: 1,
     };
@@ -111,7 +90,7 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
         batch_queue_size: 4,
     };
 
-    let filter = Filter::UNRESTRICTED;
+    let filter = Filter::default();
     let dataloader = ViriBinpackLoader::new(dataset_path, 512, 4, filter);
 
     println!("Starting bullet training loop...");
@@ -119,7 +98,7 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
     println!("Bullet training completed successfully!");
 
     // Overwrite resources/nnue.bin with the newly trained weights
-    let cp_dir = format!("checkpoints/1_simple-{}", end_superbatch);
+    let cp_dir = format!("checkpoints/1_simple-{}", 40);
     let cp_path = format!("{}/quantised.bin", cp_dir);
     println!("Copying weights from {} to resources/nnue.bin", cp_path);
     if let Err(e) = fs::copy(&cp_path, "resources/nnue.bin") {
