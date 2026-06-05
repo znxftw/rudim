@@ -6,7 +6,6 @@ use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
-use std::sync::{LazyLock, Mutex};
 
 pub struct MoveOrdering {
     pub killer_moves: [[Move; MAX_PLY]; 2],
@@ -81,6 +80,54 @@ impl MoveOrdering {
             }
         }
     }
+
+    pub fn populate_quiet_scores(
+        &self,
+        moves: &mut [ScoredMove],
+        board_state: &BoardState,
+        ply: usize,
+        previous_move: Option<Move>,
+    ) {
+        let counter_move = if let Some(prev_mv) = previous_move {
+            let prev_side = board_state.side_to_move.other();
+            let prev_piece = board_state.piece_mapping[prev_mv.target as usize];
+            if prev_piece != Piece::None {
+                self.counter_moves[prev_side as usize][prev_piece as usize][prev_mv.target as usize]
+            } else {
+                Move::NO_MOVE
+            }
+        } else {
+            Move::NO_MOVE
+        };
+
+        for move_obj in moves.iter_mut() {
+            if move_obj.mv == self.killer_moves[0][ply] {
+                move_obj.score = 9000;
+            } else if move_obj.mv == self.killer_moves[1][ply] {
+                move_obj.score = 8000;
+            } else if counter_move != Move::NO_MOVE && move_obj.mv == counter_move {
+                move_obj.score = 7000;
+            } else {
+                let piece = board_state.get_piece_on(move_obj.mv.source);
+                if piece != -1 {
+                    let history_score =
+                        self.history_moves[piece as usize][move_obj.mv.target as usize];
+                    move_obj.score = history_score.min(6999);
+                }
+            }
+        }
+    }
+
+    pub fn add_counter_move(
+        &mut self,
+        prev_side: Side,
+        prev_piece: Piece,
+        prev_square: Square,
+        counter_move: Move,
+    ) {
+        self.counter_moves[prev_side as usize][prev_piece as usize][prev_square as usize] =
+            counter_move;
+    }
 }
 
 impl Default for MoveOrdering {
@@ -88,9 +135,6 @@ impl Default for MoveOrdering {
         Self::new()
     }
 }
-
-pub static MOVE_ORDERING: LazyLock<Mutex<MoveOrdering>> =
-    LazyLock::new(|| Mutex::new(MoveOrdering::new()));
 
 pub fn populate_capture_scores(moves: &mut [ScoredMove], board_state: &BoardState) {
     for move_obj in moves.iter_mut() {
@@ -104,76 +148,6 @@ pub fn populate_capture_scores(moves: &mut [ScoredMove], board_state: &BoardStat
 
         move_obj.score = MVV_LVA[target_piece][source_piece];
     }
-}
-
-pub fn populate_quiet_scores(
-    moves: &mut [ScoredMove],
-    board_state: &BoardState,
-    ply: usize,
-    previous_move: Option<Move>,
-) {
-    let move_ordering = MOVE_ORDERING.lock().unwrap();
-
-    let counter_move = if let Some(prev_mv) = previous_move {
-        let prev_side = board_state.side_to_move.other();
-        let prev_piece = board_state.piece_mapping[prev_mv.target as usize];
-        if prev_piece != Piece::None {
-            move_ordering.counter_moves[prev_side as usize][prev_piece as usize]
-                [prev_mv.target as usize]
-        } else {
-            Move::NO_MOVE
-        }
-    } else {
-        Move::NO_MOVE
-    };
-
-    for move_obj in moves.iter_mut() {
-        if move_obj.mv == move_ordering.killer_moves[0][ply] {
-            move_obj.score = 9000;
-        } else if move_obj.mv == move_ordering.killer_moves[1][ply] {
-            move_obj.score = 8000;
-        } else if counter_move != Move::NO_MOVE && move_obj.mv == counter_move {
-            move_obj.score = 7000;
-        } else {
-            let piece = board_state.get_piece_on(move_obj.mv.source);
-            if piece != -1 {
-                let history_score =
-                    move_ordering.history_moves[piece as usize][move_obj.mv.target as usize];
-                move_obj.score = history_score.min(6999);
-            }
-        }
-    }
-}
-
-pub fn add_killer_move(move_obj: Move, ply: usize) {
-    let mut move_ordering = MOVE_ORDERING.lock().unwrap();
-    move_ordering.add_killer_move(move_obj, ply);
-}
-
-pub fn add_counter_move(
-    prev_side: Side,
-    prev_piece: Piece,
-    prev_square: Square,
-    counter_move: Move,
-) {
-    let mut move_ordering = MOVE_ORDERING.lock().unwrap();
-    move_ordering.counter_moves[prev_side as usize][prev_piece as usize][prev_square as usize] =
-        counter_move;
-}
-
-pub fn add_history_move(piece: usize, move_obj: Move, depth: u8) {
-    let mut move_ordering = MOVE_ORDERING.lock().unwrap();
-    move_ordering.add_history_move(piece, move_obj, depth);
-}
-
-pub fn reset_move_heuristic() {
-    let mut move_ordering = MOVE_ORDERING.lock().unwrap();
-    move_ordering.reset();
-}
-
-pub fn is_move_heuristic_empty() -> bool {
-    let move_ordering = MOVE_ORDERING.lock().unwrap();
-    move_ordering.is_move_heuristic_empty()
 }
 
 #[cfg(test)]

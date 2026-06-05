@@ -29,6 +29,7 @@ pub(crate) struct UciClient {
     pub board: Arc<Mutex<BoardState>>,
     pub debug_mode: Arc<AtomicBool>,
     pub current_search: Option<Arc<AtomicBool>>,
+    pub search_state: Arc<Mutex<crate::search::search_state::SearchState>>,
 }
 
 impl UciClient {
@@ -37,6 +38,7 @@ impl UciClient {
             board: Arc::new(Mutex::new(BoardState::parse_fen(STARTING_FEN))),
             debug_mode: Arc::new(AtomicBool::new(true)),
             current_search: None,
+            search_state: Arc::new(Mutex::new(crate::search::search_state::SearchState::new())),
         }
     }
 

@@ -2,17 +2,17 @@ use crate::board::state::BoardState;
 use crate::common::constants::MAX_PLY;
 use crate::eval::pst::PieceSquareTableEvaluation;
 use crate::search::move_picker::MovePicker;
-use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
-
-static NODES: AtomicI32 = AtomicI32::new(0);
+use crate::search::search_state::SearchState;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 pub fn search(
     board_state: &mut BoardState,
     mut alpha: i16,
     beta: i16,
     cancellation_token: &AtomicBool,
+    search_state: &mut SearchState,
 ) -> i16 {
-    NODES.fetch_add(1, Ordering::Relaxed);
+    search_state.nodes += 1;
 
     if board_state.is_draw() {
         return 0;
@@ -29,7 +29,7 @@ pub fn search(
 
     let mut move_picker = MovePicker::new_qsearch(MAX_PLY - 1);
 
-    while let Some(move_obj) = move_picker.next(board_state) {
+    while let Some(move_obj) = move_picker.next(board_state, &search_state.move_ordering) {
         if cancellation_token.load(Ordering::Relaxed) {
             break;
         }
@@ -40,7 +40,7 @@ pub fn search(
             continue;
         }
 
-        let score = -search(board_state, -beta, -alpha, cancellation_token);
+        let score = -search(board_state, -beta, -alpha, cancellation_token, search_state);
         board_state.unmake_move(move_obj);
 
         if score >= beta {
@@ -52,12 +52,4 @@ pub fn search(
     }
 
     alpha
-}
-
-pub fn reset_nodes() {
-    NODES.store(0, Ordering::Relaxed);
-}
-
-pub fn nodes() -> i32 {
-    NODES.load(Ordering::Relaxed)
 }

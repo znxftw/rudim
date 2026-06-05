@@ -1,7 +1,5 @@
 use crate::common::constants::{MAX_CENTIPAWN_EVAL, MAX_PLY};
 use crate::common::moves::Move;
-use std::sync::LazyLock;
-use std::sync::Mutex;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TranspositionEntryType {
@@ -169,12 +167,6 @@ impl TranspositionTable {
         (MAX_CENTIPAWN_EVAL as i32 - (score as i32).abs()) <= MAX_PLY as i32
     }
 }
-
-pub static TT: LazyLock<Mutex<TranspositionTable>> = LazyLock::new(|| {
-    Mutex::new(TranspositionTable::new(
-        TranspositionTable::DEFAULT_CAPACITY,
-    ))
-});
 
 #[cfg(test)]
 mod tests {

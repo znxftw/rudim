@@ -6,10 +6,9 @@ use std::time::Instant;
 use rudim::bitboard::magics::generate_all_magic_numbers;
 use rudim::board::state::BoardState;
 use rudim::common::helpers::{ADVANCED_MOVE_FEN, ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
-use rudim::common::tt::TT;
-use rudim::eval::move_ordering::reset_move_heuristic;
 use rudim::init;
 use rudim::perft::run_cli;
+use rudim::search::search_state::SearchState;
 use rudim::train::{convert_text_to_bin, run as train_run};
 use rudim::uci::cli::run as uci_run;
 
@@ -67,21 +66,25 @@ fn run_searches() {
 
     let cancellation_token = AtomicBool::new(false);
     let mut debug_mode = true;
+    let mut search_state = SearchState::new();
 
     for (name, fen) in positions {
         println!("\nProfiling Position: {}", name);
         println!("FEN: {}", fen);
 
-        // Reset engine
-        {
-            let mut tt = TT.lock().unwrap();
-            tt.clear();
-        }
-        reset_move_heuristic();
+        // Reset search state
+        search_state.tt.clear();
+        search_state.reset_heuristics();
+        search_state.reset_search();
 
         let mut board = BoardState::parse_fen(fen);
         let start_time = Instant::now();
-        let best_move = board.find_best_move(PROFILE_DEPTH, &cancellation_token, &mut debug_mode);
+        let best_move = board.find_best_move(
+            PROFILE_DEPTH,
+            &cancellation_token,
+            &mut debug_mode,
+            &mut search_state,
+        );
         let duration = start_time.elapsed();
 
         let promo = best_move

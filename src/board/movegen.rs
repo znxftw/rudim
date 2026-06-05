@@ -11,8 +11,8 @@ use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
-use crate::engine;
 use crate::search::iterative_deepening;
+use crate::search::search_state::SearchState;
 use std::sync::atomic::AtomicBool;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,10 +27,10 @@ impl BoardState {
         depth: u8,
         cancellation_token: &AtomicBool,
         debug_mode: &mut bool,
+        search_state: &mut SearchState,
     ) -> Move {
-        engine::reset_intermediate();
-        iterative_deepening::search(self, depth, cancellation_token, debug_mode);
-        iterative_deepening::best_move()
+        iterative_deepening::search(self, depth, cancellation_token, debug_mode, search_state);
+        search_state.best_move
     }
 
     pub fn generate_moves(&self, move_list: &mut MoveList) {

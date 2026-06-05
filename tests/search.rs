@@ -2,20 +2,12 @@ use rudim::board::state::BoardState;
 use rudim::common::helpers::{ADVANCED_MOVE_FEN, ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
 use rudim::common::move_type::MoveType;
 use rudim::common::moves::Move;
-use rudim::common::tt;
-use rudim::eval::move_ordering;
-use rudim::search::{iterative_deepening, quiescence};
+use rudim::search::search_state::SearchState;
 use serial_test::serial;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
-
-fn reset_global_state() {
-    move_ordering::reset_move_heuristic();
-    quiescence::reset_nodes();
-    tt::TT.lock().unwrap().clear();
-}
 
 fn find_move_from_move_list(board: &mut BoardState, expected_move: Move) -> Move {
     let mut move_list = rudim::common::move_list::MoveList::new();
@@ -35,21 +27,23 @@ fn find_move_from_move_list(board: &mut BoardState, expected_move: Move) -> Move
 }
 
 fn assert_traversal(position: &str, expected_nodes: i32, expected_score: i16, depth: u8) {
-    reset_global_state();
-
     let mut board_state = BoardState::parse_fen(position);
     let cancellation_token = AtomicBool::new(false);
     let mut debug_mode = false;
+    let mut search_state = SearchState::new();
 
-    board_state.find_best_move(depth, &cancellation_token, &mut debug_mode);
+    board_state.find_best_move(
+        depth,
+        &cancellation_token,
+        &mut debug_mode,
+        &mut search_state,
+    );
 
-    assert_eq!(expected_nodes, iterative_deepening::nodes());
-    assert_eq!(expected_score, iterative_deepening::score());
+    assert_eq!(expected_nodes, search_state.nodes);
+    assert_eq!(expected_score, search_state.score);
 }
 
 fn assert_tactic_best_move(fen: &str, move_lan: &str) {
-    reset_global_state();
-
     let mut board_state = BoardState::parse_fen(fen);
 
     let cancellation_token = Arc::new(AtomicBool::new(false));
@@ -60,7 +54,13 @@ fn assert_tactic_best_move(fen: &str, move_lan: &str) {
     });
 
     let mut debug_mode = false;
-    let best_move = board_state.find_best_move(25, cancellation_token.as_ref(), &mut debug_mode);
+    let mut search_state = SearchState::new();
+    let best_move = board_state.find_best_move(
+        25,
+        cancellation_token.as_ref(),
+        &mut debug_mode,
+        &mut search_state,
+    );
 
     let expected_move =
         Move::parse_long_algebraic(move_lan).expect("Failed to parse expected move");

@@ -5,6 +5,8 @@ impl UciClient {
     pub(crate) fn run_ucinewgame(&mut self, _parameters: &[&str]) {
         reset_global();
         *self.board.lock().unwrap() = BoardState::default();
+        self.search_state.lock().unwrap().reset_heuristics();
+        self.search_state.lock().unwrap().tt.clear();
         set_ready();
     }
 }
@@ -15,7 +17,6 @@ mod tests {
     use crate::common::move_type::MoveType;
     use crate::common::moves::Move;
     use crate::common::square::Square;
-    use crate::eval::move_ordering;
     use crate::uci::is_ready;
     use serial_test::serial;
 
@@ -27,7 +28,12 @@ mod tests {
             "rnbqkb1r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
         )));
 
-        move_ordering::add_killer_move(Move::new(Square::E2, Square::E3, MoveType::Quiet), 0);
+        uci_client
+            .search_state
+            .lock()
+            .unwrap()
+            .move_ordering
+            .add_killer_move(Move::new(Square::E2, Square::E3, MoveType::Quiet), 0);
 
         {
             let mut board = uci_client.board.lock().unwrap();
@@ -41,13 +47,27 @@ mod tests {
         }
 
         assert_ne!(*uci_client.board.lock().unwrap(), BoardState::default());
-        assert!(!move_ordering::is_move_heuristic_empty());
+        assert!(
+            !uci_client
+                .search_state
+                .lock()
+                .unwrap()
+                .move_ordering
+                .is_move_heuristic_empty()
+        );
         assert!(!uci_client.board.lock().unwrap().history.is_empty());
 
         uci_client.run_ucinewgame(&[]);
 
         assert_eq!(*uci_client.board.lock().unwrap(), BoardState::default());
-        assert!(move_ordering::is_move_heuristic_empty());
+        assert!(
+            uci_client
+                .search_state
+                .lock()
+                .unwrap()
+                .move_ordering
+                .is_move_heuristic_empty()
+        );
         assert!(uci_client.board.lock().unwrap().history.is_empty());
     }
 

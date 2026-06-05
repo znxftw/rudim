@@ -57,6 +57,7 @@ impl UciClient {
         let board = Arc::clone(&self.board);
         let debug = Arc::clone(&self.debug_mode);
         let cancel_for_search = Arc::clone(&cancel_token);
+        let search_state = Arc::clone(&self.search_state);
 
         if allotted_time != -1 {
             let cancel_for_timer = Arc::clone(&cancel_token);
@@ -76,7 +77,13 @@ impl UciClient {
         thread::spawn(move || {
             let mut board = board.lock().unwrap();
             let mut debug_mode = debug.load(Ordering::Relaxed);
-            let best_move = board.find_best_move(search_depth, &cancel_for_search, &mut debug_mode);
+            let mut search_state_guard = search_state.lock().unwrap();
+            let best_move = board.find_best_move(
+                search_depth,
+                &cancel_for_search,
+                &mut debug_mode,
+                &mut search_state_guard,
+            );
             debug.store(debug_mode, Ordering::Relaxed);
 
             {

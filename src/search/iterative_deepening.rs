@@ -1,58 +1,20 @@
 use crate::board::state::BoardState;
 use crate::common::constants::{ASPIRATION_WINDOW_MARGIN, MAX_CENTIPAWN_EVAL, MAX_PLY};
 use crate::common::moves::Move;
+use crate::search::negamax;
 use crate::search::pv_table::PvTable;
-use crate::search::{negamax, quiescence};
+use crate::search::search_state::SearchState;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{LazyLock, Mutex};
 use std::time::Instant;
-
-#[derive(Debug, Clone, Copy)]
-struct IterativeState {
-    best_move: Move,
-    score: i16,
-    nodes: i32,
-}
-
-static STATE: LazyLock<Mutex<IterativeState>> = LazyLock::new(|| {
-    Mutex::new(IterativeState {
-        best_move: Move::NO_MOVE,
-        score: 0,
-        nodes: 0,
-    })
-});
-
-pub fn best_move() -> Move {
-    STATE.lock().unwrap().best_move
-}
-
-pub fn score() -> i16 {
-    STATE.lock().unwrap().score
-}
-
-pub fn nodes() -> i32 {
-    STATE.lock().unwrap().nodes
-}
-
-pub fn reset_state() {
-    let mut state = STATE.lock().unwrap();
-    state.best_move = Move::NO_MOVE;
-    state.score = 0;
-    state.nodes = 0;
-}
 
 pub fn search(
     board_state: &mut BoardState,
     depth: u8,
     cancellation_token: &AtomicBool,
     debug_mode: &mut bool,
+    search_state: &mut SearchState,
 ) {
-    {
-        let mut state = STATE.lock().unwrap();
-        state.best_move = Move::NO_MOVE;
-        state.score = 0;
-        state.nodes = 0;
-    }
+    search_state.reset_search();
 
     let mut previous_pv = Vec::new();
     let mut pv_table = PvTable::new();
@@ -62,8 +24,7 @@ pub fn search(
     for current_depth in 1..=depth {
         let timer = Instant::now();
 
-        negamax::reset_nodes();
-        quiescence::reset_nodes();
+        let start_nodes = search_state.nodes;
 
         // Aspiration Windows
         let mut alpha = i16::MIN + 1;
@@ -89,6 +50,7 @@ pub fn search(
                 cancellation_token,
                 &previous_pv,
                 &mut pv_table,
+                search_state,
             );
 
             if cancellation_token.load(Ordering::Relaxed) {
@@ -106,35 +68,18 @@ pub fn search(
         }
 
         last_score = current_score;
-
-        {
-            let mut state = STATE.lock().unwrap();
-            state.score = current_score;
-        }
+        search_state.score = current_score;
 
         if cancellation_token.load(Ordering::Relaxed) {
             break;
         }
 
         previous_pv = pv_table.line().to_vec();
-
-        {
-            let mut state = STATE.lock().unwrap();
-            state.best_move = previous_pv.first().copied().unwrap_or(Move::NO_MOVE);
-            let nodes_traversed = negamax::nodes() + quiescence::nodes();
-            state.nodes += nodes_traversed;
-        }
+        search_state.best_move = previous_pv.first().copied().unwrap_or(Move::NO_MOVE);
 
         let time_ms = timer.elapsed().as_millis().max(1) as f64;
-        let (nodes_total, score_now, nodes_traversed_now) = {
-            let state = STATE.lock().unwrap();
-            (
-                state.nodes,
-                state.score,
-                negamax::nodes() + quiescence::nodes(),
-            )
-        };
-        let nps = (nodes_total as f64 / time_ms * 1000.0) as i32;
+        let nodes_traversed_now = search_state.nodes - start_nodes;
+        let nps = (search_state.nodes as f64 / time_ms * 1000.0) as i32;
 
         let pv_string = previous_pv
             .iter()
@@ -149,7 +94,7 @@ pub fn search(
             .join(" ");
 
         if *debug_mode {
-            let score_str = format_score(score_now);
+            let score_str = format_score(search_state.score);
             println!(
                 "info depth {} score {} nodes {} time {} nps {} pv {}",
                 current_depth, score_str, nodes_traversed_now, time_ms, nps, pv_string

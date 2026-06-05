@@ -3,27 +3,14 @@ use crate::common::constants;
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::tt::{self, TranspositionEntryType};
-use crate::eval::move_ordering;
 use crate::eval::pst::PieceSquareTableEvaluation;
 use crate::search::move_picker::MovePicker;
 use crate::search::pv_table::PvTable;
+use crate::search::search_state::SearchState;
 use crate::search::{lmr, nmp, quiescence};
-use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 
-static NODES: AtomicI32 = AtomicI32::new(0);
-
-pub fn nodes() -> i32 {
-    NODES.load(Ordering::Relaxed)
-}
-
-pub fn reset_state() {
-    NODES.store(0, Ordering::Relaxed);
-}
-
-pub fn reset_nodes() {
-    NODES.store(0, Ordering::Relaxed);
-}
-
+#[allow(clippy::too_many_arguments)]
 pub fn search(
     board_state: &mut BoardState,
     depth: u8,
@@ -32,6 +19,7 @@ pub fn search(
     cancellation_token: &AtomicBool,
     previous_pv: &[Move],
     pv_table: &mut PvTable,
+    search_state: &mut SearchState,
 ) -> i16 {
     let mut ctx = SearchContext {
         allow_null_move: true,
@@ -39,6 +27,7 @@ pub fn search(
         previous_pv,
         pv_table,
         cancellation_token,
+        search_state,
     };
 
     search_internal(board_state, depth, 0, alpha, beta, None, &mut ctx)
@@ -61,20 +50,26 @@ fn search_internal(
     let is_pv_node = beta > 1 + alpha;
     let in_check = board_state.is_in_check(board_state.side_to_move);
 
-    NODES.fetch_add(1, Ordering::Relaxed);
+    ctx.search_state.nodes += 1;
 
     if board_state.is_draw() {
         return 0;
     }
 
     if ply as usize >= constants::MAX_PLY {
-        return quiescence::search(board_state, alpha, beta, ctx.cancellation_token);
+        return quiescence::search(
+            board_state,
+            alpha,
+            beta,
+            ctx.cancellation_token,
+            ctx.search_state,
+        );
     }
 
-    let (has_value, tt_score, tt_best) = {
-        let table = tt::TT.lock().unwrap();
-        table.get_entry(board_state.board_hash, alpha, beta, depth, ply)
-    };
+    let (has_value, tt_score, tt_best) =
+        ctx.search_state
+            .tt
+            .get_entry(board_state.board_hash, alpha, beta, depth, ply);
 
     // TODO: determine improvement for not returning in PV nodes
     if has_value && !is_pv_node {
@@ -82,7 +77,13 @@ fn search_internal(
     }
 
     if depth == 0 {
-        return quiescence::search(board_state, alpha, beta, ctx.cancellation_token);
+        return quiescence::search(
+            board_state,
+            alpha,
+            beta,
+            ctx.cancellation_token,
+            ctx.search_state,
+        );
     }
 
     // PRUNE: Reverse Futility Pruning
@@ -122,13 +123,13 @@ fn search_internal(
                 previous_pv: ctx.previous_pv,
                 pv_table: &mut *ctx.pv_table,
                 cancellation_token: ctx.cancellation_token,
+                search_state: ctx.search_state,
             },
         );
         board_state.undo_null_move();
 
         if score >= beta {
-            let mut table = tt::TT.lock().unwrap();
-            table.submit_entry(
+            ctx.search_state.tt.submit_entry(
                 board_state.board_hash,
                 tt::TranspositionTable::adjust_score(score, ply as i32),
                 depth,
@@ -152,7 +153,7 @@ fn search_internal(
     let mut number_of_legal_moves = 0;
     let mut has_legal_moves = false;
 
-    while let Some(move_obj) = move_picker.next(board_state) {
+    while let Some(move_obj) = move_picker.next(board_state, &ctx.search_state.move_ordering) {
         if ctx.cancellation_token.load(Ordering::Relaxed) {
             break;
         }
@@ -200,6 +201,7 @@ fn search_internal(
                     previous_pv: ctx.previous_pv,
                     pv_table: &mut *ctx.pv_table,
                     cancellation_token: ctx.cancellation_token,
+                    search_state: ctx.search_state,
                 },
             );
 
@@ -210,6 +212,7 @@ fn search_internal(
                     previous_pv: ctx.previous_pv,
                     pv_table: &mut *ctx.pv_table,
                     cancellation_token: ctx.cancellation_token,
+                    search_state: ctx.search_state,
                 };
                 score = search_deeper(
                     board_state,
@@ -229,6 +232,7 @@ fn search_internal(
                 previous_pv: ctx.previous_pv,
                 pv_table: &mut *ctx.pv_table,
                 cancellation_token: ctx.cancellation_token,
+                search_state: ctx.search_state,
             };
             score = search_deeper(
                 board_state,
@@ -257,6 +261,7 @@ fn search_internal(
                     depth,
                     &mut alpha,
                     &mut best_move,
+                    ctx.search_state,
                 );
                 entry_type = TranspositionEntryType::Exact;
                 found_pv = true;
@@ -273,6 +278,7 @@ fn search_internal(
                 board_state,
                 depth,
                 previous_move,
+                ctx.search_state,
             );
         }
     }
@@ -285,8 +291,7 @@ fn search_internal(
     }
 
     if !ctx.cancellation_token.load(Ordering::Relaxed) {
-        let mut table = tt::TT.lock().unwrap();
-        table.submit_entry(
+        ctx.search_state.tt.submit_entry(
             board_state.board_hash,
             tt::TranspositionTable::adjust_score(best_score, ply as i32),
             depth,
@@ -325,6 +330,7 @@ fn search_deeper(
                 previous_pv: ctx.previous_pv,
                 pv_table: &mut *ctx.pv_table,
                 cancellation_token: ctx.cancellation_token,
+                search_state: ctx.search_state,
             },
         )
     }
@@ -352,6 +358,7 @@ fn principal_variation_search(
             previous_pv: ctx.previous_pv,
             pv_table: &mut *ctx.pv_table,
             cancellation_token: ctx.cancellation_token,
+            search_state: ctx.search_state,
         },
     );
     if score > alpha && score < beta {
@@ -368,6 +375,7 @@ fn principal_variation_search(
                 previous_pv: ctx.previous_pv,
                 pv_table: &mut *ctx.pv_table,
                 cancellation_token: ctx.cancellation_token,
+                search_state: ctx.search_state,
             },
         );
     }
@@ -382,10 +390,13 @@ fn alpha_update(
     depth: u8,
     alpha: &mut i16,
     best_move: &mut Move,
+    search_state: &mut SearchState,
 ) {
     if !move_obj.is_capture() {
         let piece = board_state.get_piece_on(move_obj.source) as usize;
-        move_ordering::add_history_move(piece, move_obj, depth);
+        search_state
+            .move_ordering
+            .add_history_move(piece, move_obj, depth);
     }
     *alpha = score;
     *best_move = move_obj;
@@ -398,27 +409,29 @@ fn beta_cutoff(
     board_state: &BoardState,
     depth: u8,
     previous_move: Option<Move>,
+    search_state: &mut SearchState,
 ) -> i16 {
-    {
-        let mut table = tt::TT.lock().unwrap();
-        table.submit_entry(
-            board_state.board_hash,
-            tt::TranspositionTable::adjust_score(score, ply as i32),
-            depth,
-            move_obj,
-            TranspositionEntryType::Beta,
-        );
-    }
+    search_state.tt.submit_entry(
+        board_state.board_hash,
+        tt::TranspositionTable::adjust_score(score, ply as i32),
+        depth,
+        move_obj,
+        TranspositionEntryType::Beta,
+    );
 
     if !move_obj.is_capture() {
-        move_ordering::add_killer_move(move_obj, ply);
+        search_state.move_ordering.add_killer_move(move_obj, ply);
 
         if let Some(prev_mv) = previous_move {
             let prev_side = board_state.side_to_move.other();
             let prev_piece = board_state.piece_mapping[prev_mv.target as usize];
-            // TODO: EP?
             if prev_piece != Piece::None {
-                move_ordering::add_counter_move(prev_side, prev_piece, prev_mv.target, move_obj);
+                search_state.move_ordering.add_counter_move(
+                    prev_side,
+                    prev_piece,
+                    prev_mv.target,
+                    move_obj,
+                );
             }
         }
     }
@@ -432,4 +445,5 @@ pub struct SearchContext<'a> {
     pub previous_pv: &'a [Move],
     pub pv_table: &'a mut PvTable,
     pub cancellation_token: &'a AtomicBool,
+    pub search_state: &'a mut SearchState,
 }

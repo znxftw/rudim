@@ -1,7 +1,7 @@
 use crate::board::state::BoardState;
 use crate::common::move_list::{MoveList, ScoredMove};
 use crate::common::moves::Move;
-use crate::eval::move_ordering;
+use crate::eval::move_ordering::{self, MoveOrdering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SearchPhase {
@@ -64,7 +64,11 @@ impl MovePicker {
         }
     }
 
-    pub fn next(&mut self, board_state: &mut BoardState) -> Option<Move> {
+    pub fn next(
+        &mut self,
+        board_state: &mut BoardState,
+        move_ordering: &MoveOrdering,
+    ) -> Option<Move> {
         loop {
             match self.phase {
                 SearchPhase::PvMove => {
@@ -123,7 +127,7 @@ impl MovePicker {
                     self.quiets.clear();
                     self.current_index = 0;
                     board_state.generate_quiets(&mut self.quiets);
-                    move_ordering::populate_quiet_scores(
+                    move_ordering.populate_quiet_scores(
                         &mut self.quiets,
                         board_state,
                         self.ply,
@@ -170,7 +174,7 @@ fn get_next_valid_move(
 ) -> Option<Move> {
     let limit = moves.len();
     while *current_index < limit {
-        move_ordering::MoveOrdering::sort_next_best_move(moves, *current_index);
+        MoveOrdering::sort_next_best_move(moves, *current_index);
         let mv = moves[*current_index].mv;
         *current_index += 1;
 
@@ -193,7 +197,8 @@ mod tests {
 
         let mut picker = MovePicker::new_qsearch(0);
         let mut good_captures = Vec::new();
-        while let Some(mv) = picker.next(&mut board) {
+        let move_ordering = MoveOrdering::new();
+        while let Some(mv) = picker.next(&mut board, &move_ordering) {
             good_captures.push(mv);
         }
         assert!(!good_captures.is_empty());
@@ -217,7 +222,8 @@ mod tests {
 
         let mut picker = MovePicker::new(None, None, None, 0);
         let mut returned_moves = Vec::new();
-        while let Some(mv) = picker.next(&mut board) {
+        let move_ordering = MoveOrdering::new();
+        while let Some(mv) = picker.next(&mut board, &move_ordering) {
             returned_moves.push(mv);
         }
 

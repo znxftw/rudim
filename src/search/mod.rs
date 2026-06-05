@@ -5,3 +5,4 @@ pub mod negamax;
 pub mod nmp;
 pub mod pv_table;
 pub mod quiescence;
+pub mod search_state;
