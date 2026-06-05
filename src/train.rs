@@ -13,19 +13,25 @@ use bullet_lib::{
         schedule::{TrainingSchedule, TrainingSteps, lr, wdl},
         settings::LocalSettings,
     },
-    value::{ValueTrainerBuilder, loader::DirectSequentialDataLoader},
+    value::{
+        ValueTrainerBuilder,
+        loader::{ViriBinpackLoader, viribinpack::Filter},
+    },
 };
 use bulletformat::ChessBoard;
 
 // WIP - commit in place for sample trained network
 pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
-    let dataset_path = custom_dataset_path.unwrap_or("data/self_play.data");
+    let dataset_path = custom_dataset_path.unwrap_or("data/self_play.binpack");
 
     let metadata = fs::metadata(dataset_path)
         .unwrap_or_else(|_| panic!("Failed to read dataset metadata for '{}'.", dataset_path));
     let file_size = metadata.len();
-    let num_positions = file_size / size_of::<ChessBoard>() as u64;
-    println!("Dataset contains {} positions.", num_positions);
+    let num_positions = (file_size / 8).max(1);
+    println!(
+        "Dataset contains approximately {} positions.",
+        num_positions
+    );
 
     let batch_size = 16384.min(num_positions as usize).max(1);
     let batches_per_superbatch = (num_positions as usize / batch_size).max(1);
@@ -50,7 +56,7 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
     let hl_size = 1024;
     let initial_lr = 0.001;
     let final_lr = 0.001;
-    let wdl_proportion = 0.0; // 0.0 for pure value prediction
+    let wdl_proportion = 1.0; // 0.0 for pure value prediction
 
     let mut trainer = ValueTrainerBuilder::default()
         .dual_perspective()
@@ -105,7 +111,8 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
         batch_queue_size: 4,
     };
 
-    let dataloader = DirectSequentialDataLoader::new(&[dataset_path]);
+    let filter = Filter::UNRESTRICTED;
+    let dataloader = ViriBinpackLoader::new(dataset_path, 512, 4, filter);
 
     println!("Starting bullet training loop...");
     trainer.run(&schedule, &settings, &dataloader);

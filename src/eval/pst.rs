@@ -56,7 +56,7 @@ impl PieceSquareTableEvaluation {
             }
             #[cfg(not(test))]
             {
-                false
+                true
             }
         };
 

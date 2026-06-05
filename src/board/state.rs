@@ -26,7 +26,7 @@ pub const CASTLING_CONSTANTS: [u8; SQUARES] = [
     13, 15, 15, 15, 12, 15, 15, 14,
 ];
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BoardState {
     pub pieces: PieceMap<Bitboard>,
     pub occupancies: SideMap<Bitboard>,
