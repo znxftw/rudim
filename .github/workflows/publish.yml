@@ -15,7 +15,7 @@ jobs:
       latest_release_version: ${{ steps.gate.outputs.latest_release_version }}
       matched_tag: ${{ steps.gate.outputs.matched_tag }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
           submodules: true
@@ -132,7 +132,7 @@ jobs:
             output_name: Rudim
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
 
       - name: Setup Rust toolchain (rustup)
         shell: bash
