@@ -76,7 +76,7 @@ Rudim uses Criterion benchmarks to validate how some sample position searches ar
 - [maksimKorzh](https://github.com/maksimKorzh) for his YouTube series on on bitboard chess engines
 - [bullet](https://github.com/jw1912/bullet) - used for training the NNUE
 - [Reckless](https://github.com/codedeliveryservice/Reckless), [Viridithas](https://github.com/cosmobobak/viridithas), [Hobbes](https://github.com/kelseyde/hobbes-chess-engine) - took some references for Rust optimizations they did
-- ChessProgramming wiki, TalkChess, Engine Programming Discord Server
+- ChessProgramming wiki, TalkChess, Engine Programming Discord Server, CCRL, CCI
 
 ## Contributing
 
