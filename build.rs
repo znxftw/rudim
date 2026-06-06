@@ -64,6 +64,7 @@ fn main() {
     println!("cargo:rerun-if-changed=src/common/side.rs");
     println!("cargo:rerun-if-changed=src/common/constants.rs");
     println!("cargo:rerun-if-changed=src/common/random.rs");
+    println!("cargo:rerun-if-changed=resources/nnue.bin");
 
     use bitboard::Bitboard;
     use bitboard::attacks::{

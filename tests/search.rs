@@ -111,7 +111,7 @@ traversal_test_case!(
     traversal_starting,
     skip = "fails with zero weights",
     STARTING_FEN,
-    1631475,
+    791562,
     35,
     13
 );
@@ -119,7 +119,7 @@ traversal_test_case!(
     traversal_endgame,
     skip = "fails with zero weights",
     ENDGAME_FEN,
-    1345885,
+    3121620,
     84,
     17
 );
@@ -127,7 +127,7 @@ traversal_test_case!(
     traversal_advanced,
     skip = "fails with zero weights",
     ADVANCED_MOVE_FEN,
-    1662229,
+    6431741,
     1753,
     16
 );
@@ -135,7 +135,7 @@ traversal_test_case!(
     traversal_kiwi_pete,
     skip = "fails with zero weights",
     KIWI_PETE_FEN,
-    1636740,
+    1067883,
     -119,
     12
 );

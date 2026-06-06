@@ -35,7 +35,7 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
     let hl_size = 32;
     let initial_lr = 0.001;
     let final_lr = 0.00001;
-    let wdl_proportion = 0.85; // 0.0 for pure value prediction
+    let wdl_proportion = 0.7; // 0.0 for pure value prediction
 
     let mut trainer = ValueTrainerBuilder::default()
         .dual_perspective()
