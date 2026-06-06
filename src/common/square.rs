@@ -18,6 +18,13 @@ pub enum Square {
 
 impl Square {
     pub const ALL_SQUARES: usize = 64;
+
+    pub fn mirrored(self) -> Self {
+        if self == Square::NoSquare {
+            return Square::NoSquare;
+        }
+        Square::from((self as usize) ^ 0b111000)
+    }
 }
 
 impl From<usize> for Square {
@@ -119,6 +126,15 @@ impl fmt::Display for Square {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_square_mirrored() {
+        assert_eq!(Square::A8.mirrored(), Square::A1);
+        assert_eq!(Square::A1.mirrored(), Square::A8);
+        assert_eq!(Square::E4.mirrored(), Square::E5);
+        assert_eq!(Square::E5.mirrored(), Square::E4);
+        assert_eq!(Square::NoSquare.mirrored(), Square::NoSquare);
+    }
 
     #[test]
     fn test_square_from_usize() {

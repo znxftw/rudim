@@ -11,7 +11,6 @@ use crate::common::piece::{Piece, PieceMap};
 use crate::common::side::{Side, SideMap};
 use crate::common::square::Square;
 use crate::eval::nnue::accumulator::Accumulator;
-use crate::eval::pst::get_pst_values;
 use std::fmt;
 
 #[rustfmt::skip]
@@ -39,8 +38,6 @@ pub struct BoardState {
     pub board_hash: u64,
     pub half_move_clock: u8,
     pub history: History,
-    pub pst_mid: i32,
-    pub pst_end: i32,
     pub accumulator_white: Accumulator,
     pub accumulator_black: Accumulator,
 }
@@ -59,8 +56,6 @@ impl BoardState {
             board_hash: 0,
             half_move_clock: 0,
             history: History::new(),
-            pst_mid: 0,
-            pst_end: 0,
             accumulator_white: Accumulator::new(),
             accumulator_black: Accumulator::new(),
         }
@@ -83,10 +78,6 @@ impl BoardState {
         self.piece_mapping[sq] = piece;
         self.phase = add_phase(self.phase, piece);
 
-        let (mid_val, end_val) = get_pst_values(piece, square, side);
-        self.pst_mid += mid_val;
-        self.pst_end += end_val;
-
         // TODO: make_move + history instead?
         self.nnue_add_piece(square, side, piece);
     }
@@ -106,10 +97,6 @@ impl BoardState {
         self.occupancies[Side::Black].clear_bit(sq);
         self.piece_mapping[sq] = Piece::None;
         self.phase = remove_phase(self.phase, piece);
-
-        let (mid_val, end_val) = get_pst_values(piece, square, side);
-        self.pst_mid -= mid_val;
-        self.pst_end -= end_val;
 
         // TODO: make_move + history instead?
         self.nnue_remove_piece(square, side, piece);

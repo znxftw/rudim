@@ -5,27 +5,19 @@ pub mod loader;
 use crate::board::state::BoardState;
 use crate::common::side::Side;
 use std::sync::OnceLock;
-use std::sync::atomic::{AtomicBool, Ordering};
 
 use self::loader::Network;
 
 pub static GLOBAL_NETWORK: OnceLock<&'static Network> = OnceLock::new();
-pub static USE_NNUE: AtomicBool = AtomicBool::new(true);
 
 pub const ACC_SIZE: usize = 32;
 pub const INPUT_SIZE: usize = 768;
 
 pub const SCALE: i32 = 400;
 
-pub fn evaluate(board: &BoardState) -> Option<i16> {
-    // TODO: clean after pst is removed
-    if !USE_NNUE.load(Ordering::Relaxed) {
-        return None;
-    }
-
+pub fn evaluate(board: &BoardState) -> i16 {
     let network = *GLOBAL_NETWORK.get_or_init(Network::get_embedded);
-
-    Some(evaluate_internal(board, network))
+    evaluate_internal(board, network)
 }
 
 pub fn evaluate_internal(board: &BoardState, network: &Network) -> i16 {

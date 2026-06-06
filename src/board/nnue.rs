@@ -6,7 +6,6 @@ use crate::eval::nnue::GLOBAL_NETWORK;
 use crate::eval::nnue::accumulator::Accumulator;
 use crate::eval::nnue::features::get_feature_index;
 use crate::eval::nnue::loader::Network;
-use crate::eval::pst::mirror_square;
 
 // TODO: optz, fused updates
 impl BoardState {
@@ -35,11 +34,9 @@ impl BoardState {
             }
 
             // Black accumulator update
-            let mirrored_sq = mirror_square(square as usize);
+            let mirrored_sq = square.mirrored();
             let relative_side = side.other();
-            if let Some(feature_idx_black) =
-                get_feature_index(piece, relative_side, Square::from(mirrored_sq))
-            {
+            if let Some(feature_idx_black) = get_feature_index(piece, relative_side, mirrored_sq) {
                 if is_add {
                     self.accumulator_black
                         .add_feature(feature_idx_black, network);
@@ -71,15 +68,14 @@ impl BoardState {
                     let sq_raw = pieces_bb.get_lsb() as usize;
                     pieces_bb.clear_lsb();
 
+                    let sq = Square::from(sq_raw);
                     let sq = if side == Side::White {
-                        sq_raw
+                        sq
                     } else {
-                        mirror_square(sq_raw)
+                        sq.mirrored()
                     };
 
-                    if let Some(feature_idx) =
-                        get_feature_index(piece, relative_side, Square::from(sq))
-                    {
+                    if let Some(feature_idx) = get_feature_index(piece, relative_side, sq) {
                         acc.add_feature(feature_idx, network);
                     }
                 }

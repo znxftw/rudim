@@ -1,6 +1,6 @@
 use crate::board::state::BoardState;
 use crate::common::constants::MAX_PLY;
-use crate::eval::pst::PieceSquareTableEvaluation;
+use crate::eval::evaluate;
 use crate::search::move_picker::MovePicker;
 use crate::search::search_state::SearchState;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -18,7 +18,7 @@ pub fn search(
         return 0;
     }
 
-    let eval = PieceSquareTableEvaluation::evaluate(board_state);
+    let eval = evaluate(board_state);
 
     if eval >= beta {
         return beta;

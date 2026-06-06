@@ -3,7 +3,7 @@ use crate::common::constants;
 use crate::common::moves::Move;
 use crate::common::piece::Piece;
 use crate::common::tt::{self, TranspositionEntryType};
-use crate::eval::pst::PieceSquareTableEvaluation;
+use crate::eval::evaluate;
 use crate::search::move_picker::MovePicker;
 use crate::search::pv_table::PvTable;
 use crate::search::search_state::SearchState;
@@ -92,7 +92,7 @@ fn search_internal(
     let has_static_eval = !is_pv_node && !in_check;
 
     if has_static_eval {
-        static_eval = PieceSquareTableEvaluation::evaluate(board_state);
+        static_eval = evaluate(board_state);
         // TODO: tune
         let margin = 150 * depth as i16;
         if static_eval.saturating_sub(margin) >= beta {
