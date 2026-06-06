@@ -11,13 +11,16 @@ Series of blog posts on how I wrote rudim : [vishnubhagyanath.dev](https://vishn
 
 Rudim currently implements these core engine capabilities:
 
-### Board Representation
+<details>
+<summary><b>Board Representation</b></summary>
 
 - Bitboards, Magic Bitboards
 - Phased Pseudo-Legal Move Generation
 - Zobrist Hashing
+</details>
 
-### Search
+<details>
+<summary><b>Search</b></summary>
 
 - Iterative Deepening with Aspiration Windows
 - Negamax + Alpha-Beta Pruning
@@ -29,17 +32,19 @@ Rudim currently implements these core engine capabilities:
 - Late Move Reductions
 - Futility Pruning
 - Reverse Futility Pruning
+</details>
 
-### Evaluation
+<details>
+<summary><b>Evaluation</b></summary>
 
-- Incremental Piece-Square Tables
-- Pawn Structure (Doubled, Isolated, Passed)
-- Mobility
-- Draw Detection
+- [NNUE](https://github.com/znxftw/rudim-networks) Architecture: (768 -> 32) x 2 -> 1
+</details>
 
-### Other
+<details>
+<summary><b>Other</b></summary>
 
 - UCI Protocol support
+</details>
 
 ## Prerequisites
 
