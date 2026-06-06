@@ -133,6 +133,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6.0.2
+        with:
+          submodules: true
 
       - name: Setup Rust toolchain (rustup)
         shell: bash
