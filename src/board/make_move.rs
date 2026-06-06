@@ -43,6 +43,8 @@ impl BoardState {
         self.board_hash ^=
             zobrist::zobrist_table()[self.get_piece_on(m.target) as usize][m.target as usize];
 
+        self.nnue_make_move(m, moved_piece, final_moved_piece, final_captured_piece);
+
         self.update_castling_rights(m);
         self.update_en_passant(m);
         self.flip_side_to_move();
@@ -170,6 +172,14 @@ impl BoardState {
                 moved_piece
             },
         );
+
+        self.nnue_unmake_move(
+            m,
+            if m.is_promotion() { Piece::Pawn } else { moved_piece },
+            moved_piece,
+            history.captured_piece,
+        );
+
         self.half_move_clock = history.half_move_clock;
         self.board_hash = history.board_hash;
         self.castle = history.castling_rights;
@@ -177,7 +187,7 @@ impl BoardState {
         self.move_count -= 1;
     }
 
-    fn en_passant_square_for(&self, m: Move) -> Square {
+    pub(crate) fn en_passant_square_for(&self, m: Move) -> Square {
         let offset = if self.side_to_move == Side::Black {
             -8
         } else {

@@ -19,6 +19,105 @@ impl Accumulator {
     }
 
     #[inline(always)]
+    pub fn update_1_1(&mut self, add_idx: usize, rem_idx: usize, network: &Network) {
+        let add_start = add_idx * ACC_SIZE;
+        let rem_start = rem_idx * ACC_SIZE;
+        let add_weights: &[i16; ACC_SIZE] = network.transformer_weights[add_start..add_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+        let rem_weights: &[i16; ACC_SIZE] = network.transformer_weights[rem_start..rem_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+
+        for i in 0..ACC_SIZE {
+            self.state[i] += add_weights[i] - rem_weights[i];
+        }
+    }
+
+    #[inline(always)]
+    pub fn update_1_2(
+        &mut self,
+        add_idx: usize,
+        rem_idx1: usize,
+        rem_idx2: usize,
+        network: &Network,
+    ) {
+        let add_start = add_idx * ACC_SIZE;
+        let rem1_start = rem_idx1 * ACC_SIZE;
+        let rem2_start = rem_idx2 * ACC_SIZE;
+        let add_weights: &[i16; ACC_SIZE] = network.transformer_weights[add_start..add_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+        let rem1_weights: &[i16; ACC_SIZE] = network.transformer_weights[rem1_start..rem1_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+        let rem2_weights: &[i16; ACC_SIZE] = network.transformer_weights[rem2_start..rem2_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+
+        for i in 0..ACC_SIZE {
+            self.state[i] += add_weights[i] - rem1_weights[i] - rem2_weights[i];
+        }
+    }
+
+    #[inline(always)]
+    pub fn update_2_1(
+        &mut self,
+        add_idx1: usize,
+        add_idx2: usize,
+        rem_idx: usize,
+        network: &Network,
+    ) {
+        let add1_start = add_idx1 * ACC_SIZE;
+        let add2_start = add_idx2 * ACC_SIZE;
+        let rem_start = rem_idx * ACC_SIZE;
+        let add1_weights: &[i16; ACC_SIZE] = network.transformer_weights[add1_start..add1_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+        let add2_weights: &[i16; ACC_SIZE] = network.transformer_weights[add2_start..add2_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+        let rem_weights: &[i16; ACC_SIZE] = network.transformer_weights[rem_start..rem_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+
+        for i in 0..ACC_SIZE {
+            self.state[i] += add1_weights[i] + add2_weights[i] - rem_weights[i];
+        }
+    }
+
+    #[inline(always)]
+    pub fn update_2_2(
+        &mut self,
+        add_idx1: usize,
+        add_idx2: usize,
+        rem_idx1: usize,
+        rem_idx2: usize,
+        network: &Network,
+    ) {
+        let add1_start = add_idx1 * ACC_SIZE;
+        let add2_start = add_idx2 * ACC_SIZE;
+        let rem1_start = rem_idx1 * ACC_SIZE;
+        let rem2_start = rem_idx2 * ACC_SIZE;
+        let add1_weights: &[i16; ACC_SIZE] = network.transformer_weights[add1_start..add1_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+        let add2_weights: &[i16; ACC_SIZE] = network.transformer_weights[add2_start..add2_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+        let rem1_weights: &[i16; ACC_SIZE] = network.transformer_weights[rem1_start..rem1_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+        let rem2_weights: &[i16; ACC_SIZE] = network.transformer_weights[rem2_start..rem2_start + ACC_SIZE]
+            .try_into()
+            .unwrap();
+
+        for i in 0..ACC_SIZE {
+            self.state[i] += add1_weights[i] + add2_weights[i] - rem1_weights[i] - rem2_weights[i];
+        }
+    }
+
+    #[inline(always)]
     pub fn add_feature(&mut self, feature_idx: usize, network: &Network) {
         let start = feature_idx * ACC_SIZE;
         let weights = &network.transformer_weights[start..start + ACC_SIZE];

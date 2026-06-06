@@ -77,29 +77,17 @@ impl BoardState {
         self.occupancies[side].set_bit(sq);
         self.piece_mapping[sq] = piece;
         self.phase = add_phase(self.phase, piece);
-
-        // TODO: make_move + history instead?
-        self.nnue_add_piece(square, side, piece);
     }
 
     pub fn remove_piece(&mut self, square: Square) -> Piece {
         let sq = square as usize;
         let piece = self.piece_mapping[sq];
 
-        let side = if self.occupancies[Side::White].get_bit(sq) == 1 {
-            Side::White
-        } else {
-            Side::Black
-        };
-
         self.pieces[piece].clear_bit(sq);
         self.occupancies[Side::White].clear_bit(sq);
         self.occupancies[Side::Black].clear_bit(sq);
         self.piece_mapping[sq] = Piece::None;
         self.phase = remove_phase(self.phase, piece);
-
-        // TODO: make_move + history instead?
-        self.nnue_remove_piece(square, side, piece);
 
         piece
     }
