@@ -62,13 +62,6 @@ Rudim currently implements these core engine capabilities:
 - `cargo clippy --all-targets`
 - `cargo fmt --all`
 
-## Benchmarks
-
-Rudim uses Criterion benchmarks to validate how some sample position searches are performing
-
-- Run all benches: `cargo bench`
-- Main benchmark suite (`find_best_move` at depth 6-7 on standard positions) lives in `benches/search_benchmark.rs`.
-
 ## Acknowledgements
 
 - [maksimKorzh](https://github.com/maksimKorzh) for his YouTube series on on bitboard chess engines
