@@ -50,10 +50,11 @@ Rudim currently implements these core engine capabilities:
 ## Usage
 
 - Build Binary : `cargo build --release`
-- Run engine : `cargo run`
-- Run perft validation: `cargo run -- --perft`
+- Run engine : `cargo run --release`
+- Run perft validation: `cargo run --release -- --perft`
 - Run benchmark: `cargo bench`
-- Misc : `cargo run -- --generate-magics`, `cargo run -- --train <binpack_path>`
+- Misc : `cargo run --release -- --generate-magics`, `cargo run --release --features cuda -- --train <binpack_path>`
+- Use unoptimized versions (non `--release`) only if profiling or debugging
 
 ## Quality Checks
 
