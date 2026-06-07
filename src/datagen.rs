@@ -7,7 +7,6 @@ use std::sync::mpsc;
 
 use crate::board::state::BoardState;
 use crate::common::castle::Castle as RudimCastle;
-use crate::common::move_list::MoveList;
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
 use crate::common::piece::Piece as RudimPiece;
@@ -24,7 +23,7 @@ use bullet_lib::game::formats::viriformat::{
 };
 
 pub struct SelfPlayPosition {
-    pub board_state: BoardState,
+    pub side_to_move: RudimSide,
     pub mv: Move,
     pub engine_eval: i16,
 }
@@ -189,7 +188,7 @@ pub fn write_game_to_binpack<W: Write>(
 
     for pos in positions {
         let viri_move = map_rudim_move(&pos.mv);
-        let white_pov_eval = if pos.board_state.side_to_move == RudimSide::White {
+        let white_pov_eval = if pos.side_to_move == RudimSide::White {
             pos.engine_eval
         } else {
             -pos.engine_eval
@@ -247,6 +246,9 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                     let mut board_state = BoardState::parse_fen(starting_fen);
                     let initial_state = board_state.clone();
 
+                    search_state.tt.clear();
+                    search_state.reset_heuristics();
+
                     search_state.reset_search();
                     let _ = board_state.find_best_move(
                         depth,
@@ -265,23 +267,15 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                             break;
                         }
 
-                        let mut move_list = MoveList::new();
-                        board_state.generate_moves(&mut move_list);
+                        search_state.reset_search();
+                        let best_move = board_state.find_best_move(
+                            depth,
+                            &cancellation_token,
+                            &mut debug_mode,
+                            &mut search_state,
+                        );
 
-                        let mut has_legal_move = false;
-                        for m_entry in move_list.iter() {
-                            let m = m_entry.mv;
-                            board_state.make_move(m);
-                            let is_legal =
-                                !board_state.is_in_check(board_state.side_to_move.other());
-                            board_state.unmake_move(m);
-                            if is_legal {
-                                has_legal_move = true;
-                                break;
-                            }
-                        }
-
-                        if !has_legal_move {
+                        if best_move == Move::NO_MOVE {
                             if board_state.is_in_check(board_state.side_to_move) {
                                 outcome = board_state.side_to_move.other();
                             } else {
@@ -290,17 +284,10 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                             break;
                         }
 
-                        search_state.reset_search();
-                        let best_move = board_state.find_best_move(
-                            depth,
-                            &cancellation_token,
-                            &mut debug_mode,
-                            &mut search_state,
-                        );
                         let score = search_state.score;
 
                         positions.push(SelfPlayPosition {
-                            board_state: board_state.clone(),
+                            side_to_move: board_state.side_to_move,
                             mv: best_move,
                             engine_eval: score,
                         });
@@ -353,11 +340,8 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                     _ => draws += 1,
                 }
 
-                if games_written % 1000 == 0 {
+                if games_written % 2500 == 0 {
                     let _ = writer.flush();
-                }
-
-                if games_written % 10000 == 0 {
                     let avg_len = total_positions as f64 / games_written as f64;
                     println!("----------------------------------------");
                     println!("Games completed     : {}", games_written);
