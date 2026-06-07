@@ -46,23 +46,20 @@ Rudim currently implements these core engine capabilities:
 - UCI Protocol support
 </details>
 
-## Prerequisites
 
-- Rust stable toolchain (`rustup` + `cargo`)
+## Usage
 
-## Build and Run
-
-- Build: `cargo build`
-- Release build: `cargo build --release`
-- Run engine (UCI loop): `cargo run`
-- Run perft suite: `cargo run -- --perft`
-- Generate magic numbers: `cargo run -- --generate-magics`
+- Build Binary : `cargo build --release`
+- Run engine : `cargo run`
+- Run perft validation: `cargo run -- --perft`
+- Run benchmark: `cargo bench`
+- Misc : `cargo run -- --generate-magics`, `cargo run -- --train <binpack_path>`
 
 ## Quality Checks
 
-- Tests: `cargo test`
-- Lint (Clippy): `cargo clippy --all-targets --all-features`
-- Format: `cargo fmt --all`
+- `cargo test`
+- `cargo clippy --all-targets`
+- `cargo fmt --all`
 
 ## Benchmarks
 
@@ -82,10 +79,6 @@ Rudim uses Criterion benchmarks to validate how some sample position searches ar
 
 PRs are welcome.
 
-Before opening a PR, please run:
+Before opening a PR, please run all the quality checks, perft and benchmark.
 
-- `cargo fmt --all -- --check`
-- `cargo clippy --all-targets --all-features`
-- `cargo test`
-
-If your change affects search strength, run a tournament/regression check as well.
+If your change affects search strength, run a 1000 match 10+0.1 tournament as well.
