@@ -200,7 +200,7 @@ fn download_nnue_if_needed() {
     if needs_recreate {
         create_dir_all("resources").unwrap();
         println!(
-            "cargo:warning=Downloading NNUE weights from GitHub (znxftw/rudim-networks v0)..."
+            "cargo:warning=Downloading NNUE weights from GitHub (znxftw/rudim-networks v2-gen1)..."
         );
 
         let url = "https://github.com/znxftw/rudim-networks/releases/download/v2-gen1/nnue.bin";
