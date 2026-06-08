@@ -1,6 +1,8 @@
-use std::fs::{self};
+use std::fs;
 
 use bullet_lib::game::inputs::Chess768;
+use bullet_lib::nn::optimiser::AdamWOptimiser;
+use bullet_lib::value::{NoOutputBuckets, ValueTrainer};
 use bullet_lib::{
     nn::optimiser::AdamW,
     trainer::{
@@ -14,25 +16,47 @@ use bullet_lib::{
     },
 };
 
-// WIP - commit in place for sample trained network
-pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
-    let dataset_path = custom_dataset_path.unwrap_or("data/self_play.binpack");
+pub fn run(custom_dataset_path: Option<&str>) {
+    let dataset_path = custom_dataset_path.unwrap_or(DEFAULT_DATASET_PATH);
 
-    let metadata = fs::metadata(dataset_path)
-        .unwrap_or_else(|_| panic!("Failed to read dataset metadata for '{}'.", dataset_path));
-    let file_size = metadata.len();
-    let num_positions = (file_size / 8).max(1);
-    println!(
-        "Dataset contains approximately {} positions.",
-        num_positions
-    );
+    let mut trainer = build_trainer(HL_SIZE);
 
-    let hl_size = 32;
-    let initial_lr = 0.001;
-    let final_lr = 0.00001;
-    let wdl_proportion = 0.7; // 0.0 for pure value prediction
+    let schedule = build_schedule();
+    let settings = build_settings();
+    let dataloader = build_dataloader(dataset_path);
 
-    let mut trainer = ValueTrainerBuilder::default()
+    println!("Starting bullet training loop...");
+    trainer.run(&schedule, &settings, &dataloader);
+    println!("Bullet training completed successfully!");
+
+    copy_trained_weights();
+}
+
+// Tunable Hyperparameters and Configurations
+const DEFAULT_DATASET_PATH: &str = "data/self_play.binpack";
+const OUTPUT_DIRECTORY: &str = "checkpoints";
+const TARGET_WEIGHTS_PATH: &str = "resources/nnue.bin";
+
+const HL_SIZE: usize = 32;
+
+const INITIAL_LR: f32 = 0.001;
+const FINAL_LR: f32 = 0.00001;
+const WDL_PROPORTION: f32 = 0.7;
+const EVAL_SCALE: f32 = 400.0;
+
+const NET_ID: &str = "1_simple";
+const BATCH_SIZE: usize = 16_384;
+const BATCHES_PER_SUPERBATCH: usize = 6104;
+const START_SUPERBATCH: usize = 1;
+const END_SUPERBATCH: usize = 40;
+const SAVE_RATE: usize = 1;
+
+const THREADS: usize = 4;
+const BATCH_QUEUE_SIZE: usize = 4;
+const DATALOADER_PER_THREAD_BUFFERS: usize = 512;
+
+fn build_trainer(hl_size: usize) -> ValueTrainer<AdamWOptimiser, Chess768, NoOutputBuckets> {
+    ValueTrainerBuilder::default()
         .dual_perspective()
         .optimiser(AdamW)
         .inputs(Chess768)
@@ -51,54 +75,55 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
             let ntm_hidden = l0.forward(ntm_inputs).screlu();
             let hidden_layer = stm_hidden.concat(ntm_hidden);
             l1.forward(hidden_layer)
-        });
+        })
+}
 
-    if let Some(path) = checkpoint_path {
-        println!("Loading checkpoint from {}...", path);
-        trainer.load_from_checkpoint(path);
-    }
-
-    let schedule = TrainingSchedule {
-        net_id: "1_simple".to_string(),
-        eval_scale: 400.0,
+fn build_schedule() -> TrainingSchedule<lr::CosineDecayLR, wdl::ConstantWDL> {
+    TrainingSchedule {
+        net_id: NET_ID.to_string(),
+        eval_scale: EVAL_SCALE,
         steps: TrainingSteps {
-            batch_size: 16_384,
-            batches_per_superbatch: 6104,
-            start_superbatch: 1,
-            end_superbatch: 40,
+            batch_size: BATCH_SIZE,
+            batches_per_superbatch: BATCHES_PER_SUPERBATCH,
+            start_superbatch: START_SUPERBATCH,
+            end_superbatch: END_SUPERBATCH,
         },
         wdl_scheduler: wdl::ConstantWDL {
-            value: wdl_proportion,
+            value: WDL_PROPORTION,
         },
         lr_scheduler: lr::CosineDecayLR {
-            initial_lr,
-            final_lr,
-            final_superbatch: 40,
+            initial_lr: INITIAL_LR,
+            final_lr: FINAL_LR,
+            final_superbatch: END_SUPERBATCH,
         },
-        save_rate: 1,
-    };
+        save_rate: SAVE_RATE,
+    }
+}
 
-    let settings = LocalSettings {
-        threads: 4,
+fn build_settings() -> LocalSettings<'static> {
+    LocalSettings {
+        threads: THREADS,
         test_set: None,
-        output_directory: "checkpoints",
-        batch_queue_size: 4,
-    };
+        output_directory: OUTPUT_DIRECTORY,
+        batch_queue_size: BATCH_QUEUE_SIZE,
+    }
+}
 
+fn build_dataloader(dataset_path: &str) -> ViriBinpackLoader {
     let filter = Filter::default();
-    let dataloader = ViriBinpackLoader::new(dataset_path, 512, 4, filter);
+    ViriBinpackLoader::new(dataset_path, DATALOADER_PER_THREAD_BUFFERS, THREADS, filter)
+}
 
-    println!("Starting bullet training loop...");
-    trainer.run(&schedule, &settings, &dataloader);
-    println!("Bullet training completed successfully!");
-
-    // Overwrite resources/nnue.bin with the newly trained weights
-    let cp_dir = format!("checkpoints/1_simple-{}", 40);
+fn copy_trained_weights() {
+    let cp_dir = format!("{}/{}-{}", OUTPUT_DIRECTORY, NET_ID, END_SUPERBATCH);
     let cp_path = format!("{}/quantised.bin", cp_dir);
-    println!("Copying weights from {} to resources/nnue.bin", cp_path);
-    if let Err(e) = fs::copy(&cp_path, "resources/nnue.bin") {
+    println!(
+        "Copying weights from {} to {}",
+        cp_path, TARGET_WEIGHTS_PATH
+    );
+    if let Err(e) = fs::copy(&cp_path, TARGET_WEIGHTS_PATH) {
         eprintln!("Error copying weights: {}", e);
     } else {
-        println!("Successfully copied weights to resources/nnue.bin!");
+        println!("Successfully copied weights to {}!", TARGET_WEIGHTS_PATH);
     }
 }

@@ -36,8 +36,7 @@ fn main() {
         Some("--train") => {
             init();
             let dataset_path = raw_args.get(2).map(String::as_str);
-            let checkpoint_path = raw_args.get(3).map(String::as_str);
-            train_run(dataset_path, checkpoint_path);
+            train_run(dataset_path);
         }
         Some("--profile") => {
             // Intended to be used when profiling as reqd to debug CPU usage
