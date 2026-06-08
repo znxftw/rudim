@@ -33,23 +33,24 @@ pub fn run(custom_dataset_path: Option<&str>) {
 }
 
 // Tunable Hyperparameters and Configurations
-const DEFAULT_DATASET_PATH: &str = "data/self_play.binpack";
+const DEFAULT_DATASET_PATH: &str = "data/v1_gen3_1m_d7.binpack";
 const OUTPUT_DIRECTORY: &str = "checkpoints";
 const TARGET_WEIGHTS_PATH: &str = "resources/nnue.bin";
 
-const HL_SIZE: usize = 32;
+const HL_SIZE: usize = 64;
 
 const INITIAL_LR: f32 = 0.001;
 const FINAL_LR: f32 = 0.00001;
-const WDL_PROPORTION: f32 = 0.7;
+const WDL_START: f32 = 0.3;
+const WDL_END: f32 = 0.8;
 const EVAL_SCALE: f32 = 400.0;
 
-const NET_ID: &str = "1_simple";
+const NET_ID: &str = "rudim-64";
 const BATCH_SIZE: usize = 16_384;
 const BATCHES_PER_SUPERBATCH: usize = 6104;
 const START_SUPERBATCH: usize = 1;
 const END_SUPERBATCH: usize = 40;
-const SAVE_RATE: usize = 1;
+const SAVE_RATE: usize = 5;
 
 const THREADS: usize = 4;
 const BATCH_QUEUE_SIZE: usize = 4;
@@ -78,7 +79,7 @@ fn build_trainer(hl_size: usize) -> ValueTrainer<AdamWOptimiser, Chess768, NoOut
         })
 }
 
-fn build_schedule() -> TrainingSchedule<lr::CosineDecayLR, wdl::ConstantWDL> {
+fn build_schedule() -> TrainingSchedule<lr::CosineDecayLR, wdl::LinearWDL> {
     TrainingSchedule {
         net_id: NET_ID.to_string(),
         eval_scale: EVAL_SCALE,
@@ -88,8 +89,9 @@ fn build_schedule() -> TrainingSchedule<lr::CosineDecayLR, wdl::ConstantWDL> {
             start_superbatch: START_SUPERBATCH,
             end_superbatch: END_SUPERBATCH,
         },
-        wdl_scheduler: wdl::ConstantWDL {
-            value: WDL_PROPORTION,
+        wdl_scheduler: wdl::LinearWDL {
+            start: WDL_START,
+            end: WDL_END,
         },
         lr_scheduler: lr::CosineDecayLR {
             initial_lr: INITIAL_LR,

@@ -182,7 +182,7 @@ fn download_nnue_if_needed() {
 
     let dest_path = Path::new("resources/nnue.bin");
 
-    let acc_size = 32;
+    let acc_size = 64;
     let input_size = 768;
     let struct_size: usize = (input_size * acc_size + acc_size + acc_size * 2 + 1) * 2;
     // Align up to 64 bytes
@@ -203,7 +203,7 @@ fn download_nnue_if_needed() {
             "cargo:warning=Downloading NNUE weights from GitHub (znxftw/rudim-networks v0)..."
         );
 
-        let url = "https://github.com/znxftw/rudim-networks/releases/latest/download/nnue.bin";
+        let url = "https://github.com/znxftw/rudim-networks/releases/download/v2-gen1/nnue.bin";
         let status = Command::new("curl")
             .arg("-L")
             .arg("-s")
