@@ -43,6 +43,51 @@ fn main() {
             // Intended to be used when profiling as reqd to debug CPU usage
             run_searches();
         }
+        Some("datagen") | Some("--datagen") => {
+            if raw_args.len() < 5 {
+                eprintln!(
+                    "Usage: {} datagen <output.binpack> <number_of_games> <opening_book.fen> [depth] [threads]",
+                    raw_args[0]
+                );
+                exit(1);
+            }
+            init();
+            let output_path = &raw_args[2];
+            let num_games = match raw_args[3].parse::<usize>() {
+                Ok(n) => n,
+                Err(_) => {
+                    eprintln!("Error: invalid number of games");
+                    exit(1);
+                }
+            };
+            let book_path = &raw_args[4];
+            let depth = if raw_args.len() > 5 {
+                match raw_args[5].parse::<u8>() {
+                    Ok(d) => d,
+                    Err(_) => {
+                        eprintln!("Error: invalid depth");
+                        exit(1);
+                    }
+                }
+            } else {
+                8
+            };
+            let threads = if raw_args.len() > 6 {
+                match raw_args[6].parse::<usize>() {
+                    Ok(t) => t,
+                    Err(_) => {
+                        eprintln!("Error: invalid thread count");
+                        exit(1);
+                    }
+                }
+            } else {
+                std::thread::available_parallelism()
+                    .map(|p| p.get())
+                    .unwrap_or(4)
+            };
+            rudim::datagen::run(output_path, num_games, book_path, depth, threads);
+            exit(0);
+        }
         _ => {
             init();
             uci_run();

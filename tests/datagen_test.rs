@@ -2,7 +2,7 @@ use rudim::board::state::BoardState;
 use rudim::common::move_type::MoveType;
 use rudim::common::moves::Move;
 use rudim::common::square::Square;
-use rudim::datagen::{board_state_to_viriboard, map_rudim_move, run as run_datagen};
+use rudim::datagen::{board_state_to_viriboard, map_rudim_move, read_metadata, run as run_datagen};
 use std::fs::{self, File};
 use std::io::Write;
 
@@ -72,16 +72,29 @@ fn test_mini_datagen_run() {
     drop(file);
 
     let output_binpack = "tests/test_output.binpack";
+    let output_metadata = format!("{}.meta", output_binpack);
     let _ = fs::remove_file(output_binpack);
+    let _ = fs::remove_file(&output_metadata);
 
+    // Run 1: generate 2 games
     run_datagen(output_binpack, 2, book_path, 2, 2);
 
     let metadata = fs::metadata(output_binpack).unwrap();
     assert!(metadata.len() > 0);
-
-    // Each game with 0 moves is 36 bytes. Games with moves are larger.
     assert!(metadata.len() >= 72);
+
+    let meta = read_metadata(output_binpack);
+    assert_eq!(meta.games_completed, 2);
+    assert!(meta.total_positions > 0);
+
+    // Run 2: append 3 games (total should become 5)
+    run_datagen(output_binpack, 3, book_path, 2, 2);
+
+    let meta2 = read_metadata(output_binpack);
+    assert_eq!(meta2.games_completed, 5);
+    assert!(meta2.total_positions > meta.total_positions);
 
     let _ = fs::remove_file(book_path);
     let _ = fs::remove_file(output_binpack);
+    let _ = fs::remove_file(&output_metadata);
 }

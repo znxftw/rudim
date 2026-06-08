@@ -2,6 +2,7 @@ use rand::seq::IndexedRandom;
 use std::collections::HashSet;
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, BufWriter, Error, ErrorKind, Result, Write};
+use std::process::exit;
 use std::sync::atomic::AtomicBool;
 use std::sync::mpsc;
 
@@ -199,7 +200,60 @@ pub fn write_game_to_binpack<W: Write>(
     game.serialise_into(writer)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct DatagenMetadata {
+    pub games_completed: usize,
+    pub total_positions: usize,
+    pub white_wins: usize,
+    pub black_wins: usize,
+    pub draws: usize,
+}
+
+pub fn read_metadata(output_path: &str) -> DatagenMetadata {
+    let meta_path = format!("{}.meta", output_path);
+    let mut meta = DatagenMetadata::default();
+    let content = match std::fs::read_to_string(&meta_path) {
+        Ok(c) => c,
+        Err(_) => return meta,
+    };
+    for line in content.lines() {
+        let line = line.trim();
+        // TODO: Include serde? Unnecessary dependency for just one tiny JSON file
+        if line.starts_with('{') || line.starts_with('}') {
+            continue;
+        }
+        let parts: Vec<&str> = line.split(':').collect();
+        if parts.len() != 2 {
+            continue;
+        }
+        let key = parts[0].trim().trim_matches('"');
+        let val_str = parts[1].trim().trim_matches(',').trim();
+        if let Ok(val) = val_str.parse::<usize>() {
+            match key {
+                "games_completed" => meta.games_completed = val,
+                "total_positions" => meta.total_positions = val,
+                "white_wins" => meta.white_wins = val,
+                "black_wins" => meta.black_wins = val,
+                "draws" => meta.draws = val,
+                _ => {}
+            }
+        }
+    }
+    meta
+}
+
+pub fn write_metadata(output_path: &str, meta: &DatagenMetadata) -> Result<()> {
+    let meta_path = format!("{}.meta", output_path);
+    let content = format!(
+        "{{\n  \"games_completed\": {},\n  \"total_positions\": {},\n  \"white_wins\": {},\n  \"black_wins\": {},\n  \"draws\": {}\n}}\n",
+        meta.games_completed, meta.total_positions, meta.white_wins, meta.black_wins, meta.draws
+    );
+    std::fs::write(&meta_path, content)
+}
+
 pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_threads: usize) {
+    let initial_metadata = read_metadata(output_path);
+
     println!("Loading opening book from '{}'...", book_path);
     let book_fens = match load_opening_book(book_path) {
         Ok(fens) => fens,
@@ -342,20 +396,48 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
 
                 if games_written % 2500 == 0 {
                     let _ = writer.flush();
+                    let updated_metadata = DatagenMetadata {
+                        games_completed: initial_metadata.games_completed + games_written,
+                        total_positions: initial_metadata.total_positions + total_positions,
+                        white_wins: initial_metadata.white_wins + white_wins,
+                        black_wins: initial_metadata.black_wins + black_wins,
+                        draws: initial_metadata.draws + draws,
+                    };
+                    if let Err(e) = write_metadata(output_path, &updated_metadata) {
+                        println!("Error writing metadata file: {}", e);
+                    }
+
                     let avg_len = total_positions as f64 / games_written as f64;
                     println!("----------------------------------------");
-                    println!("Games completed     : {}", games_written);
-                    println!("Games left          : {}", num_games - games_written);
-                    println!("Total positions     : {}", total_positions);
-                    println!("Total White Wins    : {}", white_wins);
-                    println!("Total Black Wins    : {}", black_wins);
-                    println!("Total Draws         : {}", draws);
-                    println!("Average Game Length : {:.2}", avg_len);
+                    println!("Games completed (run) : {}", games_written);
+                    println!("Games left            : {}", num_games - games_written);
+                    println!("Total positions (run) : {}", total_positions);
+                    println!("Total White Wins (run): {}", white_wins);
+                    println!("Total Black Wins (run): {}", black_wins);
+                    println!("Total Draws (run)     : {}", draws);
+                    println!("Average Game Length   : {:.2}", avg_len);
+                    println!("--- Cumulative Stats (Total in File) ---");
+                    println!("Games completed       : {}", updated_metadata.games_completed);
+                    println!("Total positions       : {}", updated_metadata.total_positions);
+                    println!("Total White Wins      : {}", updated_metadata.white_wins);
+                    println!("Total Black Wins      : {}", updated_metadata.black_wins);
+                    println!("Total Draws           : {}", updated_metadata.draws);
                     println!("----------------------------------------");
                 }
             }
 
             let _ = writer.flush();
+            let updated_metadata = DatagenMetadata {
+                games_completed: initial_metadata.games_completed + games_written,
+                total_positions: initial_metadata.total_positions + total_positions,
+                white_wins: initial_metadata.white_wins + white_wins,
+                black_wins: initial_metadata.black_wins + black_wins,
+                draws: initial_metadata.draws + draws,
+            };
+            if let Err(e) = write_metadata(output_path, &updated_metadata) {
+                println!("Error writing metadata file: {}", e);
+            }
+
             let avg_len = if games_written > 0 {
                 total_positions as f64 / games_written as f64
             } else {
@@ -363,13 +445,19 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
             };
             println!("----------------------------------------");
             println!("Final Data Generation Summary:");
-            println!("Games completed     : {}", games_written);
-            println!("Games left          : {}", num_games - games_written);
-            println!("Total positions     : {}", total_positions);
-            println!("Total White Wins    : {}", white_wins);
-            println!("Total Black Wins    : {}", black_wins);
-            println!("Total Draws         : {}", draws);
-            println!("Average Game Length : {:.2}", avg_len);
+            println!("Games completed (run) : {}", games_written);
+            println!("Games left            : {}", num_games - games_written);
+            println!("Total positions (run) : {}", total_positions);
+            println!("Total White Wins (run): {}", white_wins);
+            println!("Total Black Wins (run): {}", black_wins);
+            println!("Total Draws (run)     : {}", draws);
+            println!("Average Game Length   : {:.2}", avg_len);
+            println!("--- Cumulative Stats (Total in File) ---");
+            println!("Games completed       : {}", updated_metadata.games_completed);
+            println!("Total positions       : {}", updated_metadata.total_positions);
+            println!("Total White Wins      : {}", updated_metadata.white_wins);
+            println!("Total Black Wins      : {}", updated_metadata.black_wins);
+            println!("Total Draws           : {}", updated_metadata.draws);
             println!("----------------------------------------");
             println!(
                 "Data generation finished. Successfully wrote {} games to '{}' ({} unique end positions).",
@@ -379,4 +467,5 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
             );
         });
     });
+    exit(0);
 }

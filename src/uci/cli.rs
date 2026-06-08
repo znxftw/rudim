@@ -82,8 +82,10 @@ pub fn run() {
 
     loop {
         let mut line = String::new();
-        if stdin.read_line(&mut line).is_err() {
-            continue;
+        match stdin.read_line(&mut line) {
+            Ok(0) => break,
+            Ok(_) => {}
+            Err(_) => continue,
         }
 
         let line = line.trim();
