@@ -1,8 +1,4 @@
-use std::fs::{self, File};
-use std::io::{BufRead, BufReader, Result, Write};
-use std::mem::size_of;
-use std::slice::from_raw_parts;
-use std::str::FromStr;
+use std::fs::{self};
 
 use bullet_lib::game::inputs::Chess768;
 use bullet_lib::{
@@ -17,7 +13,6 @@ use bullet_lib::{
         loader::{ViriBinpackLoader, viribinpack::Filter},
     },
 };
-use bulletformat::ChessBoard;
 
 // WIP - commit in place for sample trained network
 pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
@@ -106,38 +101,4 @@ pub fn run(custom_dataset_path: Option<&str>, checkpoint_path: Option<&str>) {
     } else {
         println!("Successfully copied weights to resources/nnue.bin!");
     }
-}
-
-pub fn convert_text_to_bin(input_path: &str, output_path: &str) -> Result<()> {
-    let input_file = File::open(input_path)?;
-    let reader = BufReader::new(input_file);
-    let mut output_file = File::create(output_path)?;
-
-    let mut count = 0;
-    for line in reader.lines() {
-        let line = line?;
-        if line.trim().is_empty() {
-            continue;
-        }
-        if let Ok(board) = ChessBoard::from_str(&line) {
-            let bytes = unsafe {
-                from_raw_parts(
-                    &board as *const ChessBoard as *const u8,
-                    size_of::<ChessBoard>(),
-                )
-            };
-            output_file.write_all(bytes)?;
-            count += 1;
-            if count % 1_000_000 == 0 {
-                println!("Converted {} positions...", count);
-            }
-        } else {
-            eprintln!("Warning: Failed to parse line: {}", line);
-        }
-    }
-    println!(
-        "Successfully converted {} positions to binary format!",
-        count
-    );
-    Ok(())
 }

@@ -9,7 +9,7 @@ use rudim::common::helpers::{ADVANCED_MOVE_FEN, ENDGAME_FEN, KIWI_PETE_FEN, STAR
 use rudim::init;
 use rudim::perft::run_cli;
 use rudim::search::search_state::SearchState;
-use rudim::train::{convert_text_to_bin, run as train_run};
+use rudim::train::run as train_run;
 use rudim::uci::cli::run as uci_run;
 
 fn main() {
@@ -38,18 +38,6 @@ fn main() {
             let dataset_path = raw_args.get(2).map(String::as_str);
             let checkpoint_path = raw_args.get(3).map(String::as_str);
             train_run(dataset_path, checkpoint_path);
-        }
-        Some("--convert") => {
-            if raw_args.len() < 4 {
-                eprintln!("Usage: rudim --convert <input.txt> <output.data>");
-                exit(1);
-            }
-            let input_path = &raw_args[2];
-            let output_path = &raw_args[3];
-            if let Err(e) = convert_text_to_bin(input_path, output_path) {
-                eprintln!("Error converting file: {}", e);
-                exit(1);
-            }
         }
         Some("--profile") => {
             // Intended to be used when profiling as reqd to debug CPU usage
