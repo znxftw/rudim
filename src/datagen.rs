@@ -1,5 +1,4 @@
 use rand::seq::IndexedRandom;
-use std::collections::HashSet;
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, BufWriter, Error, ErrorKind, Result, Write};
 use std::process::exit;
@@ -34,7 +33,6 @@ struct CompletedGame {
     initial_eval: i16,
     positions: Vec<SelfPlayPosition>,
     outcome: RudimSide,
-    end_board_hash: u64,
 }
 
 pub fn load_opening_book(file_path: &str) -> Result<Vec<String>> {
@@ -354,7 +352,6 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                         initial_eval,
                         positions,
                         outcome,
-                        end_board_hash: board_state.board_hash,
                     };
                     let _ = tx.send(game_data);
                 }
@@ -367,14 +364,12 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
 
         s.spawn(move || {
             let mut games_written = 0;
-            let mut end_positions = HashSet::new();
             let mut total_positions = 0;
             let mut white_wins = 0;
             let mut black_wins = 0;
             let mut draws = 0;
 
             while let Ok(game) = rx.recv() {
-                end_positions.insert(game.end_board_hash);
                 if let Err(e) = write_game_to_binpack(
                     &game.initial_state,
                     game.initial_eval,
@@ -417,8 +412,14 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                     println!("Total Draws (run)     : {}", draws);
                     println!("Average Game Length   : {:.2}", avg_len);
                     println!("--- Cumulative Stats (Total in File) ---");
-                    println!("Games completed       : {}", updated_metadata.games_completed);
-                    println!("Total positions       : {}", updated_metadata.total_positions);
+                    println!(
+                        "Games completed       : {}",
+                        updated_metadata.games_completed
+                    );
+                    println!(
+                        "Total positions       : {}",
+                        updated_metadata.total_positions
+                    );
                     println!("Total White Wins      : {}", updated_metadata.white_wins);
                     println!("Total Black Wins      : {}", updated_metadata.black_wins);
                     println!("Total Draws           : {}", updated_metadata.draws);
@@ -453,17 +454,21 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
             println!("Total Draws (run)     : {}", draws);
             println!("Average Game Length   : {:.2}", avg_len);
             println!("--- Cumulative Stats (Total in File) ---");
-            println!("Games completed       : {}", updated_metadata.games_completed);
-            println!("Total positions       : {}", updated_metadata.total_positions);
+            println!(
+                "Games completed       : {}",
+                updated_metadata.games_completed
+            );
+            println!(
+                "Total positions       : {}",
+                updated_metadata.total_positions
+            );
             println!("Total White Wins      : {}", updated_metadata.white_wins);
             println!("Total Black Wins      : {}", updated_metadata.black_wins);
             println!("Total Draws           : {}", updated_metadata.draws);
             println!("----------------------------------------");
             println!(
-                "Data generation finished. Successfully wrote {} games to '{}' ({} unique end positions).",
-                games_written,
-                output_path,
-                end_positions.len()
+                "Data generation finished. Successfully wrote {} games to '{}'.",
+                games_written, output_path,
             );
         });
     });
