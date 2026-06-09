@@ -43,11 +43,11 @@ Format the list using a clean, lowercase style with short bullet points, groupin
 
 ## 4. Generate Release Notes Draft
 
-- Read the current network name from the `NETWORK_NAME` constant in `build.rs`.
+- Read the current network name from the `NETWORK_NAME` constant in `build.rs` and link it to its corresponding release tag page under `https://github.com/znxftw/rudim-networks/releases/tag/<network_name>`.
 - Use the following template to generate the release notes:
 
 ```markdown
-Network: <network_name>
+Network: [<network_name>](https://github.com/znxftw/rudim-networks/releases/tag/<network_name>)
 
 ## Features
 <List features here>
