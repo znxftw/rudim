@@ -1,4 +1,6 @@
 // TODO: isolate all build.rs code so that the rest of the binary can make use of other abstractions (e.g. Index for Piece)
+const NETWORK_NAME: &str = "v2-gen1";
+
 pub mod common {
     pub mod square {
         #![allow(dead_code)]
@@ -200,10 +202,14 @@ fn download_nnue_if_needed() {
     if needs_recreate {
         create_dir_all("resources").unwrap();
         println!(
-            "cargo:warning=Downloading NNUE weights from GitHub (znxftw/rudim-networks v2-gen1)..."
+            "cargo:warning=Downloading NNUE weights from GitHub (znxftw/rudim-networks {})...",
+            NETWORK_NAME
         );
 
-        let url = "https://github.com/znxftw/rudim-networks/releases/download/v2-gen1/nnue.bin";
+        let url = format!(
+            "https://github.com/znxftw/rudim-networks/releases/download/{}/nnue.bin",
+            NETWORK_NAME
+        );
         let status = Command::new("curl")
             .arg("-L")
             .arg("-s")

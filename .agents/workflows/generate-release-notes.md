@@ -43,9 +43,12 @@ Format the list using a clean, lowercase style with short bullet points, groupin
 
 ## 4. Generate Release Notes Draft
 
-Use the following template to generate the release notes:
+- Read the current network name from the `NETWORK_NAME` constant in `build.rs`.
+- Use the following template to generate the release notes:
 
 ```markdown
+Network: <network_name>
+
 ## Features
 <List features here>
 
