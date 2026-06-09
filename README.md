@@ -37,7 +37,8 @@ Rudim currently implements these core engine capabilities:
 <details>
 <summary><b>Evaluation</b></summary>
 
-- [NNUE](https://github.com/znxftw/rudim-networks) Architecture: (768 -> 32) x 2 -> 1
+- [NNUE](https://github.com/znxftw/rudim-networks) Architecture: (768 -> 64) x 2 -> 1
+- Trained purely on Self-Play games from scratch without any external data or games of HCE version of Rudim
 </details>
 
 <details>
