@@ -2,7 +2,6 @@ use crate::board::state::BoardState;
 use crate::common::piece::Piece;
 use crate::common::side::Side;
 use crate::common::square::Square;
-use crate::eval::nnue::GLOBAL_NETWORK;
 use crate::eval::nnue::accumulator::Accumulator;
 use crate::eval::nnue::features::get_feature_index;
 use crate::eval::nnue::loader::Network;
@@ -21,29 +20,28 @@ impl BoardState {
 
     #[inline(always)]
     fn nnue_update_piece(&mut self, square: Square, side: Side, piece: Piece, is_add: bool) {
-        if let Some(network) = GLOBAL_NETWORK.get() {
-            // White accumulator update
-            if let Some(feature_idx_white) = get_feature_index(piece, side, square) {
-                if is_add {
-                    self.accumulator_white
-                        .add_feature(feature_idx_white, network);
-                } else {
-                    self.accumulator_white
-                        .remove_feature(feature_idx_white, network);
-                }
+        let network = Network::get_embedded();
+        // White accumulator update
+        if let Some(feature_idx_white) = get_feature_index(piece, side, square) {
+            if is_add {
+                self.accumulator_white
+                    .add_feature(feature_idx_white, network);
+            } else {
+                self.accumulator_white
+                    .remove_feature(feature_idx_white, network);
             }
+        }
 
-            // Black accumulator update
-            let mirrored_sq = square.mirrored();
-            let relative_side = side.other();
-            if let Some(feature_idx_black) = get_feature_index(piece, relative_side, mirrored_sq) {
-                if is_add {
-                    self.accumulator_black
-                        .add_feature(feature_idx_black, network);
-                } else {
-                    self.accumulator_black
-                        .remove_feature(feature_idx_black, network);
-                }
+        // Black accumulator update
+        let mirrored_sq = square.mirrored();
+        let relative_side = side.other();
+        if let Some(feature_idx_black) = get_feature_index(piece, relative_side, mirrored_sq) {
+            if is_add {
+                self.accumulator_black
+                    .add_feature(feature_idx_black, network);
+            } else {
+                self.accumulator_black
+                    .remove_feature(feature_idx_black, network);
             }
         }
     }

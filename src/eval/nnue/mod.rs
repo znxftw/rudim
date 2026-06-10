@@ -4,11 +4,8 @@ pub mod loader;
 
 use crate::board::state::BoardState;
 use crate::common::side::Side;
-use std::sync::OnceLock;
 
 use self::loader::Network;
-
-pub static GLOBAL_NETWORK: OnceLock<&'static Network> = OnceLock::new();
 
 pub const ACC_SIZE: usize = 64;
 pub const INPUT_SIZE: usize = 768;
@@ -16,7 +13,7 @@ pub const INPUT_SIZE: usize = 768;
 pub const SCALE: i32 = 400;
 
 pub fn evaluate(board: &BoardState) -> i16 {
-    let network = *GLOBAL_NETWORK.get_or_init(Network::get_embedded);
+    let network = Network::get_embedded();
     evaluate_internal(board, network)
 }
 

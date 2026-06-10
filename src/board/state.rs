@@ -335,15 +335,9 @@ mod tests {
     #[test]
     fn test_accumulator_make_unmake_consistency() {
         use crate::common::move_list::MoveList;
-        use crate::eval::nnue::GLOBAL_NETWORK;
         use crate::eval::nnue::loader::Network;
 
-        let network = *GLOBAL_NETWORK.get_or_init(|| {
-            let mut net = Network::new_boxed();
-            net.transformer_biases.fill(3);
-            net.transformer_weights.fill(2);
-            Box::leak(net)
-        });
+        let network = Network::get_embedded();
 
         let mut board = BoardState::starting_position();
 
