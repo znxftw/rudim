@@ -9,8 +9,4 @@ pub mod search;
 pub mod train;
 pub mod uci;
 
-use common::zobrist;
-
-pub fn init() {
-    zobrist::init();
-}
+pub fn init() {}

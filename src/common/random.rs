@@ -9,6 +9,7 @@ static INT_STATE: AtomicI32 = AtomicI32::new(1804289383);
 #[cfg(test)]
 static TEST_MUTEX: Mutex<()> = Mutex::new(());
 
+// TODO: can be moved into build.rs
 pub fn next_u64() -> u64 {
     let mut current = ULONG_STATE.load(Ordering::Relaxed);
     loop {
