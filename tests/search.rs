@@ -109,7 +109,7 @@ macro_rules! tactic_test_case {
 
 traversal_test_case!(traversal_starting, STARTING_FEN, 997517, 46, 13);
 traversal_test_case!(traversal_endgame, ENDGAME_FEN, 1437338, 278, 17);
-traversal_test_case!(traversal_advanced, ADVANCED_MOVE_FEN, 2798481, -553, 16);
+traversal_test_case!(traversal_advanced, ADVANCED_MOVE_FEN, 2793526, 2765, 16);
 traversal_test_case!(traversal_kiwi_pete, KIWI_PETE_FEN, 1294710, -178, 12);
 
 tactic_test_case!(

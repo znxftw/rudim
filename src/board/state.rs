@@ -11,6 +11,7 @@ use crate::common::piece::{Piece, PieceMap};
 use crate::common::side::{Side, SideMap};
 use crate::common::square::Square;
 use crate::eval::nnue::accumulator::Accumulator;
+use crate::eval::nnue::loader::Network;
 use std::fmt;
 
 #[rustfmt::skip]
@@ -44,6 +45,12 @@ pub struct BoardState {
 
 impl BoardState {
     pub fn new() -> Self {
+        let network = Network::get_embedded();
+        let mut accumulator_white = Accumulator::new();
+        accumulator_white.init_with_biases(network);
+        let mut accumulator_black = Accumulator::new();
+        accumulator_black.init_with_biases(network);
+
         Self {
             pieces: PieceMap([Bitboard(0); PIECES]),
             occupancies: SideMap([Bitboard(0); SIDES]),
@@ -56,8 +63,8 @@ impl BoardState {
             board_hash: 0,
             half_move_clock: 0,
             history: History::new(),
-            accumulator_white: Accumulator::new(),
-            accumulator_black: Accumulator::new(),
+            accumulator_white,
+            accumulator_black,
         }
     }
 
