@@ -184,7 +184,7 @@ fn download_nnue_if_needed() {
 
     let dest_path = Path::new("resources/nnue.bin");
 
-    let acc_size = 64;
+    let acc_size = 128;
     let input_size = 768;
     let struct_size: usize = (input_size * acc_size + acc_size + acc_size * 2 + 1) * 2;
     // Align up to 64 bytes
