@@ -12,6 +12,10 @@ pub fn search(
     cancellation_token: &AtomicBool,
     search_state: &mut SearchState,
 ) -> i16 {
+    if cancellation_token.load(Ordering::Relaxed) {
+        return 0;
+    }
+
     search_state.nodes += 1;
 
     if board_state.is_draw() {
@@ -42,6 +46,10 @@ pub fn search(
 
         let score = -search(board_state, -beta, -alpha, cancellation_token, search_state);
         board_state.unmake_move(move_obj);
+
+        if cancellation_token.load(Ordering::Relaxed) {
+            return 0;
+        }
 
         if score >= beta {
             return beta;

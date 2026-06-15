@@ -42,6 +42,10 @@ fn search_internal(
     previous_move: Option<Move>,
     ctx: &mut SearchContext,
 ) -> i16 {
+    if ctx.cancellation_token.load(Ordering::Relaxed) {
+        return 0;
+    }
+
     ctx.pv_table.clear(ply as usize);
 
     let mut best_move = Move::NO_MOVE;
@@ -127,6 +131,10 @@ fn search_internal(
             },
         );
         board_state.undo_null_move();
+
+        if ctx.cancellation_token.load(Ordering::Relaxed) {
+            return 0;
+        }
 
         if score >= beta {
             ctx.search_state.tt.submit_entry(
@@ -249,6 +257,10 @@ fn search_internal(
         number_of_legal_moves += 1;
 
         board_state.unmake_move(move_obj);
+
+        if ctx.cancellation_token.load(Ordering::Relaxed) {
+            return 0;
+        }
 
         if score > best_score {
             best_score = score;
