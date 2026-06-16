@@ -1,5 +1,5 @@
 // TODO: isolate all build.rs code so that the rest of the binary can make use of other abstractions (e.g. Index for Piece)
-const NETWORK_NAME: &str = "v3-gen2";
+const NETWORK_NAME: &str = "v3-gen3";
 
 pub mod common {
     pub mod square {
