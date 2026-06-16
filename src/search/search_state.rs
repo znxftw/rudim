@@ -25,6 +25,7 @@ impl SearchState {
         self.best_move = Move::NO_MOVE;
         self.score = 0;
         self.nodes = 0;
+        self.reset_heuristics();
     }
 
     pub fn reset_heuristics(&mut self) {
