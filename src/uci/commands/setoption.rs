@@ -24,14 +24,14 @@ impl UciClient {
             i += 1;
         }
 
-        if name.eq_ignore_ascii_case("Hash") {
-            if let Ok(mb_size) = value.parse::<usize>() {
-                let mb_size = mb_size.clamp(1, 2048);
-                if let Ok(mut state) = self.search_state.try_lock() {
-                    state.tt.resize(mb_size);
-                }
-                // else, as per UCI specs, we should just ignore it (e.g. attempt to resize mid-search)
+        if name.eq_ignore_ascii_case("Hash")
+            && let Ok(mb_size) = value.parse::<usize>()
+        {
+            let mb_size = mb_size.clamp(1, 2048);
+            if let Ok(mut state) = self.search_state.try_lock() {
+                state.tt.resize(mb_size);
             }
+            // else, as per UCI specs, we should just ignore it (e.g. attempt to resize mid-search)
         }
     }
 }
