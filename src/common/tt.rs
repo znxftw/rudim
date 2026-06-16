@@ -41,6 +41,26 @@ impl TranspositionTable {
         }
     }
 
+    pub fn resize(&mut self, mb_size: usize) {
+        let max_bytes = mb_size * 1024 * 1024;
+        let entry_size = size_of::<Option<TranspositionTableEntry>>();
+        let max_capacity = max_bytes / (2 * entry_size);
+
+        let capacity = if max_capacity < 1024 {
+            1024
+        } else {
+            1 << max_capacity.ilog2()
+        };
+
+        self.capacity = capacity;
+        self.depth_replaced_entries = vec![None; capacity];
+        self.always_replaced_entries = vec![None; capacity];
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.capacity
+    }
+
     pub fn clear(&mut self) {
         for entry in self.depth_replaced_entries.iter_mut() {
             *entry = None;
@@ -51,7 +71,7 @@ impl TranspositionTable {
     }
 
     pub fn get_hash_move(&self, hash: u64) -> Option<Move> {
-        let index = (hash as usize) & (self.capacity - 1);
+        let index = (hash as usize) & (self.depth_replaced_entries.len() - 1);
         if let Some(e) = self.depth_replaced_entries[index]
             && e.hash == hash
             && e.entry_type == TranspositionEntryType::Exact
@@ -217,5 +237,20 @@ mod tests {
 
         let retrieved = TranspositionTable::retrieve_score(adjusted, 10);
         assert_eq!(retrieved, mate_score);
+    }
+
+    #[test]
+    fn test_tt_resize() {
+        let mut tt = TranspositionTable::new(1024);
+        assert_eq!(tt.capacity, 1024);
+
+        tt.resize(1);
+        assert_eq!(tt.capacity, 32768);
+
+        tt.resize(64);
+        assert_eq!(tt.capacity, 2097152);
+
+        tt.resize(128);
+        assert_eq!(tt.capacity, 4194304);
     }
 }

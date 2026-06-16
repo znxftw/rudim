@@ -72,6 +72,7 @@ impl UciClient {
                 "stop" => self.run_stop(parameters),
                 "ucinewgame" => self.run_ucinewgame(parameters),
                 "debug" => self.run_debug(parameters),
+                "setoption" => self.run_setoption(parameters),
                 _ => cli::write_line(&format!("Unknown command {command}")),
             }
         }
@@ -80,6 +81,7 @@ impl UciClient {
     fn write_id(&self) {
         cli::write_line(&format!("id name Rudim {}", env!("CARGO_PKG_VERSION")));
         cli::write_line("id author Vishnu B");
+        cli::write_line("option name Hash type spin default 64 min 1 max 2048");
         cli::write_line("uciok");
     }
 }
