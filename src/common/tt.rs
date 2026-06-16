@@ -70,23 +70,6 @@ impl TranspositionTable {
         }
     }
 
-    pub fn get_hash_move(&self, hash: u64) -> Option<Move> {
-        let index = (hash as usize) & (self.depth_replaced_entries.len() - 1);
-        if let Some(e) = self.depth_replaced_entries[index]
-            && e.hash == hash
-            && e.entry_type == TranspositionEntryType::Exact
-        {
-            return Some(e.best_move);
-        }
-        if let Some(e) = self.always_replaced_entries[index]
-            && e.hash == hash
-            && e.entry_type == TranspositionEntryType::Exact
-        {
-            return Some(e.best_move);
-        }
-        None
-    }
-
     pub fn get_entry(
         &self,
         hash: u64,
