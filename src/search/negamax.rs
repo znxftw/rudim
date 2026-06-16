@@ -65,6 +65,7 @@ fn search_internal(
             board_state,
             alpha,
             beta,
+            ply,
             ctx.cancellation_token,
             ctx.search_state,
         );
@@ -85,6 +86,7 @@ fn search_internal(
             board_state,
             alpha,
             beta,
+            ply,
             ctx.cancellation_token,
             ctx.search_state,
         );
