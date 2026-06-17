@@ -78,18 +78,21 @@ impl BoardState {
         self.pieces[piece] & self.occupancies[side]
     }
 
-    pub fn add_piece(&mut self, square: Square, side: Side, piece: Piece) {
+    #[inline(always)]
+    pub fn add_piece(&mut self, square: Square, side: Side, piece: Piece, update_nnue: bool) {
         let sq = square as usize;
         self.pieces[piece].set_bit(sq);
         self.occupancies[side].set_bit(sq);
         self.piece_mapping[sq] = piece;
         self.phase = add_phase(self.phase, piece);
 
-        // TODO: make_move + history instead?
-        self.nnue_add_piece(square, side, piece);
+        if update_nnue {
+            self.nnue_add_piece(square, side, piece);
+        }
     }
 
-    pub fn remove_piece(&mut self, square: Square) -> Piece {
+    #[inline(always)]
+    pub fn remove_piece(&mut self, square: Square, update_nnue: bool) -> Piece {
         let sq = square as usize;
         let piece = self.piece_mapping[sq];
 
@@ -105,8 +108,9 @@ impl BoardState {
         self.piece_mapping[sq] = Piece::None;
         self.phase = remove_phase(self.phase, piece);
 
-        // TODO: make_move + history instead?
-        self.nnue_remove_piece(square, side, piece);
+        if update_nnue {
+            self.nnue_remove_piece(square, side, piece);
+        }
 
         piece
     }
@@ -210,7 +214,7 @@ mod tests {
     #[test]
     fn add_piece_sets_all_structures() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E4, Side::White, Piece::Pawn);
+        board.add_piece(Square::E4, Side::White, Piece::Pawn, false);
 
         let sq = Square::E4 as usize;
 
@@ -225,10 +229,10 @@ mod tests {
     #[test]
     fn remove_piece_clears_all_structures() {
         let mut board = BoardState::new();
-        board.add_piece(Square::D5, Side::Black, Piece::Queen);
+        board.add_piece(Square::D5, Side::Black, Piece::Queen, false);
 
         let sq = Square::D5 as usize;
-        let removed = board.remove_piece(Square::D5);
+        let removed = board.remove_piece(Square::D5, false);
 
         assert_eq!(removed, Piece::Queen);
         assert_eq!(board.get_pieces(Side::Black, Piece::Queen).get_bit(sq), 0);
@@ -240,7 +244,7 @@ mod tests {
     #[test]
     fn get_piece_on_side_returns_correct_piece() {
         let mut board = BoardState::new();
-        board.add_piece(Square::C3, Side::White, Piece::Knight);
+        board.add_piece(Square::C3, Side::White, Piece::Knight, false);
 
         assert_eq!(
             board.get_piece_on_side(Square::C3, Side::White),
@@ -259,8 +263,8 @@ mod tests {
     #[test]
     fn get_piece_on_returns_signed_index() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E1, Side::White, Piece::King);
-        board.add_piece(Square::E8, Side::Black, Piece::King);
+        board.add_piece(Square::E1, Side::White, Piece::King, false);
+        board.add_piece(Square::E8, Side::Black, Piece::King, false);
 
         assert_eq!(board.get_piece_on(Square::E1), 5);
         assert_eq!(board.get_piece_on(Square::E8), 11);
@@ -278,64 +282,64 @@ mod tests {
     fn equality_detects_difference() {
         let mut b1 = BoardState::new();
         let b2 = BoardState::new();
-        b1.add_piece(Square::E4, Side::White, Piece::Pawn);
+        b1.add_piece(Square::E4, Side::White, Piece::Pawn, false);
         assert_ne!(b1, b2);
     }
 
     #[test]
     fn is_in_check_not_in_check_on_empty_board() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E1, Side::White, Piece::King);
+        board.add_piece(Square::E1, Side::White, Piece::King, false);
         assert!(!board.is_in_check(Side::White));
     }
 
     #[test]
     fn is_in_check_detects_rook_check() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E1, Side::White, Piece::King);
-        board.add_piece(Square::E8, Side::Black, Piece::Rook);
+        board.add_piece(Square::E1, Side::White, Piece::King, false);
+        board.add_piece(Square::E8, Side::Black, Piece::Rook, false);
         assert!(board.is_in_check(Side::White));
     }
 
     #[test]
     fn is_in_check_detects_knight_check() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E4, Side::White, Piece::King);
+        board.add_piece(Square::E4, Side::White, Piece::King, false);
         // D6 knight attacks E4
-        board.add_piece(Square::D6, Side::Black, Piece::Knight);
+        board.add_piece(Square::D6, Side::Black, Piece::Knight, false);
         assert!(board.is_in_check(Side::White));
     }
 
     #[test]
     fn is_in_check_detects_bishop_check() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E4, Side::White, Piece::King);
-        board.add_piece(Square::H7, Side::Black, Piece::Bishop);
+        board.add_piece(Square::E4, Side::White, Piece::King, false);
+        board.add_piece(Square::H7, Side::Black, Piece::Bishop, false);
         assert!(board.is_in_check(Side::White));
     }
 
     #[test]
     fn is_in_check_detects_queen_check() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E4, Side::White, Piece::King);
-        board.add_piece(Square::E8, Side::Black, Piece::Queen);
+        board.add_piece(Square::E4, Side::White, Piece::King, false);
+        board.add_piece(Square::E8, Side::Black, Piece::Queen, false);
         assert!(board.is_in_check(Side::White));
     }
 
     #[test]
     fn is_in_check_detects_pawn_check() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E4, Side::White, Piece::King);
-        board.add_piece(Square::D5, Side::Black, Piece::Pawn);
+        board.add_piece(Square::E4, Side::White, Piece::King, false);
+        board.add_piece(Square::D5, Side::Black, Piece::Pawn, false);
         assert!(board.is_in_check(Side::White));
     }
 
     #[test]
     fn blocker_prevents_rook_check() {
         let mut board = BoardState::new();
-        board.add_piece(Square::E1, Side::White, Piece::King);
-        board.add_piece(Square::E4, Side::White, Piece::Pawn);
-        board.add_piece(Square::E8, Side::Black, Piece::Rook);
+        board.add_piece(Square::E1, Side::White, Piece::King, false);
+        board.add_piece(Square::E4, Side::White, Piece::Pawn, false);
+        board.add_piece(Square::E8, Side::Black, Piece::Rook, false);
         assert!(!board.is_in_check(Side::White));
     }
 

@@ -14,10 +14,12 @@ impl BoardState {
         let original_en_passant_square = self.en_passant_square;
         let original_castling_rights = self.castle;
         let original_half_move_clock = self.half_move_clock;
+        let original_accumulator_white = self.accumulator_white;
+        let original_accumulator_black = self.accumulator_black;
 
         self.board_hash ^=
             zobrist::zobrist_table()[self.get_piece_on(m.source) as usize][m.source as usize];
-        let moved_piece = self.remove_piece(m.source);
+        let moved_piece = self.remove_piece(m.source, true);
         if moved_piece == Piece::Pawn || m.is_capture() {
             self.half_move_clock = 0;
         } else {
@@ -39,7 +41,7 @@ impl BoardState {
             self.handle_castle(m);
         }
 
-        self.add_piece(m.target, self.side_to_move, final_moved_piece);
+        self.add_piece(m.target, self.side_to_move, final_moved_piece, true);
         self.board_hash ^=
             zobrist::zobrist_table()[self.get_piece_on(m.target) as usize][m.target as usize];
 
@@ -53,6 +55,8 @@ impl BoardState {
             original_castling_rights,
             original_board_hash,
             original_half_move_clock,
+            original_accumulator_white,
+            original_accumulator_black,
         );
         self.move_count += 1;
     }
@@ -78,7 +82,7 @@ impl BoardState {
             [target_square as usize];
         self.half_move_clock = 0;
 
-        self.remove_piece(target_square)
+        self.remove_piece(target_square, true)
     }
 
     fn flip_side_to_move(&mut self) {
@@ -114,8 +118,8 @@ impl BoardState {
 
     fn move_rook_from(&mut self, source: Square, target: Square, side: Side) {
         let rook_index = self.get_piece_on(source);
-        self.remove_piece(source);
-        self.add_piece(target, side, Piece::Rook);
+        self.remove_piece(source, true);
+        self.add_piece(target, side, Piece::Rook, true);
 
         self.board_hash ^= zobrist::zobrist_table()[rook_index as usize][source as usize];
         self.board_hash ^= zobrist::zobrist_table()[rook_index as usize][target as usize];
@@ -124,7 +128,7 @@ impl BoardState {
     pub fn unmake_move(&mut self, m: Move) {
         let history = self.history.restore();
 
-        let moved_piece = self.remove_piece(m.target);
+        let moved_piece = self.remove_piece(m.target, false);
         self.side_to_move = self.side_to_move.other();
 
         if history.captured_piece != Piece::None {
@@ -133,29 +137,35 @@ impl BoardState {
                     self.en_passant_square_for(m),
                     self.side_to_move.other(),
                     Piece::Pawn,
+                    false,
                 );
             } else {
-                self.add_piece(m.target, self.side_to_move.other(), history.captured_piece);
+                self.add_piece(
+                    m.target,
+                    self.side_to_move.other(),
+                    history.captured_piece,
+                    false,
+                );
             }
         }
 
         if m.is_castle() {
             match m.target {
                 Square::C1 => {
-                    self.remove_piece(Square::D1);
-                    self.add_piece(Square::A1, self.side_to_move, Piece::Rook);
+                    self.remove_piece(Square::D1, false);
+                    self.add_piece(Square::A1, self.side_to_move, Piece::Rook, false);
                 }
                 Square::G1 => {
-                    self.remove_piece(Square::F1);
-                    self.add_piece(Square::H1, self.side_to_move, Piece::Rook);
+                    self.remove_piece(Square::F1, false);
+                    self.add_piece(Square::H1, self.side_to_move, Piece::Rook, false);
                 }
                 Square::C8 => {
-                    self.remove_piece(Square::D8);
-                    self.add_piece(Square::A8, self.side_to_move, Piece::Rook);
+                    self.remove_piece(Square::D8, false);
+                    self.add_piece(Square::A8, self.side_to_move, Piece::Rook, false);
                 }
                 Square::G8 => {
-                    self.remove_piece(Square::F8);
-                    self.add_piece(Square::H8, self.side_to_move, Piece::Rook);
+                    self.remove_piece(Square::F8, false);
+                    self.add_piece(Square::H8, self.side_to_move, Piece::Rook, false);
                 }
                 _ => {}
             }
@@ -169,12 +179,15 @@ impl BoardState {
             } else {
                 moved_piece
             },
+            false,
         );
         self.half_move_clock = history.half_move_clock;
         self.board_hash = history.board_hash;
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
         self.move_count -= 1;
+        self.accumulator_black = history.acc_black;
+        self.accumulator_white = history.acc_white;
     }
 
     fn en_passant_square_for(&self, m: Move) -> Square {
@@ -220,6 +233,9 @@ impl BoardState {
             self.castle,
             self.board_hash,
             self.half_move_clock,
+            // TODO: value doesn't matter for null move
+            self.accumulator_white,
+            self.accumulator_black,
         );
         self.update_en_passant(Move::NO_MOVE);
         self.flip_side_to_move();
@@ -232,6 +248,8 @@ impl BoardState {
         self.board_hash = history.board_hash;
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
+        self.accumulator_white = history.acc_white;
+        self.accumulator_black = history.acc_black;
     }
 }
 

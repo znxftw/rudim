@@ -17,6 +17,7 @@ mod tests {
     use crate::common::move_type::MoveType;
     use crate::common::moves::Move;
     use crate::common::square::Square;
+    use crate::eval::nnue::accumulator::Accumulator;
     use crate::uci::is_ready;
     use serial_test::serial;
 
@@ -43,6 +44,8 @@ mod tests {
                 crate::common::castle::Castle::NONE,
                 0,
                 0,
+                Accumulator::default(),
+                Accumulator::default(),
             );
         }
 

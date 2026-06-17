@@ -1,6 +1,7 @@
 use crate::common::castle::Castle;
 use crate::common::piece::Piece;
 use crate::common::square::Square;
+use crate::eval::nnue::accumulator::Accumulator;
 
 pub const HISTORY_SIZE: usize = 4096;
 
@@ -11,6 +12,8 @@ pub struct BoardHistory {
     pub castling_rights: Castle,
     pub board_hash: u64,
     pub half_move_clock: u8,
+    pub acc_white: Accumulator,
+    pub acc_black: Accumulator,
 }
 
 impl Default for BoardHistory {
@@ -21,24 +24,27 @@ impl Default for BoardHistory {
             castling_rights: Castle::NONE,
             board_hash: 0,
             half_move_clock: 0,
+            acc_white: Accumulator::default(),
+            acc_black: Accumulator::default(),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct History {
-    pub entries: [BoardHistory; HISTORY_SIZE],
+    pub entries: Box<[BoardHistory]>,
     pub index: usize,
 }
 
 impl History {
     pub fn new() -> Self {
         Self {
-            entries: [BoardHistory::default(); HISTORY_SIZE],
+            entries: vec![BoardHistory::default(); HISTORY_SIZE].into_boxed_slice(),
             index: 0,
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn save(
         &mut self,
         captured_piece: Piece,
@@ -46,6 +52,8 @@ impl History {
         original_castling_rights: Castle,
         board_hash: u64,
         half_move_clock: u8,
+        acc_white: Accumulator,
+        acc_black: Accumulator,
     ) {
         if self.index < HISTORY_SIZE {
             self.entries[self.index] = BoardHistory {
@@ -54,6 +62,8 @@ impl History {
                 castling_rights: original_castling_rights,
                 board_hash,
                 half_move_clock,
+                acc_white,
+                acc_black,
             };
             self.index += 1;
         } else {
@@ -111,7 +121,15 @@ mod tests {
     fn test_history_save_restore() {
         let mut history = History::new();
 
-        history.save(Piece::Pawn, Square::E3, Castle::WHITE_SHORT, 123456789, 42);
+        history.save(
+            Piece::Pawn,
+            Square::E3,
+            Castle::WHITE_SHORT,
+            123456789,
+            42,
+            Accumulator::default(),
+            Accumulator::default(),
+        );
 
         assert!(!history.is_empty());
         assert_eq!(history.index, 1);
@@ -128,7 +146,15 @@ mod tests {
     #[test]
     fn test_history_clear() {
         let mut history = History::new();
-        history.save(Piece::None, Square::NoSquare, Castle::NONE, 0, 0);
+        history.save(
+            Piece::None,
+            Square::NoSquare,
+            Castle::NONE,
+            0,
+            0,
+            Accumulator::default(),
+            Accumulator::default(),
+        );
         assert!(!history.is_empty());
         history.clear();
         assert!(history.is_empty());
@@ -140,9 +166,33 @@ mod tests {
         let mut history = History::new();
         let hash = 0xDEADBEEF;
 
-        history.save(Piece::None, Square::NoSquare, Castle::NONE, hash, 0);
-        history.save(Piece::None, Square::NoSquare, Castle::NONE, 0x123, 0);
-        history.save(Piece::None, Square::NoSquare, Castle::NONE, hash, 0);
+        history.save(
+            Piece::None,
+            Square::NoSquare,
+            Castle::NONE,
+            hash,
+            0,
+            Accumulator::default(),
+            Accumulator::default(),
+        );
+        history.save(
+            Piece::None,
+            Square::NoSquare,
+            Castle::NONE,
+            0x123,
+            0,
+            Accumulator::default(),
+            Accumulator::default(),
+        );
+        history.save(
+            Piece::None,
+            Square::NoSquare,
+            Castle::NONE,
+            hash,
+            0,
+            Accumulator::default(),
+            Accumulator::default(),
+        );
 
         assert!(history.has_hash_appeared_twice(hash, 0));
         assert!(!history.has_hash_appeared_twice(0x123, 0));

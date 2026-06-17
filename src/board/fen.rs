@@ -40,6 +40,7 @@ fn parse_pieces(board: &mut BoardState, fen: &str) {
                     Square::from(index),
                     symbol_to_side(symbol),
                     symbol_to_piece(symbol),
+                    true,
                 );
                 index += 1;
             } else if let Some(skip) = symbol.to_digit(10) {
