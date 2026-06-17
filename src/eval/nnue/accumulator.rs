@@ -35,6 +35,36 @@ impl Accumulator {
             self.state[i] -= *item;
         }
     }
+
+    #[inline(always)]
+    pub fn add_1_sub_1(&mut self, add_idx: usize, remove_idx: usize, network: &Network) {
+        let add_start = add_idx * ACC_SIZE;
+        let remove_start = remove_idx * ACC_SIZE;
+        let add_weights = &network.transformer_weights[add_start..add_start + ACC_SIZE];
+        let remove_weights = &network.transformer_weights[remove_start..remove_start + ACC_SIZE];
+        for i in 0..ACC_SIZE {
+            self.state[i] += add_weights[i] - remove_weights[i];
+        }
+    }
+
+    #[inline(always)]
+    pub fn add_1_sub_2(
+        &mut self,
+        add_idx: usize,
+        remove_idx1: usize,
+        remove_idx2: usize,
+        network: &Network,
+    ) {
+        let add_start = add_idx * ACC_SIZE;
+        let remove1_start = remove_idx1 * ACC_SIZE;
+        let remove2_start = remove_idx2 * ACC_SIZE;
+        let add_weights = &network.transformer_weights[add_start..add_start + ACC_SIZE];
+        let remove1_weights = &network.transformer_weights[remove1_start..remove1_start + ACC_SIZE];
+        let remove2_weights = &network.transformer_weights[remove2_start..remove2_start + ACC_SIZE];
+        for i in 0..ACC_SIZE {
+            self.state[i] += add_weights[i] - remove1_weights[i] - remove2_weights[i];
+        }
+    }
 }
 
 impl Default for Accumulator {

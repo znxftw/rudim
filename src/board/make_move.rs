@@ -45,6 +45,7 @@ impl BoardState {
         self.board_hash ^=
             zobrist::zobrist_table()[self.get_piece_on(m.target) as usize][m.target as usize];
 
+        self.flush_pending_updates();
         self.update_castling_rights(m);
         self.update_en_passant(m);
         self.flip_side_to_move();

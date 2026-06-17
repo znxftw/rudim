@@ -6,44 +6,76 @@ use crate::eval::nnue::accumulator::Accumulator;
 use crate::eval::nnue::features::get_feature_index;
 use crate::eval::nnue::loader::Network;
 
-// TODO: optz, fused updates
 impl BoardState {
     #[inline(always)]
     pub fn nnue_add_piece(&mut self, square: Square, side: Side, piece: Piece) {
-        self.nnue_update_piece(square, side, piece, true);
+        if let Some(w_idx) = get_feature_index(piece, side, square) {
+            self.pending_adds_w[self.pending_adds as usize] = w_idx;
+            let mirrored_sq = square.mirrored();
+            let b_idx = get_feature_index(piece, side.other(), mirrored_sq).unwrap();
+            self.pending_adds_b[self.pending_adds as usize] = b_idx;
+            self.pending_adds += 1;
+        }
     }
 
     #[inline(always)]
     pub fn nnue_remove_piece(&mut self, square: Square, side: Side, piece: Piece) {
-        self.nnue_update_piece(square, side, piece, false);
+        if let Some(w_idx) = get_feature_index(piece, side, square) {
+            self.pending_dels_w[self.pending_removes as usize] = w_idx;
+            let mirrored_sq = square.mirrored();
+            let b_idx = get_feature_index(piece, side.other(), mirrored_sq).unwrap();
+            self.pending_dels_b[self.pending_removes as usize] = b_idx;
+            self.pending_removes += 1;
+        }
     }
 
-    #[inline(always)]
-    fn nnue_update_piece(&mut self, square: Square, side: Side, piece: Piece, is_add: bool) {
+    pub fn flush_pending_updates(&mut self) {
         let network = Network::get_embedded();
-        // White accumulator update
-        if let Some(feature_idx_white) = get_feature_index(piece, side, square) {
-            if is_add {
-                self.accumulator_white
-                    .add_feature(feature_idx_white, network);
-            } else {
-                self.accumulator_white
-                    .remove_feature(feature_idx_white, network);
+        match (self.pending_adds, self.pending_removes) {
+            (1, 1) => {
+                self.accumulator_white.add_1_sub_1(
+                    self.pending_adds_w[0],
+                    self.pending_dels_w[0],
+                    network,
+                );
+                self.accumulator_black.add_1_sub_1(
+                    self.pending_adds_b[0],
+                    self.pending_dels_b[0],
+                    network,
+                );
+            }
+            (1, 2) => {
+                self.accumulator_white.add_1_sub_2(
+                    self.pending_adds_w[0],
+                    self.pending_dels_w[0],
+                    self.pending_dels_w[1],
+                    network,
+                );
+                self.accumulator_black.add_1_sub_2(
+                    self.pending_adds_b[0],
+                    self.pending_dels_b[0],
+                    self.pending_dels_b[1],
+                    network,
+                );
+            }
+            // TODO: worth it for a add_2_sub_2 for castling?
+            _ => {
+                for i in 0..self.pending_adds as usize {
+                    self.accumulator_white
+                        .add_feature(self.pending_adds_w[i], network);
+                    self.accumulator_black
+                        .add_feature(self.pending_adds_b[i], network);
+                }
+                for i in 0..self.pending_removes as usize {
+                    self.accumulator_white
+                        .remove_feature(self.pending_dels_w[i], network);
+                    self.accumulator_black
+                        .remove_feature(self.pending_dels_b[i], network);
+                }
             }
         }
-
-        // Black accumulator update
-        let mirrored_sq = square.mirrored();
-        let relative_side = side.other();
-        if let Some(feature_idx_black) = get_feature_index(piece, relative_side, mirrored_sq) {
-            if is_add {
-                self.accumulator_black
-                    .add_feature(feature_idx_black, network);
-            } else {
-                self.accumulator_black
-                    .remove_feature(feature_idx_black, network);
-            }
-        }
+        self.pending_adds = 0;
+        self.pending_removes = 0;
     }
 
     pub fn refresh_accumulator(&mut self, side: Side, network: &Network) {

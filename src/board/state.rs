@@ -41,6 +41,12 @@ pub struct BoardState {
     pub history: History,
     pub accumulator_white: Accumulator,
     pub accumulator_black: Accumulator,
+    pub pending_adds_w: [usize; 2],
+    pub pending_dels_w: [usize; 2],
+    pub pending_adds_b: [usize; 2],
+    pub pending_dels_b: [usize; 2],
+    pub pending_adds: u8,
+    pub pending_removes: u8,
 }
 
 impl BoardState {
@@ -65,6 +71,12 @@ impl BoardState {
             history: History::new(),
             accumulator_white,
             accumulator_black,
+            pending_adds_w: [0; 2],
+            pending_dels_w: [0; 2],
+            pending_adds_b: [0; 2],
+            pending_dels_b: [0; 2],
+            pending_adds: 0,
+            pending_removes: 0,
         }
     }
 
