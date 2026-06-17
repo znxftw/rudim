@@ -23,7 +23,7 @@ impl ScoredMove {
     }
 }
 
-pub const MAX_MOVES: usize = 256;
+pub const MAX_MOVES: usize = 218;
 
 #[derive(Clone, Copy)]
 pub struct MoveList {
