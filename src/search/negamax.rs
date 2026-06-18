@@ -163,7 +163,12 @@ fn search_internal(
     let mut number_of_legal_moves = 0;
     let mut has_legal_moves = false;
 
-    while let Some(move_obj) = move_picker.next(board_state, &ctx.search_state.move_ordering) {
+    while let Some(move_obj) = move_picker.next(
+        board_state,
+        &ctx.search_state.move_ordering,
+        &mut ctx.search_state.captures_stack[ply as usize],
+        &mut ctx.search_state.quiets_stack[ply as usize],
+    ) {
         if ctx.cancellation_token.load(Ordering::Relaxed) {
             break;
         }

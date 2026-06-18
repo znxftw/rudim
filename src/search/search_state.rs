@@ -1,3 +1,5 @@
+use crate::common::constants::MAX_PLY;
+use crate::common::move_list::MoveList;
 use crate::common::moves::Move;
 use crate::common::tt::TranspositionTable;
 use crate::eval::move_ordering::MoveOrdering;
@@ -8,6 +10,9 @@ pub struct SearchState {
     pub nodes: i32,
     pub move_ordering: MoveOrdering,
     pub tt: TranspositionTable,
+
+    pub captures_stack: [MoveList; MAX_PLY],
+    pub quiets_stack: [MoveList; MAX_PLY],
 }
 
 impl SearchState {
@@ -18,6 +23,8 @@ impl SearchState {
             nodes: 0,
             move_ordering: MoveOrdering::new(),
             tt: TranspositionTable::new(TranspositionTable::DEFAULT_CAPACITY),
+            captures_stack: [MoveList::new(); MAX_PLY],
+            quiets_stack: [MoveList::new(); MAX_PLY],
         }
     }
 

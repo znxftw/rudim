@@ -20,8 +20,6 @@ pub struct MovePicker {
     pv_move: Option<Move>,
     tt_best: Option<Move>,
     previous_move: Option<Move>,
-    captures: MoveList,
-    quiets: MoveList,
     good_captures_count: usize,
     current_index: usize,
     ply: usize,
@@ -40,8 +38,6 @@ impl MovePicker {
             pv_move,
             tt_best,
             previous_move,
-            captures: MoveList::new(),
-            quiets: MoveList::new(),
             good_captures_count: 0,
             current_index: 0,
             ply,
@@ -55,8 +51,6 @@ impl MovePicker {
             pv_move: None,
             tt_best: None,
             previous_move: None,
-            captures: MoveList::new(),
-            quiets: MoveList::new(),
             good_captures_count: 0,
             current_index: 0,
             ply,
@@ -68,6 +62,8 @@ impl MovePicker {
         &mut self,
         board_state: &mut BoardState,
         move_ordering: &MoveOrdering,
+        captures: &mut MoveList,
+        quiets: &mut MoveList,
     ) -> Option<Move> {
         loop {
             match self.phase {
@@ -89,20 +85,20 @@ impl MovePicker {
                     }
                 }
                 SearchPhase::GenerateCaptures => {
-                    self.captures.clear();
+                    captures.clear();
                     self.current_index = 0;
 
-                    board_state.generate_captures(&mut self.captures);
-                    move_ordering::populate_capture_scores(&mut self.captures, board_state);
+                    board_state.generate_captures(captures);
+                    move_ordering::populate_capture_scores(captures, board_state);
 
                     // Partition in-place: good captures (SEE >= 0) to the left, bad captures (SEE < 0) to the right
                     let mut left = 0;
-                    let mut right = self.captures.len() as i32 - 1;
+                    let mut right = captures.len() as i32 - 1;
                     while left <= right {
-                        if board_state.see(self.captures[left as usize].mv) >= 0 {
+                        if board_state.see(captures[left as usize].mv) >= 0 {
                             left += 1;
                         } else {
-                            self.captures.swap(left as usize, right as usize);
+                            captures.swap(left as usize, right as usize);
                             right -= 1;
                         }
                     }
@@ -111,7 +107,7 @@ impl MovePicker {
                 }
                 SearchPhase::GoodCaptures => {
                     if let Some(mv) = get_next_valid_move(
-                        &mut self.captures[..self.good_captures_count],
+                        &mut captures[..self.good_captures_count],
                         &mut self.current_index,
                         self.pv_move,
                         self.tt_best,
@@ -124,11 +120,11 @@ impl MovePicker {
                     }
                 }
                 SearchPhase::GenerateQuiets => {
-                    self.quiets.clear();
+                    quiets.clear();
                     self.current_index = 0;
-                    board_state.generate_quiets(&mut self.quiets);
+                    board_state.generate_quiets(quiets);
                     move_ordering.populate_quiet_scores(
-                        &mut self.quiets,
+                        quiets,
                         board_state,
                         self.ply,
                         self.previous_move,
@@ -137,7 +133,7 @@ impl MovePicker {
                 }
                 SearchPhase::Quiets => {
                     if let Some(mv) = get_next_valid_move(
-                        &mut self.quiets,
+                        quiets,
                         &mut self.current_index,
                         self.pv_move,
                         self.tt_best,
@@ -150,7 +146,7 @@ impl MovePicker {
                 }
                 SearchPhase::BadCaptures => {
                     if let Some(mv) = get_next_valid_move(
-                        &mut self.captures,
+                        captures,
                         &mut self.current_index,
                         self.pv_move,
                         self.tt_best,
@@ -196,9 +192,11 @@ mod tests {
         let mut board = BoardState::parse_fen("k7/8/8/5n2/1p1p4/2B5/3R4/K7 w - - 0 1");
 
         let mut picker = MovePicker::new_qsearch(0);
+        let mut captures = MoveList::new();
+        let mut quiets = MoveList::new();
         let mut good_captures = Vec::new();
         let move_ordering = MoveOrdering::new();
-        while let Some(mv) = picker.next(&mut board, &move_ordering) {
+        while let Some(mv) = picker.next(&mut board, &move_ordering, &mut captures, &mut quiets) {
             good_captures.push(mv);
         }
         assert!(!good_captures.is_empty());
@@ -221,9 +219,11 @@ mod tests {
         let mut board = BoardState::parse_fen("k7/8/8/5n2/1p1p4/2B5/3R4/K7 w - - 0 1");
 
         let mut picker = MovePicker::new(None, None, None, 0);
+        let mut captures = MoveList::new();
+        let mut quiets = MoveList::new();
         let mut returned_moves = Vec::new();
         let move_ordering = MoveOrdering::new();
-        while let Some(mv) = picker.next(&mut board, &move_ordering) {
+        while let Some(mv) = picker.next(&mut board, &move_ordering, &mut captures, &mut quiets) {
             returned_moves.push(mv);
         }
 

@@ -47,7 +47,12 @@ pub fn search(
 
     let mut has_legal_moves = false;
 
-    while let Some(move_obj) = move_picker.next(board_state, &search_state.move_ordering) {
+    while let Some(move_obj) = move_picker.next(
+        board_state,
+        &search_state.move_ordering,
+        &mut search_state.captures_stack[ply as usize],
+        &mut search_state.quiets_stack[ply as usize],
+    ) {
         if cancellation_token.load(Ordering::Relaxed) {
             break;
         }
