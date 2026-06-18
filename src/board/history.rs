@@ -12,6 +12,7 @@ pub struct BoardHistory {
     pub castling_rights: Castle,
     pub board_hash: u64,
     pub half_move_clock: u8,
+    // TODO: can maintain a separate stack for the accumulators to avoid large memory copies from history.restore
     pub acc_white: Accumulator,
     pub acc_black: Accumulator,
 }

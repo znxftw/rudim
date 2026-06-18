@@ -27,6 +27,7 @@ pub const MAX_MOVES: usize = 218;
 
 #[derive(Clone, Copy)]
 pub struct MoveList {
+    // TODO: optz, have an Uninit list to avoid unnecessary mem ops
     pub moves: [ScoredMove; MAX_MOVES],
     pub count: usize,
 }

@@ -1,6 +1,7 @@
 use super::ACC_SIZE;
 use super::loader::Network;
 
+#[repr(C, align(64))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Accumulator {
     pub state: [i16; ACC_SIZE],
