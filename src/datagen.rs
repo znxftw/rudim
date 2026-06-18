@@ -250,6 +250,7 @@ pub fn write_metadata(output_path: &str, meta: &DatagenMetadata) -> Result<()> {
 }
 
 pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_threads: usize) {
+    let overall_start = std::time::Instant::now();
     let initial_metadata = read_metadata(output_path);
 
     println!("Loading opening book from '{}'...", book_path);
@@ -368,6 +369,8 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
             let mut white_wins = 0;
             let mut black_wins = 0;
             let mut draws = 0;
+            let mut batch_positions = 0;
+            let mut last_batch_time = overall_start;
 
             while let Ok(game) = rx.recv() {
                 if let Err(e) = write_game_to_binpack(
@@ -382,6 +385,7 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                 }
                 games_written += 1;
                 total_positions += game.positions.len();
+                batch_positions += game.positions.len();
 
                 match game.outcome {
                     RudimSide::White => white_wins += 1,
@@ -403,6 +407,12 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                     }
 
                     let avg_len = total_positions as f64 / games_written as f64;
+                    let batch_duration = last_batch_time.elapsed();
+                    let overall_duration = overall_start.elapsed();
+                    let batch_secs = batch_duration.as_secs_f64();
+                    let overall_secs = overall_duration.as_secs_f64();
+                    last_batch_time = std::time::Instant::now();
+
                     println!("----------------------------------------");
                     println!("Games completed (run) : {}", games_written);
                     println!("Games left            : {}", num_games - games_written);
@@ -411,6 +421,35 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
                     println!("Total Black Wins (run): {}", black_wins);
                     println!("Total Draws (run)     : {}", draws);
                     println!("Average Game Length   : {:.2}", avg_len);
+                    println!("Batch Time            : {:.2?}", batch_duration);
+                    if batch_secs > 0.0 {
+                        println!("Batch Games/sec       : {:.2}", 2500.0 / batch_secs);
+                        println!(
+                            "Batch Positions/sec   : {:.2}",
+                            batch_positions as f64 / batch_secs
+                        );
+                    }
+                    println!("Overall Time          : {:.2?}", overall_duration);
+                    if overall_secs > 0.0 {
+                        println!(
+                            "Overall Games/sec     : {:.2}",
+                            games_written as f64 / overall_secs
+                        );
+                        println!(
+                            "Overall Positions/sec : {:.2}",
+                            total_positions as f64 / overall_secs
+                        );
+                    }
+                    if overall_secs > 0.0 && games_written < num_games {
+                        let games_left = num_games - games_written;
+                        let games_per_sec = games_written as f64 / overall_secs;
+                        if games_per_sec > 0.0 {
+                            let eta_secs = games_left as f64 / games_per_sec;
+                            let eta_duration = std::time::Duration::from_secs_f64(eta_secs);
+                            println!("Estimated Time Left  : {:.2?}", eta_duration);
+                        }
+                    }
+                    batch_positions = 0;
                     println!("--- Cumulative Stats (Total in File) ---");
                     println!(
                         "Games completed       : {}",
@@ -444,6 +483,8 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
             } else {
                 0.0
             };
+            let overall_duration = overall_start.elapsed();
+            let overall_secs = overall_duration.as_secs_f64();
             println!("----------------------------------------");
             println!("Final Data Generation Summary:");
             println!("Games completed (run) : {}", games_written);
@@ -453,6 +494,17 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
             println!("Total Black Wins (run): {}", black_wins);
             println!("Total Draws (run)     : {}", draws);
             println!("Average Game Length   : {:.2}", avg_len);
+            println!("Overall Time          : {:.2?}", overall_duration);
+            if overall_secs > 0.0 {
+                println!(
+                    "Overall Games/sec     : {:.2}",
+                    games_written as f64 / overall_secs
+                );
+                println!(
+                    "Overall Positions/sec : {:.2}",
+                    total_positions as f64 / overall_secs
+                );
+            }
             println!("--- Cumulative Stats (Total in File) ---");
             println!(
                 "Games completed       : {}",
