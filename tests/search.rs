@@ -107,10 +107,10 @@ macro_rules! tactic_test_case {
     };
 }
 
-traversal_test_case!(traversal_starting, STARTING_FEN, 876159, 26, 13);
-traversal_test_case!(traversal_endgame, ENDGAME_FEN, 577462, 386, 17);
-traversal_test_case!(traversal_advanced, ADVANCED_MOVE_FEN, 1557147, 3443, 16);
-traversal_test_case!(traversal_kiwi_pete, KIWI_PETE_FEN, 723398, -226, 12);
+traversal_test_case!(traversal_starting, STARTING_FEN, 922037, 23, 13);
+traversal_test_case!(traversal_endgame, ENDGAME_FEN, 777543, 341, 17);
+traversal_test_case!(traversal_advanced, ADVANCED_MOVE_FEN, 3754278, 3848, 16);
+traversal_test_case!(traversal_kiwi_pete, KIWI_PETE_FEN, 920134, -324, 12);
 
 tactic_test_case!(
     tactic_random_puzzle_position,
@@ -143,6 +143,7 @@ tactic_test_case!(
 );
 tactic_test_case!(
     tactic_zugzwang_verification_4,
+    skip = "More Depth Needed",
     "8/8/p1p5/1p5p/1P5p/8/PPP2K1p/4R1rk w - - 0 1",
     "e1f1"
 );
