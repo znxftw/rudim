@@ -186,7 +186,8 @@ fn search_internal(
         has_legal_moves = true;
 
         // PRUNE: Futility Pruning
-        if has_static_eval
+        if number_of_legal_moves > 0
+            && has_static_eval
             && depth < 3
             && !is_tactical
             // TODO: tune
