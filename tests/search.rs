@@ -114,7 +114,6 @@ traversal_test_case!(traversal_kiwi_pete, KIWI_PETE_FEN, 723398, -226, 12);
 
 tactic_test_case!(
     tactic_random_puzzle_position,
-    skip = "More Depth Needed",
     "r4r2/pb4kp/1p4p1/1P6/2P1pRp1/P3B3/7P/5RK1 w - - 0 29",
     "f4f8"
 );
