@@ -42,7 +42,7 @@ fn parse_pieces(board: &mut BoardState, fen: &str) {
                     symbol_to_piece(symbol),
                     true,
                 );
-                board.flush_pending_updates();
+                board.flush_pending_updates(board.history.index);
                 index += 1;
             } else if let Some(skip) = symbol.to_digit(10) {
                 index += skip as usize;

@@ -29,29 +29,29 @@ impl BoardState {
         }
     }
 
-    pub fn flush_pending_updates(&mut self) {
+    pub fn flush_pending_updates(&mut self, target_idx: usize) {
         let network = Network::get_embedded();
         match (self.pending_adds, self.pending_removes) {
             (1, 1) => {
-                self.accumulator_white.add_1_sub_1(
+                self.history.accumulators[target_idx].white.add_1_sub_1(
                     self.pending_adds_w[0],
                     self.pending_dels_w[0],
                     network,
                 );
-                self.accumulator_black.add_1_sub_1(
+                self.history.accumulators[target_idx].black.add_1_sub_1(
                     self.pending_adds_b[0],
                     self.pending_dels_b[0],
                     network,
                 );
             }
             (1, 2) => {
-                self.accumulator_white.add_1_sub_2(
+                self.history.accumulators[target_idx].white.add_1_sub_2(
                     self.pending_adds_w[0],
                     self.pending_dels_w[0],
                     self.pending_dels_w[1],
                     network,
                 );
-                self.accumulator_black.add_1_sub_2(
+                self.history.accumulators[target_idx].black.add_1_sub_2(
                     self.pending_adds_b[0],
                     self.pending_dels_b[0],
                     self.pending_dels_b[1],
@@ -61,15 +61,19 @@ impl BoardState {
             // TODO: worth it for a add_2_sub_2 for castling?
             _ => {
                 for i in 0..self.pending_adds as usize {
-                    self.accumulator_white
+                    self.history.accumulators[target_idx]
+                        .white
                         .add_feature(self.pending_adds_w[i], network);
-                    self.accumulator_black
+                    self.history.accumulators[target_idx]
+                        .black
                         .add_feature(self.pending_adds_b[i], network);
                 }
                 for i in 0..self.pending_removes as usize {
-                    self.accumulator_white
+                    self.history.accumulators[target_idx]
+                        .white
                         .remove_feature(self.pending_dels_w[i], network);
-                    self.accumulator_black
+                    self.history.accumulators[target_idx]
+                        .black
                         .remove_feature(self.pending_dels_b[i], network);
                 }
             }
@@ -113,9 +117,9 @@ impl BoardState {
         }
 
         if side == Side::White {
-            self.accumulator_white = acc;
+            self.history.accumulators[self.history.index].white = acc;
         } else {
-            self.accumulator_black = acc;
+            self.history.accumulators[self.history.index].black = acc;
         }
     }
 }

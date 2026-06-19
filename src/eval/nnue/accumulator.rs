@@ -7,6 +7,12 @@ pub struct Accumulator {
     pub state: [i16; ACC_SIZE],
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct Accumulators {
+    pub white: Accumulator,
+    pub black: Accumulator,
+}
+
 impl Accumulator {
     pub fn new() -> Self {
         Self {
@@ -116,7 +122,8 @@ mod tests {
         let mut board = BoardState::default();
         board.refresh_accumulator(Side::White, &network);
 
-        assert_ne!(board.accumulator_white.state[0], 5);
-        assert_ne!(board.accumulator_white.state[0], 0);
+        let idx = board.history.index;
+        assert_ne!(board.history.accumulators[idx].white.state[0], 5);
+        assert_ne!(board.history.accumulators[idx].white.state[0], 0);
     }
 }

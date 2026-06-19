@@ -9,13 +9,15 @@ use crate::common::zobrist;
 
 impl BoardState {
     pub fn make_move(&mut self, m: Move) {
+        let current_idx = self.history.index;
+        let next_idx = current_idx + 1;
+        self.history.accumulators[next_idx] = self.history.accumulators[current_idx];
+
         let captured_piece = Piece::None;
         let original_board_hash = self.board_hash;
         let original_en_passant_square = self.en_passant_square;
         let original_castling_rights = self.castle;
         let original_half_move_clock = self.half_move_clock;
-        let original_accumulator_white = self.accumulator_white;
-        let original_accumulator_black = self.accumulator_black;
 
         self.board_hash ^=
             zobrist::zobrist_table()[self.get_piece_on(m.source) as usize][m.source as usize];
@@ -45,7 +47,7 @@ impl BoardState {
         self.board_hash ^=
             zobrist::zobrist_table()[self.get_piece_on(m.target) as usize][m.target as usize];
 
-        self.flush_pending_updates();
+        self.flush_pending_updates(next_idx);
         self.update_castling_rights(m);
         self.update_en_passant(m);
         self.flip_side_to_move();
@@ -56,8 +58,6 @@ impl BoardState {
             original_castling_rights,
             original_board_hash,
             original_half_move_clock,
-            original_accumulator_white,
-            original_accumulator_black,
         );
         self.move_count += 1;
     }
@@ -187,8 +187,6 @@ impl BoardState {
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
         self.move_count -= 1;
-        self.accumulator_black = history.acc_black;
-        self.accumulator_white = history.acc_white;
     }
 
     fn en_passant_square_for(&self, m: Move) -> Square {
@@ -228,15 +226,16 @@ impl BoardState {
     }
 
     pub fn make_null_move(&mut self) {
+        let current_idx = self.history.index;
+        let next_idx = current_idx + 1;
+        self.history.accumulators[next_idx] = self.history.accumulators[current_idx];
+
         self.history.save(
             Piece::None,
             self.en_passant_square,
             self.castle,
             self.board_hash,
             self.half_move_clock,
-            // TODO: value doesn't matter for null move
-            self.accumulator_white,
-            self.accumulator_black,
         );
         self.update_en_passant(Move::NO_MOVE);
         self.flip_side_to_move();
@@ -249,8 +248,6 @@ impl BoardState {
         self.board_hash = history.board_hash;
         self.castle = history.castling_rights;
         self.en_passant_square = history.en_passant_square;
-        self.accumulator_white = history.acc_white;
-        self.accumulator_black = history.acc_black;
     }
 }
 

@@ -20,9 +20,15 @@ pub fn evaluate(board: &BoardState) -> i16 {
 pub fn evaluate_internal(board: &BoardState, network: &Network) -> i16 {
     let side_to_move = board.side_to_move;
     let (acc_active, acc_passive) = if side_to_move == Side::White {
-        (&board.accumulator_white, &board.accumulator_black)
+        (
+            &board.history.accumulators[board.history.index].white,
+            &board.history.accumulators[board.history.index].black,
+        )
     } else {
-        (&board.accumulator_black, &board.accumulator_white)
+        (
+            &board.history.accumulators[board.history.index].black,
+            &board.history.accumulators[board.history.index].white,
+        )
     };
 
     let mut output: i32 = 0;
@@ -74,8 +80,9 @@ mod tests {
 
         let mut board = BoardState::new();
 
-        board.accumulator_white.state.fill(10);
-        board.accumulator_black.state.fill(20);
+        let idx = board.history.index;
+        board.history.accumulators[idx].white.state.fill(10);
+        board.history.accumulators[idx].black.state.fill(20);
 
         board.side_to_move = Side::White;
         let score = evaluate_internal(&board, &network);

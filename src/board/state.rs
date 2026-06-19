@@ -10,7 +10,6 @@ use crate::common::game_phase::{add_phase, get_clipped_phase, remove_phase};
 use crate::common::piece::{Piece, PieceMap};
 use crate::common::side::{Side, SideMap};
 use crate::common::square::Square;
-use crate::eval::nnue::accumulator::Accumulator;
 use crate::eval::nnue::loader::Network;
 use std::fmt;
 
@@ -39,8 +38,6 @@ pub struct BoardState {
     pub board_hash: u64,
     pub half_move_clock: u8,
     pub history: History,
-    pub accumulator_white: Accumulator,
-    pub accumulator_black: Accumulator,
     pub pending_adds_w: [usize; 2],
     pub pending_dels_w: [usize; 2],
     pub pending_adds_b: [usize; 2],
@@ -52,10 +49,9 @@ pub struct BoardState {
 impl BoardState {
     pub fn new() -> Self {
         let network = Network::get_embedded();
-        let mut accumulator_white = Accumulator::new();
-        accumulator_white.init_with_biases(network);
-        let mut accumulator_black = Accumulator::new();
-        accumulator_black.init_with_biases(network);
+        let mut history = History::new();
+        history.accumulators[0].white.init_with_biases(network);
+        history.accumulators[0].black.init_with_biases(network);
 
         Self {
             pieces: PieceMap([Bitboard(0); PIECES]),
@@ -68,9 +64,7 @@ impl BoardState {
             phase: 0,
             board_hash: 0,
             half_move_clock: 0,
-            history: History::new(),
-            accumulator_white,
-            accumulator_black,
+            history,
             pending_adds_w: [0; 2],
             pending_dels_w: [0; 2],
             pending_adds_b: [0; 2],
@@ -364,12 +358,18 @@ mod tests {
 
         let mut board = BoardState::starting_position();
 
-        let expected_white = board.accumulator_white;
-        let expected_black = board.accumulator_black;
+        let expected_white = board.history.accumulators[board.history.index].white;
+        let expected_black = board.history.accumulators[board.history.index].black;
         board.refresh_accumulator(Side::White, network);
         board.refresh_accumulator(Side::Black, network);
-        assert_eq!(board.accumulator_white, expected_white);
-        assert_eq!(board.accumulator_black, expected_black);
+        assert_eq!(
+            board.history.accumulators[board.history.index].white,
+            expected_white
+        );
+        assert_eq!(
+            board.history.accumulators[board.history.index].black,
+            expected_black
+        );
 
         let mut move_history = Vec::new();
         for _ in 0..10 {
@@ -399,19 +399,19 @@ mod tests {
             board.make_move(m);
             move_history.push(m);
 
-            let current_white = board.accumulator_white;
-            let current_black = board.accumulator_black;
+            let current_white = board.history.accumulators[board.history.index].white;
+            let current_black = board.history.accumulators[board.history.index].black;
 
             board.refresh_accumulator(Side::White, network);
             board.refresh_accumulator(Side::Black, network);
 
             assert_eq!(
-                board.accumulator_white, current_white,
+                board.history.accumulators[board.history.index].white, current_white,
                 "Failed white accumulator check after move {:?}",
                 m
             );
             assert_eq!(
-                board.accumulator_black, current_black,
+                board.history.accumulators[board.history.index].black, current_black,
                 "Failed black accumulator check after move {:?}",
                 m
             );
@@ -420,25 +420,31 @@ mod tests {
         while let Some(m) = move_history.pop() {
             board.unmake_move(m);
 
-            let current_white = board.accumulator_white;
-            let current_black = board.accumulator_black;
+            let current_white = board.history.accumulators[board.history.index].white;
+            let current_black = board.history.accumulators[board.history.index].black;
 
             board.refresh_accumulator(Side::White, network);
             board.refresh_accumulator(Side::Black, network);
 
             assert_eq!(
-                board.accumulator_white, current_white,
+                board.history.accumulators[board.history.index].white, current_white,
                 "Failed white accumulator check after unmake {:?}",
                 m
             );
             assert_eq!(
-                board.accumulator_black, current_black,
+                board.history.accumulators[board.history.index].black, current_black,
                 "Failed black accumulator check after unmake {:?}",
                 m
             );
         }
 
-        assert_eq!(board.accumulator_white, expected_white);
-        assert_eq!(board.accumulator_black, expected_black);
+        assert_eq!(
+            board.history.accumulators[board.history.index].white,
+            expected_white
+        );
+        assert_eq!(
+            board.history.accumulators[board.history.index].black,
+            expected_black
+        );
     }
 }
