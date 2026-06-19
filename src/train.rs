@@ -37,15 +37,15 @@ const DEFAULT_DATASET_PATH: &str = "data/v1_gen3_1m_d7.binpack";
 const OUTPUT_DIRECTORY: &str = "checkpoints";
 const TARGET_WEIGHTS_PATH: &str = "resources/nnue.bin";
 
-const HL_SIZE: usize = 128;
+const HL_SIZE: usize = 256;
 
 const INITIAL_LR: f32 = 0.001;
 const FINAL_LR: f32 = 0.00001;
-const WDL_START: f32 = 0.3;
-const WDL_END: f32 = 0.8;
+const WDL_START: f32 = 0.2;
+const WDL_END: f32 = 0.7;
 const EVAL_SCALE: f32 = 400.0;
 
-const NET_ID: &str = "rudim-128";
+const NET_ID: &str = "rudim-256";
 const BATCH_SIZE: usize = 16_384;
 const BATCHES_PER_SUPERBATCH: usize = 6104;
 const START_SUPERBATCH: usize = 1;

@@ -7,7 +7,7 @@ use crate::common::side::Side;
 
 use self::loader::Network;
 
-pub const ACC_SIZE: usize = 128;
+pub const ACC_SIZE: usize = 256;
 pub const INPUT_SIZE: usize = 768;
 
 pub const SCALE: i32 = 400;
@@ -89,12 +89,12 @@ mod tests {
 
         // Active state value: 10.clamp(0, 255) = 10. screlu = 10 * 10 = 100.
         // Passive state value: 20.clamp(0, 255) = 20. screlu = 20 * 20 = 400.
-        // sum = 128 * (100 * 2) + 128 * (400 * 3) = 25600 + 153600 = 179200
+        // sum = 256 * (100 * 2) + 256 * (400 * 3) = 51200 + 307200 = 358400
         // Dequantize:
-        // output = 179200 / 255 = 702
-        // output += 10 (bias) = 712
-        // output *= 400 (SCALE) = 284800
-        // output /= 16320 (QA * QB) = 17
-        assert_eq!(score, 17);
+        // output = 358400 / 255 = 1405
+        // output += 10 (bias) = 1415
+        // output *= 400 (SCALE) = 566000
+        // output /= 16320 (QA * QB) = 34
+        assert_eq!(score, 34);
     }
 }

@@ -1,5 +1,5 @@
 // TODO: isolate all build.rs code so that the rest of the binary can make use of other abstractions (e.g. Index for Piece)
-const NETWORK_NAME: &str = "v3-gen3";
+const NETWORK_NAME: &str = "v4-gen1";
 
 pub mod common {
     pub mod square {
@@ -184,7 +184,7 @@ fn download_nnue_if_needed() {
 
     let dest_path = Path::new("resources/nnue.bin");
 
-    let acc_size = 128;
+    let acc_size = 256;
     let input_size = 768;
     let struct_size: usize = (input_size * acc_size + acc_size + acc_size * 2 + 1) * 2;
     // Align up to 64 bytes
