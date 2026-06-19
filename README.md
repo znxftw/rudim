@@ -3,7 +3,7 @@
 
 Rudim is a chess engine written in Rust.
 
-You can play against Rudim on lichess: [rudim-bot](https://lichess.org/@/rudim-bot). (Hosted version: v3.0.1)
+You can play against Rudim on lichess: [rudim-bot](https://lichess.org/@/rudim-bot). (Hosted version: v3.0.3)
 
 Series of blog posts on how I wrote rudim : [vishnubhagyanath.dev](https://vishnubhagyanath.dev/tags/rudim/) (these reference the older C# implementation, rudim was rewritten in rust)
 
@@ -37,7 +37,7 @@ Rudim currently implements these core engine capabilities:
 <details>
 <summary><b>Evaluation</b></summary>
 
-- [NNUE](https://github.com/znxftw/rudim-networks) Architecture: (768 -> 64) x 2 -> 1
+- [NNUE](https://github.com/znxftw/rudim-networks) Architecture: (768 -> 128) x 2 -> 1
 - Trained purely on Self-Play games from scratch without any external data or games of HCE version of Rudim
 </details>
 
