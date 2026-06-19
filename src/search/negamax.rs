@@ -54,12 +54,10 @@ fn search_internal(
     let is_pv_node = beta > 1 + alpha;
     let in_check = board_state.is_in_check(board_state.side_to_move);
 
-    ctx.search_state.nodes += 1;
-
     if board_state.is_draw() {
+        ctx.search_state.nodes += 1;
         return 0;
     }
-
     if ply as usize >= constants::MAX_PLY {
         return quiescence::search(
             board_state,
@@ -78,6 +76,7 @@ fn search_internal(
 
     // TODO: determine improvement for not returning in PV nodes
     if has_value && !is_pv_node {
+        ctx.search_state.nodes += 1;
         return tt_score;
     }
 
@@ -91,6 +90,8 @@ fn search_internal(
             ctx.search_state,
         );
     }
+
+    ctx.search_state.nodes += 1;
 
     // PRUNE: Reverse Futility Pruning
     // TODO: tune conditions
