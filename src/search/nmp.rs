@@ -1,4 +1,5 @@
 use crate::board::state::BoardState;
+use crate::common::piece::Piece;
 
 #[inline(always)]
 pub fn can_prune(
@@ -8,11 +9,13 @@ pub fn can_prune(
     depth: u8,
     in_check: bool,
 ) -> bool {
-    allow_null_move
-        && !is_pv_node
-        && !in_check
-        && depth >= 2
-        && board_state.phase > crate::common::game_phase::ONLY_PAWNS
+    let side = board_state.side_to_move;
+    let has_non_pawn_material = (board_state.occupancies[side]
+        ^ board_state.get_pieces(side, Piece::Pawn)
+        ^ board_state.get_pieces(side, Piece::King))
+    .is_not_empty();
+
+    allow_null_move && !is_pv_node && !in_check && depth >= 2 && has_non_pawn_material
 }
 
 #[inline(always)]

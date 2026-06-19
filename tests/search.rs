@@ -108,7 +108,7 @@ macro_rules! tactic_test_case {
 }
 
 traversal_test_case!(traversal_starting, STARTING_FEN, 876159, 26, 13);
-traversal_test_case!(traversal_endgame, ENDGAME_FEN, 578955, 386, 17);
+traversal_test_case!(traversal_endgame, ENDGAME_FEN, 577462, 386, 17);
 traversal_test_case!(traversal_advanced, ADVANCED_MOVE_FEN, 1557147, 3443, 16);
 traversal_test_case!(traversal_kiwi_pete, KIWI_PETE_FEN, 723398, -226, 12);
 
@@ -143,13 +143,11 @@ tactic_test_case!(
 );
 tactic_test_case!(
     tactic_zugzwang_verification_4,
-    skip = "Improve NMR",
     "8/8/p1p5/1p5p/1P5p/8/PPP2K1p/4R1rk w - - 0 1",
     "e1f1"
 );
 tactic_test_case!(
     tactic_zugzwang_verification_5,
-    skip = "Improve NMR",
     "1q1k4/2Rr4/8/2Q3K1/8/8/8/8 w - - 0 1",
     "g5h6"
 );
