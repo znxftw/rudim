@@ -21,11 +21,9 @@ pub fn search(
 
     let mut last_score: i16 = 0;
 
+    let timer = Instant::now();
+
     for current_depth in 1..=depth {
-        let timer = Instant::now();
-
-        let start_nodes = search_state.nodes;
-
         // Aspiration Windows
         let mut alpha = i16::MIN + 1;
         let mut beta = i16::MAX - 1;
@@ -78,7 +76,6 @@ pub fn search(
         search_state.best_move = previous_pv.first().copied().unwrap_or(Move::NO_MOVE);
 
         let time_ms = timer.elapsed().as_millis().max(1) as f64;
-        let nodes_traversed_now = search_state.nodes - start_nodes;
         let nps = (search_state.nodes as f64 / time_ms * 1000.0) as i32;
 
         let pv_string = previous_pv
@@ -97,7 +94,7 @@ pub fn search(
             let score_str = format_score(search_state.score);
             println!(
                 "info depth {} score {} nodes {} time {} nps {} pv {}",
-                current_depth, score_str, nodes_traversed_now, time_ms, nps, pv_string
+                current_depth, score_str, search_state.nodes, time_ms, nps, pv_string
             );
         }
     }
