@@ -1,7 +1,7 @@
 # Rudim
 [![Pipeline](https://github.com/znxftw/rudim/actions/workflows/pipeline.yml/badge.svg)](https://github.com/znxftw/rudim/actions/workflows/pipeline.yml)
 
-Rudim is a UCI compatible chess engine written in Rust which uses Efficiently Updatable Neural Networks (NNUE) to evaluate positions.
+Rudim is a UCI compatible chess engine written in Rust which uses Efficiently Updatable Neural Networks (NNUE).
 
 You can play against Rudim on lichess: [rudim-bot](https://lichess.org/@/rudim-bot). (Hosted version: v3.0.3)
 
