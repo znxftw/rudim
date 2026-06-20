@@ -19,7 +19,7 @@ venv/
 # Training outputs and datasets
 /checkpoints/
 /data/
-/resources/nnue.bin
+**/nnue.bin
 *.epd
 *.binpack
 *.binpack.meta
