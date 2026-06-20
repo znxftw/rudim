@@ -327,11 +327,13 @@ fn search_internal(
             && best_move != Move::NO_MOVE
             && !best_move.is_capture()
         {
-            let piece = board_state.get_piece_on(best_move.source) as usize;
-            let bonus = (150 * depth as i32) - 125;
-            ctx.search_state
-                .move_ordering
-                .update_history(piece, best_move, bonus);
+            update_history_stats(
+                board_state,
+                ctx.search_state,
+                best_move,
+                depth,
+                &tried_quiets[..tried_quiets_count],
+            );
         }
     }
 
@@ -417,6 +419,29 @@ fn principal_variation_search(
     score
 }
 
+fn update_history_stats(
+    board_state: &BoardState,
+    search_state: &mut SearchState,
+    best_move: Move,
+    depth: u8,
+    tried_quiets: &[Move],
+) {
+    let bonus = (300 * depth as i32) - 250;
+    let piece = board_state.get_piece_on(best_move.source) as usize;
+    search_state
+        .move_ordering
+        .update_history(piece, best_move, bonus);
+
+    for &quiet_move in tried_quiets {
+        if quiet_move != best_move {
+            let q_piece = board_state.get_piece_on(quiet_move.source) as usize;
+            search_state
+                .move_ordering
+                .update_history(q_piece, quiet_move, -bonus);
+        }
+    }
+}
+
 #[inline(always)]
 fn alpha_update(score: i16, move_obj: Move, alpha: &mut i16, best_move: &mut Move) {
     *alpha = score;
@@ -445,18 +470,13 @@ fn beta_cutoff(
     if !move_obj.is_capture() {
         search_state.move_ordering.add_killer_move(move_obj, ply);
 
-        let piece = board_state.get_piece_on(move_obj.source) as usize;
-        let bonus = (300 * depth as i32) - 250;
-        search_state
-            .move_ordering
-            .update_history(piece, move_obj, bonus);
-
-        for &quiet_move in tried_quiets {
-            let q_piece = board_state.get_piece_on(quiet_move.source) as usize;
-            search_state
-                .move_ordering
-                .update_history(q_piece, quiet_move, -bonus);
-        }
+        update_history_stats(
+            board_state,
+            search_state,
+            move_obj,
+            depth,
+            tried_quiets,
+        );
 
         if let Some(prev_mv) = previous_move {
             let prev_side = board_state.side_to_move.other();
