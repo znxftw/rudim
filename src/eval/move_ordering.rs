@@ -48,13 +48,22 @@ impl MoveOrdering {
         let target = move_obj.target as usize;
         let clamped_bonus = bonus.clamp(-MAX_HISTORY, MAX_HISTORY);
         let current_score = self.history_moves[piece][target];
-        self.history_moves[piece][target] += clamped_bonus - current_score * clamped_bonus.abs() / MAX_HISTORY;
+        self.history_moves[piece][target] +=
+            clamped_bonus - current_score * clamped_bonus.abs() / MAX_HISTORY;
     }
 
     pub fn reset(&mut self) {
         self.killer_moves = [[Move::NO_MOVE; MAX_PLY]; 2];
         self.history_moves = [[0; SQUARES]; PIECES * 2];
         self.counter_moves = [[[Move::NO_MOVE; SQUARES]; PIECES]; SIDES];
+    }
+
+    pub fn decay_history(&mut self) {
+        for row in self.history_moves.iter_mut() {
+            for score in row.iter_mut() {
+                *score /= 2;
+            }
+        }
     }
 
     pub fn is_move_heuristic_empty(&self) -> bool {

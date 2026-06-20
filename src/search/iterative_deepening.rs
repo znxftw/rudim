@@ -24,6 +24,8 @@ pub fn search(
     let timer = Instant::now();
 
     for current_depth in 1..=depth {
+        search_state.move_ordering.decay_history();
+
         // Aspiration Windows
         let mut alpha = i16::MIN + 1;
         let mut beta = i16::MAX - 1;

@@ -423,6 +423,7 @@ fn alpha_update(score: i16, move_obj: Move, alpha: &mut i16, best_move: &mut Mov
     *best_move = move_obj;
 }
 
+#[allow(clippy::too_many_arguments)]
 fn beta_cutoff(
     score: i16,
     move_obj: Move,
