@@ -43,8 +43,12 @@ impl MoveOrdering {
         self.killer_moves[0][ply] = move_obj;
     }
 
-    pub fn add_history_move(&mut self, piece: usize, move_obj: Move, depth: u8) {
-        self.history_moves[piece][move_obj.target as usize] += (depth as i32) * (depth as i32);
+    pub fn update_history(&mut self, piece: usize, move_obj: Move, bonus: i32) {
+        const MAX_HISTORY: i32 = 16384;
+        let target = move_obj.target as usize;
+        let clamped_bonus = bonus.clamp(-MAX_HISTORY, MAX_HISTORY);
+        let current_score = self.history_moves[piece][target];
+        self.history_moves[piece][target] += clamped_bonus - current_score * clamped_bonus.abs() / MAX_HISTORY;
     }
 
     pub fn reset(&mut self) {
@@ -102,17 +106,17 @@ impl MoveOrdering {
 
         for move_obj in moves.iter_mut() {
             if move_obj.mv == self.killer_moves[0][ply] {
-                move_obj.score = 9000;
+                move_obj.score = 22000;
             } else if move_obj.mv == self.killer_moves[1][ply] {
-                move_obj.score = 8000;
+                move_obj.score = 21000;
             } else if counter_move != Move::NO_MOVE && move_obj.mv == counter_move {
-                move_obj.score = 7000;
+                move_obj.score = 20000;
             } else {
                 let piece = board_state.get_piece_on(move_obj.mv.source);
                 if piece != -1 {
                     let history_score =
                         self.history_moves[piece as usize][move_obj.mv.target as usize];
-                    move_obj.score = history_score.min(6999);
+                    move_obj.score = history_score;
                 }
             }
         }

@@ -278,15 +278,7 @@ fn search_internal(
             best_score = score;
 
             if score > alpha {
-                alpha_update(
-                    score,
-                    move_obj,
-                    board_state,
-                    depth,
-                    &mut alpha,
-                    &mut best_move,
-                    ctx.search_state,
-                );
+                alpha_update(score, move_obj, &mut alpha, &mut best_move);
                 entry_type = TranspositionEntryType::Exact;
                 found_pv = true;
 
@@ -322,6 +314,17 @@ fn search_internal(
             best_move,
             entry_type,
         );
+
+        if entry_type == TranspositionEntryType::Exact
+            && best_move != Move::NO_MOVE
+            && !best_move.is_capture()
+        {
+            let piece = board_state.get_piece_on(best_move.source) as usize;
+            let bonus = (150 * depth as i32) - 125;
+            ctx.search_state
+                .move_ordering
+                .update_history(piece, best_move, bonus);
+        }
     }
 
     best_score
@@ -407,21 +410,7 @@ fn principal_variation_search(
 }
 
 #[inline(always)]
-fn alpha_update(
-    score: i16,
-    move_obj: Move,
-    board_state: &mut BoardState,
-    depth: u8,
-    alpha: &mut i16,
-    best_move: &mut Move,
-    search_state: &mut SearchState,
-) {
-    if !move_obj.is_capture() {
-        let piece = board_state.get_piece_on(move_obj.source) as usize;
-        search_state
-            .move_ordering
-            .add_history_move(piece, move_obj, depth);
-    }
+fn alpha_update(score: i16, move_obj: Move, alpha: &mut i16, best_move: &mut Move) {
     *alpha = score;
     *best_move = move_obj;
 }
@@ -445,6 +434,8 @@ fn beta_cutoff(
 
     if !move_obj.is_capture() {
         search_state.move_ordering.add_killer_move(move_obj, ply);
+
+        // TODO: add to history and penalize other moves
 
         if let Some(prev_mv) = previous_move {
             let prev_side = board_state.side_to_move.other();
