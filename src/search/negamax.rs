@@ -166,6 +166,8 @@ fn search_internal(
     let mut move_picker = MovePicker::new(pv_move, tt_best, previous_move, ply as usize);
     let mut number_of_legal_moves = 0;
     let mut has_legal_moves = false;
+    let mut tried_quiets = [Move::NO_MOVE; 64];
+    let mut tried_quiets_count = 0;
 
     while let Some(move_obj) = move_picker.next(
         board_state,
@@ -295,7 +297,13 @@ fn search_internal(
                 depth,
                 previous_move,
                 ctx.search_state,
+                &tried_quiets[..tried_quiets_count],
             );
+        }
+
+        if !move_obj.is_capture() && tried_quiets_count < tried_quiets.len() {
+            tried_quiets[tried_quiets_count] = move_obj;
+            tried_quiets_count += 1;
         }
     }
 
@@ -423,6 +431,7 @@ fn beta_cutoff(
     depth: u8,
     previous_move: Option<Move>,
     search_state: &mut SearchState,
+    tried_quiets: &[Move],
 ) -> i16 {
     search_state.tt.submit_entry(
         board_state.board_hash,
@@ -435,7 +444,18 @@ fn beta_cutoff(
     if !move_obj.is_capture() {
         search_state.move_ordering.add_killer_move(move_obj, ply);
 
-        // TODO: add to history and penalize other moves
+        let piece = board_state.get_piece_on(move_obj.source) as usize;
+        let bonus = (300 * depth as i32) - 250;
+        search_state
+            .move_ordering
+            .update_history(piece, move_obj, bonus);
+
+        for &quiet_move in tried_quiets {
+            let q_piece = board_state.get_piece_on(quiet_move.source) as usize;
+            search_state
+                .move_ordering
+                .update_history(q_piece, quiet_move, -bonus);
+        }
 
         if let Some(prev_mv) = previous_move {
             let prev_side = board_state.side_to_move.other();
