@@ -114,12 +114,15 @@ fn search_internal(
         ctx.allow_null_move,
         depth,
         in_check,
+        static_eval,
+        beta,
     ) {
         board_state.make_null_move();
         let reduction = nmp::get_reduction(depth);
+        let reduced_depth = depth.saturating_sub(reduction).max(1);
         let score = -search_internal(
             board_state,
-            depth.saturating_sub(reduction),
+            reduced_depth,
             ply + 1,
             -beta,
             -beta + 1,
