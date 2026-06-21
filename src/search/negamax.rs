@@ -470,13 +470,7 @@ fn beta_cutoff(
     if !move_obj.is_capture() {
         search_state.move_ordering.add_killer_move(move_obj, ply);
 
-        update_history_stats(
-            board_state,
-            search_state,
-            move_obj,
-            depth,
-            tried_quiets,
-        );
+        update_history_stats(board_state, search_state, move_obj, depth, tried_quiets);
 
         if let Some(prev_mv) = previous_move {
             let prev_side = board_state.side_to_move.other();

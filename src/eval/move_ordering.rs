@@ -114,12 +114,17 @@ impl MoveOrdering {
         };
 
         for move_obj in moves.iter_mut() {
-            if move_obj.mv == self.killer_moves[0][ply] {
+            let prom_piece = move_obj.mv.move_type.promotion_piece();
+            if prom_piece == Piece::Queen {
+                move_obj.score = 25000;
+            } else if move_obj.mv == self.killer_moves[0][ply] {
                 move_obj.score = 22000;
             } else if move_obj.mv == self.killer_moves[1][ply] {
                 move_obj.score = 21000;
             } else if counter_move != Move::NO_MOVE && move_obj.mv == counter_move {
                 move_obj.score = 20000;
+            } else if prom_piece != Piece::None {
+                move_obj.score = -20000;
             } else {
                 let piece = board_state.get_piece_on(move_obj.mv.source);
                 if piece != -1 {
@@ -159,7 +164,14 @@ pub fn populate_capture_scores(moves: &mut [ScoredMove], board_state: &BoardStat
             board_state.get_piece_on_side(move_obj.mv.target, board_state.side_to_move.other())
         };
 
-        move_obj.score = MVV_LVA[target_piece][source_piece];
+        let mut score = MVV_LVA[target_piece][source_piece];
+        let prom_piece = move_obj.mv.move_type.promotion_piece();
+        if prom_piece == Piece::Queen {
+            score += 50000;
+        } else if prom_piece != Piece::None {
+            score -= 20000;
+        }
+        move_obj.score = score;
     }
 }
 
@@ -236,5 +248,91 @@ mod tests {
         assert_eq!(moves[0].score, 300);
         assert_eq!(moves[1].score, 200);
         assert_eq!(moves[2].score, 100);
+    }
+
+    #[test]
+    fn should_prioritize_queen_promotions_and_penalize_under_promotions() {
+        let board = BoardState::parse_fen("1r5k/P1Q5/8/8/8/8/8/K7 w - - 0 1");
+        let mut move_ordering = MoveOrdering::new();
+
+        let mut quiet_moves = vec![
+            ScoredMove {
+                mv: Move {
+                    source: Square::A7,
+                    target: Square::A8,
+                    move_type: MoveType::QueenPromotion,
+                },
+                score: 0,
+            },
+            ScoredMove {
+                mv: Move {
+                    source: Square::A7,
+                    target: Square::A8,
+                    move_type: MoveType::RookPromotion,
+                },
+                score: 0,
+            },
+            ScoredMove {
+                mv: Move {
+                    source: Square::C7,
+                    target: Square::C8,
+                    move_type: MoveType::Quiet,
+                },
+                score: 0,
+            },
+        ];
+
+        move_ordering.populate_quiet_scores(&mut quiet_moves, &board, 0, None);
+
+        assert_eq!(quiet_moves[0].score, 25000);
+        assert_eq!(quiet_moves[1].score, -20000);
+        assert_eq!(quiet_moves[2].score, 0);
+
+        let under_prom = Move {
+            source: Square::A7,
+            target: Square::A8,
+            move_type: MoveType::RookPromotion,
+        };
+        move_ordering.add_killer_move(under_prom, 0);
+
+        let mut killer_quiet_moves = vec![ScoredMove {
+            mv: under_prom,
+            score: 0,
+        }];
+        move_ordering.populate_quiet_scores(&mut killer_quiet_moves, &board, 0, None);
+        assert_eq!(killer_quiet_moves[0].score, 22000);
+
+        let mut capture_moves = vec![
+            ScoredMove {
+                mv: Move {
+                    source: Square::A7,
+                    target: Square::B8,
+                    move_type: MoveType::QueenPromotionCapture,
+                },
+                score: 0,
+            },
+            ScoredMove {
+                mv: Move {
+                    source: Square::A7,
+                    target: Square::B8,
+                    move_type: MoveType::RookPromotionCapture,
+                },
+                score: 0,
+            },
+            ScoredMove {
+                mv: Move {
+                    source: Square::C7,
+                    target: Square::B8,
+                    move_type: MoveType::Capture,
+                },
+                score: 0,
+            },
+        ];
+
+        populate_capture_scores(&mut capture_moves, &board);
+
+        assert_eq!(capture_moves[0].score, 95000);
+        assert_eq!(capture_moves[1].score, 25000);
+        assert_eq!(capture_moves[2].score, 41000);
     }
 }
