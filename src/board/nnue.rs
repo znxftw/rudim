@@ -32,6 +32,15 @@ impl BoardState {
     pub fn flush_pending_updates(&mut self, target_idx: usize) {
         let network = Network::get_embedded();
         match (self.pending_adds, self.pending_removes) {
+            (0, 0) => {}
+            (1, 0) => {
+                self.history.accumulators[target_idx]
+                    .white
+                    .add_feature(self.pending_adds_w[0], network);
+                self.history.accumulators[target_idx]
+                    .black
+                    .add_feature(self.pending_adds_b[0], network);
+            }
             (1, 1) => {
                 self.history.accumulators[target_idx].white.add_1_sub_1(
                     self.pending_adds_w[0],
@@ -58,24 +67,27 @@ impl BoardState {
                     network,
                 );
             }
-            // TODO: worth it for a add_2_sub_2 for castling?
+            (2, 2) => {
+                self.history.accumulators[target_idx].white.add_2_sub_2(
+                    self.pending_adds_w[0],
+                    self.pending_adds_w[1],
+                    self.pending_dels_w[0],
+                    self.pending_dels_w[1],
+                    network,
+                );
+                self.history.accumulators[target_idx].black.add_2_sub_2(
+                    self.pending_adds_b[0],
+                    self.pending_adds_b[1],
+                    self.pending_dels_b[0],
+                    self.pending_dels_b[1],
+                    network,
+                );
+            }
             _ => {
-                for i in 0..self.pending_adds as usize {
-                    self.history.accumulators[target_idx]
-                        .white
-                        .add_feature(self.pending_adds_w[i], network);
-                    self.history.accumulators[target_idx]
-                        .black
-                        .add_feature(self.pending_adds_b[i], network);
-                }
-                for i in 0..self.pending_removes as usize {
-                    self.history.accumulators[target_idx]
-                        .white
-                        .remove_feature(self.pending_dels_w[i], network);
-                    self.history.accumulators[target_idx]
-                        .black
-                        .remove_feature(self.pending_dels_b[i], network);
-                }
+                unreachable!(
+                    "Unexpected pending updates state: ({}, {})",
+                    self.pending_adds, self.pending_removes
+                );
             }
         }
         self.pending_adds = 0;
