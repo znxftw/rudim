@@ -7,7 +7,6 @@ use rudim::bitboard::magics::generate_all_magic_numbers;
 use rudim::board::state::BoardState;
 use rudim::common::helpers::{ADVANCED_MOVE_FEN, ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
 use rudim::init;
-use rudim::perft::run_cli;
 use rudim::search::search_state::SearchState;
 use rudim::train::run as train_run;
 use rudim::uci::cli::run as uci_run;
@@ -28,10 +27,6 @@ fn main() {
         }
         Some("--generate-magics") => {
             generate_all_magic_numbers();
-        }
-        Some("--perft") => {
-            init();
-            run_cli();
         }
         Some("--train") => {
             init();

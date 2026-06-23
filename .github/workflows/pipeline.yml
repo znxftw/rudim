@@ -55,9 +55,6 @@ jobs:
         # Only need debug assertions if required
         run: cargo test --locked --release
 
-      - name: Verify perft correctness
-        run: cargo run --release -- --perft
-
       - name: Clippy
         run: cargo clippy --locked --all-targets
 

@@ -4,7 +4,6 @@ pub mod common;
 pub mod datagen;
 pub mod engine;
 pub mod eval;
-pub mod perft;
 pub mod search;
 pub mod train;
 pub mod uci;
