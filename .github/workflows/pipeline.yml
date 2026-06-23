@@ -52,7 +52,8 @@ jobs:
         run: cargo build --locked
 
       - name: Test
-        run: cargo test --locked
+        # Only need debug assertions if required
+        run: cargo test --locked --release
 
       - name: Verify perft correctness
         run: cargo run --release -- --perft
