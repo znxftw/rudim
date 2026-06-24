@@ -47,6 +47,38 @@ Rudim currently implements these core engine capabilities:
 - UCI Protocol support
 </details>
 
+## Estimated Strength
+
+Ratings and rankings from [CCRL 40/15](https://computerchess.org.uk/4040/), [CCRL Blitz](https://computerchess.org.uk/404/), and the [Computer Chess Index (CCI)](https://github.com/computer-chess-index/cci/blob/main/engines/Rudim.md):
+
+<details>
+<summary><b>Ratings & Rankings</b></summary>
+
+| Version | Release Date | CCRL 40/15 | CCRL Blitz | CCI STC | CCI VLTC |
+| ------- | ------------ | ---------- | ---------- | ------- | -------- |
+| v3.0.4  | 2026-06-20   | -          | -          | 2618 (#103) | 2858 (#116) |
+| v3.0.3  | 2026-06-18   | -          | -          | 2527        | 2862        |
+| v3.0.2  | 2026-06-13   | -          | -          | 2448        | 2776        |
+| v3.0.1  | 2026-06-09   | -          | -          | 2277        | 2593        |
+| v3.0.0  | 2026-06-06   | 2614 (#372)| -          | 2226        | 2585        |
+| v2.2.2  | 2026-05-29   | -          | -          | -           | -           |
+| v2.2.1  | 2026-05-28   | -          | -          | -           | -           |
+| v2.2.0  | 2026-05-26   | -          | -          | -           | -           |
+| v2.1.3  | 2026-05-23   | -          | -          | -           | -           |
+| v2.1.2  | 2026-05-20   | -          | -          | 1804        | 2149        |
+| v2.1.1  | 2026-05-16   | -          | -          | 1719        | 2072        |
+| v2.1.0  | 2026-05-14   | -          | -          | 1732        | 1944        |
+| v2.0.0  | 2026-05-03   | -          | -          | 1650        | 1949        |
+| v1.5    | 2026-04-30   | -          | 1848 (#651)| 1590        | 1953        |
+| v1.4.1  | 2024-12-18   | -          | -          | -           | -           |
+| v1.4    | 2024-12-18   | -          | -          | -           | -           |
+| v1.3    | 2024-12-05   | -          | 1434       | -           | -           |
+| v1.2    | 2022-02-25   | -          | -          | -           | -           |
+| v1.1    | 2022-02-08   | -          | -          | -           | -           |
+| v1.0    | 2022-02-06   | -          | -          | -           | -           |
+
+*Ranks are shown in brackets when available in the official rating lists.*
+</details>
 
 ## Usage
 
