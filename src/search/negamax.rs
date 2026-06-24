@@ -54,6 +54,11 @@ fn search_internal(
     let is_pv_node = beta > 1 + alpha;
     let in_check = board_state.is_in_check(board_state.side_to_move);
 
+    let mut depth = depth;
+    if in_check {
+        depth += 1;
+    }
+
     if board_state.is_draw() {
         ctx.search_state.nodes += 1;
         return 0;
