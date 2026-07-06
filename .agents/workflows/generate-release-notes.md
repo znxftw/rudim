@@ -76,7 +76,10 @@ Tournament vs <Previous_Version>
 ```
 
 **Full Changelog**: https://github.com/znxftw/rudim/compare/<Previous_Version>...<Current_Version>
+
+*NB: If your system does not support AVX2, please recompile the binary on your native machine. AVX2 was chosen as a default as [>95% of users](https://store.steampowered.com/hwsurvey) have a compatible machine.*
 ```
+
 
 ## 5. Final Review
 
