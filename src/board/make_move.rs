@@ -225,6 +225,48 @@ impl BoardState {
         )
     }
 
+    pub fn is_draw_in_search(&self, ply: u16) -> bool {
+        let num_pieces = self.occupancy().count_ones();
+        if num_pieces == 2 {
+            return true;
+        } else if num_pieces == 3 {
+            let knights = self.pieces[Piece::Knight];
+            let bishops = self.pieces[Piece::Bishop];
+            if (knights | bishops).is_not_empty() {
+                return true;
+            }
+        }
+
+        if self.half_move_clock >= 100 {
+            return true;
+        }
+
+        if self.half_move_clock <= 3 {
+            return false;
+        }
+
+        let start = self
+            .history
+            .index
+            .saturating_sub(self.half_move_clock as usize);
+        let mut matches = 0;
+        for i in (start..self.history.index).rev() {
+            if self.history.entries[i].board_hash == self.board_hash {
+                matches += 1;
+
+                if matches == 2 {
+                    return true;
+                }
+
+                if matches == 1 && i > self.history.index.saturating_sub(ply as usize) {
+                    return true;
+                }
+            }
+        }
+
+        false
+    }
+
     pub fn make_null_move(&mut self) {
         let current_idx = self.history.index;
         let next_idx = current_idx + 1;
@@ -618,5 +660,54 @@ mod tests {
         board.make_move(double_push.mv);
         assert_eq!(board.en_passant_square, Square::F6);
         assert_eq!(board.half_move_clock, 0);
+    }
+
+    #[test]
+    fn test_is_draw_in_search_twofold_repetition() {
+        let mut board = BoardState::default();
+
+        let nf3 = Move::new(Square::G1, Square::F3, MoveType::Quiet);
+        let nf6 = Move::new(Square::G8, Square::F6, MoveType::Quiet);
+        let ng1 = Move::new(Square::F3, Square::G1, MoveType::Quiet);
+        let ng8 = Move::new(Square::F6, Square::G8, MoveType::Quiet);
+
+        board.make_move(nf3);
+        board.make_move(nf6);
+        board.make_move(ng1);
+        board.make_move(ng8);
+
+        // At this point, the initial position has occurred twice.
+        // It is a 2-fold repetition at/before the root (ply = 0), so it should not be a draw.
+        assert!(!board.is_draw_in_search(0));
+        assert!(!board.is_draw_in_search(4));
+
+        board.make_move(nf3);
+        board.make_move(nf6);
+        board.make_move(ng1);
+        board.make_move(ng8);
+
+        // Threefold repetition (3rd occurrence) is always a draw.
+        assert!(board.is_draw_in_search(0));
+        assert!(board.is_draw_in_search(8));
+
+        // Test cycle strictly after the root
+        let mut board = BoardState::default();
+        let e3 = Move::new(Square::E2, Square::E3, MoveType::Quiet);
+        let nh6 = Move::new(Square::G8, Square::H6, MoveType::Quiet);
+        let ng8 = Move::new(Square::H6, Square::G8, MoveType::Quiet);
+
+        board.make_move(e3); // index = 1
+
+        board.make_move(nh6); // index = 2
+        board.make_move(nf3); // index = 3
+        board.make_move(ng8); // index = 4
+        board.make_move(ng1); // index = 5
+
+        // The position after e3 occurred at index 1 and index 5.
+        // If the search root is at index 0 (ply = 5), the first occurrence (index 1) is after the root.
+        assert!(board.is_draw_in_search(5));
+
+        // If the search root is at index 1 (ply = 4), the first occurrence (index 1) is at the root, not after it.
+        assert!(!board.is_draw_in_search(4));
     }
 }

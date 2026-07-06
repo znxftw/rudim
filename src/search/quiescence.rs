@@ -23,7 +23,7 @@ pub fn search(
 
     search_state.nodes += 1;
 
-    if board_state.is_draw() {
+    if board_state.is_draw_in_search(ply as u16) {
         return 0;
     }
 
