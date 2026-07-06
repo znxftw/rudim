@@ -23,3 +23,6 @@ venv/
 *.epd
 *.binpack
 *.binpack.meta
+*.rtbw
+*.rtbz
+checksum.md5
