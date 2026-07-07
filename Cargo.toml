@@ -6,14 +6,15 @@ edition = "2024"
 [dependencies]
 bitflags = "2.12.1"
 bulletformat = "1.8.0"
-bullet_lib = { path = "deps/bullet/crates/bullet_lib", package = "bullet_lib" }
+bullet_lib = { path = "deps/bullet/crates/bullet_lib", package = "bullet_lib", optional = true }
 rand = "0.9.0"
 
 
 [features]
 default = []
-cuda = ["bullet_lib/cuda"]
-rocm = ["bullet_lib/rocm"]
+train = ["dep:bullet_lib"]
+cuda = ["train", "bullet_lib/cuda"]
+rocm = ["train", "bullet_lib/rocm"]
 
 [dev-dependencies]
 criterion = "0.8.2"

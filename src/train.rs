@@ -88,6 +88,7 @@ fn build_schedule() -> TrainingSchedule<lr::CosineDecayLR, wdl::LinearWDL> {
             batches_per_superbatch: BATCHES_PER_SUPERBATCH,
             start_superbatch: START_SUPERBATCH,
             end_superbatch: END_SUPERBATCH,
+            save_rate: SAVE_RATE,
         },
         wdl_scheduler: wdl::LinearWDL {
             start: WDL_START,

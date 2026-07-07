@@ -46,12 +46,7 @@ fn main() {
             let mut debug_mode = false;
 
             let start_time = Instant::now();
-            board.find_best_move(
-                12,
-                &cancellation_token,
-                &mut debug_mode,
-                &mut search_state,
-            );
+            board.find_best_move(12, &cancellation_token, &mut debug_mode, &mut search_state);
             let duration = start_time.elapsed();
 
             let elapsed_secs = duration.as_secs_f64();
