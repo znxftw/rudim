@@ -37,6 +37,32 @@ fn main() {
             // Intended to be used when profiling as reqd to debug CPU usage
             run_searches();
         }
+        Some("bench") | Some("--bench") => {
+            init();
+            let mut search_state = SearchState::new();
+            search_state.reset_search();
+            let mut board = BoardState::parse_fen(STARTING_FEN);
+            let cancellation_token = AtomicBool::new(false);
+            let mut debug_mode = false;
+
+            let start_time = Instant::now();
+            board.find_best_move(
+                12,
+                &cancellation_token,
+                &mut debug_mode,
+                &mut search_state,
+            );
+            let duration = start_time.elapsed();
+
+            let elapsed_secs = duration.as_secs_f64();
+            let nps = if elapsed_secs > 0.0 {
+                (search_state.nodes as f64 / elapsed_secs) as u64
+            } else {
+                0
+            };
+            println!("{} nodes {} nps", search_state.nodes, nps);
+            exit(0);
+        }
         Some("datagen") | Some("--datagen") => {
             if raw_args.len() < 5 {
                 eprintln!(
