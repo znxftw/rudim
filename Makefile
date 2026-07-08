@@ -11,8 +11,8 @@ endif
 # Default to "rudim" if not specified
 EXE ?= rudim$(EXE_SUFFIX)
 
+# This is only temporary to fix OpenBench
 all:
-    // This is only temporarily to fix OpenBench
 	@if [ ! -f "deps/bullet/crates/bullet_lib/Cargo.toml" ]; then \
 		echo "Submodule not found. Creating placeholder dummy package..."; \
 		mkdir -p deps/bullet/crates/bullet_lib/src; \
