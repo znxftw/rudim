@@ -12,6 +12,13 @@ endif
 EXE ?= rudim$(EXE_SUFFIX)
 
 all:
+    // This is only temporarily to fix OpenBench
+	@if [ ! -f "deps/bullet/crates/bullet_lib/Cargo.toml" ]; then \
+		echo "Submodule not found. Creating placeholder dummy package..."; \
+		mkdir -p deps/bullet/crates/bullet_lib/src; \
+		printf '[package]\nname = "bullet_lib"\nversion = "0.1.0"\nedition = "2021"\n\n[features]\ncuda = []\nrocm = []\n' > deps/bullet/crates/bullet_lib/Cargo.toml; \
+		echo '// Dummy shim' > deps/bullet/crates/bullet_lib/src/lib.rs; \
+	fi
 	cargo build --release
 	cp target/release/rudim$(EXE_SUFFIX) $(EXE)
 
