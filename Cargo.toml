@@ -7,7 +7,7 @@ edition = "2024"
 bitflags = "2.12.1"
 bulletformat = "1.8.0"
 bullet_lib = { path = "deps/bullet/crates/bullet_lib", package = "bullet_lib", optional = true }
-rand = "0.9.0"
+rand = "0.10.2"
 
 
 [features]
