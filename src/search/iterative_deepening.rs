@@ -40,6 +40,7 @@ pub fn search(
         }
 
         let mut current_score;
+        let mut delta = ASPIRATION_WINDOW_MARGIN;
 
         loop {
             current_score = negamax::search(
@@ -57,11 +58,16 @@ pub fn search(
                 break;
             }
 
-            // TODO: Gradually expand window?
             if current_score <= alpha {
-                alpha = i16::MIN + 1;
+                delta = delta.saturating_add(delta / 2).saturating_add(10);
+                alpha = last_score
+                    .saturating_sub(delta)
+                    .max(i16::MIN + 1);
             } else if current_score >= beta {
-                beta = i16::MAX - 1;
+                delta = delta.saturating_add(delta / 2).saturating_add(10);
+                beta = last_score
+                    .saturating_add(delta)
+                    .min(i16::MAX - 1);
             } else {
                 break;
             }
