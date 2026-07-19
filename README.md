@@ -98,6 +98,7 @@ Ratings and rankings from [CCRL 40/15](https://computerchess.org.uk/4040/), [CCR
 
 - [maksimKorzh](https://github.com/maksimKorzh) for his YouTube series on on bitboard chess engines
 - [bullet](https://github.com/jw1912/bullet) - used for training the NNUE
+- [OpenBench](https://github.com/AndyGrant/OpenBench) - used for SPRT testing on my Homelab
 - [Reckless](https://github.com/codedeliveryservice/Reckless), [Viridithas](https://github.com/cosmobobak/viridithas), [Hobbes](https://github.com/kelseyde/hobbes-chess-engine) - took some references for Rust optimizations they did
 - ChessProgramming wiki, TalkChess, Engine Programming Discord Server, CCRL, CCI
 
