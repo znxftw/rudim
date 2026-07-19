@@ -3,7 +3,7 @@
 
 Rudim is a UCI compatible chess engine written in Rust which uses Efficiently Updatable Neural Networks (NNUE).
 
-You can play against Rudim on lichess: [rudim-bot](https://lichess.org/@/rudim-bot). (Hosted version: v3.0.3)
+You can play against Rudim on lichess: [rudim-bot](https://lichess.org/@/rudim-bot). (Hosted version: v3.0.5)
 
 Series of blog posts on how I wrote rudim : [vishnubhagyanath.dev](https://vishnubhagyanath.dev/tags/rudim/) (these reference the older C# implementation, rudim was rewritten in rust)
 
