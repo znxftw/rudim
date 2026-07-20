@@ -202,6 +202,17 @@ fn search_internal(
             continue;
         }
 
+        // PRUNE: Late Move Pruning
+        // TODO: tune base and depth limit
+        if has_static_eval
+            && depth < 4
+            && !is_tactical
+            && number_of_legal_moves >= 3 + (depth as usize * depth as usize)
+        {
+            board_state.unmake_move(move_obj);
+            continue;
+        }
+
         let needs_lmr = lmr::needs_reduction(depth, number_of_legal_moves, is_tactical, in_check);
 
         let mut score;
