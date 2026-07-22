@@ -15,7 +15,7 @@ jobs:
       latest_release_version: ${{ steps.gate.outputs.latest_release_version }}
       matched_tag: ${{ steps.gate.outputs.matched_tag }}
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           submodules: true
@@ -138,7 +138,7 @@ jobs:
             rustflags: ""
 
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           submodules: true
 
