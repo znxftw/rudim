@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pages: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v7.0.1
@@ -33,7 +35,7 @@ jobs:
 
       - name: Setup Rust toolchain (rustup)
         run: |
-          rustup toolchain install stable --profile minimal --component clippy --component rustfmt
+          rustup toolchain install stable --profile minimal --component clippy --component rustfmt --component llvm-tools-preview
           rustup default stable
           rustc --version
           cargo --version
@@ -60,3 +62,20 @@ jobs:
 
       - name: Format check
         run: cargo fmt --all -- --check
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Generate code coverage report
+        run: cargo llvm-cov --lib --release --html --output-dir html
+
+      - name: Upload HTML coverage report artifact for GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: html
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        id: deployment
+        uses: actions/deploy-pages@v4
