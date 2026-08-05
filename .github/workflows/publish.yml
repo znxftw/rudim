@@ -15,7 +15,7 @@ jobs:
       latest_release_version: ${{ steps.gate.outputs.latest_release_version }}
       matched_tag: ${{ steps.gate.outputs.matched_tag }}
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           submodules: true
@@ -138,7 +138,7 @@ jobs:
             rustflags: ""
 
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
 
@@ -172,7 +172,7 @@ jobs:
           Copy-Item "${{ matrix.binary_path }}" "dist/${{ matrix.output_name }}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ matrix.asset_name }}
           path: dist/${{ matrix.output_name }}
