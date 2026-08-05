@@ -32,18 +32,17 @@ impl Network {
     }
 
     pub fn randomize(&mut self) {
-        use rand::Rng;
-        let mut rng = rand::rng();
+        use crate::common::random;
         for val in self.transformer_weights.iter_mut() {
-            *val = rng.random_range(-10..=10);
+            *val = random::next_i16_range(-10, 10);
         }
         for val in self.transformer_biases.iter_mut() {
-            *val = rng.random_range(-10..=10);
+            *val = random::next_i16_range(-10, 10);
         }
         for val in self.output_weights.iter_mut() {
-            *val = rng.random_range(-10..=10);
+            *val = random::next_i16_range(-10, 10);
         }
-        self.output_bias = rng.random_range(-10..=10);
+        self.output_bias = random::next_i16_range(-10, 10);
     }
 
     pub fn save_to_file(&self, path: &str) -> std::io::Result<()> {

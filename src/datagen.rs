@@ -1,4 +1,4 @@
-use rand::seq::IndexedRandom;
+use crate::common::random;
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, BufWriter, Error, ErrorKind, Result, Write};
 use std::process::exit;
@@ -289,13 +289,12 @@ pub fn run(output_path: &str, num_games: usize, book_path: &str, depth: u8, num_
             let thread_games = games_per_thread + if t < remainder { 1 } else { 0 };
 
             s.spawn(move || {
-                let mut rng = rand::rng();
                 let cancellation_token = AtomicBool::new(false);
                 let mut debug_mode = false;
                 let mut search_state = SearchState::new();
 
                 for _ in 0..thread_games {
-                    let starting_fen = book_fens_ref.choose(&mut rng).unwrap();
+                    let starting_fen = random::choose(book_fens_ref).unwrap();
                     let mut board_state = BoardState::parse_fen(starting_fen);
                     let initial_state = board_state.clone();
 
