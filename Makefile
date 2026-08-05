@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean coverage coverage-open coverage-release coverage-release-open mutants
 
 # Detect operating system to handle executable suffixes correctly (.exe on Windows)
 ifeq ($(OS),Windows_NT)
@@ -24,3 +24,18 @@ all:
 
 clean:
 	cargo clean
+# Non OpenBench
+coverage:
+	cargo llvm-cov --lib --html
+
+coverage-open:
+	cargo llvm-cov --lib --open
+
+coverage-release:
+	cargo llvm-cov --lib --release --html
+
+coverage-release-open:
+	cargo llvm-cov --lib --release --open
+
+mutants:
+	cargo mutants -- --lib

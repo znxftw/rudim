@@ -26,3 +26,7 @@ venv/
 *.rtbw
 *.rtbz
 checksum.md5
+
+
+# cargo-mutants
+*mutants.out*
