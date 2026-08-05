@@ -16,7 +16,7 @@ rocm = ["train", "bullet_lib/rocm"]
 
 [dev-dependencies]
 criterion = "0.8.2"
-serial_test = "3.5"
+serial_test = "4.0"
 
 [[bench]]
 name = "search_benchmark"
