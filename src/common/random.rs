@@ -49,7 +49,7 @@ pub fn next_i16_range(min: i16, max: i16) -> i16 {
     min + (next_u64() % range) as i16
 }
 
-pub fn choose<'a, T>(slice: &'a [T]) -> Option<&'a T> {
+pub fn choose<T>(slice: &[T]) -> Option<&T> {
     if slice.is_empty() {
         None
     } else {
