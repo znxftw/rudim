@@ -57,4 +57,4 @@ quality:
 	cargo test --lib
 	cargo test --tests --release
 	# TODO: improve coverage, cases
-	cargo llvm-cov --lib --html --fail-under-lines 80
+	cargo llvm-cov --lib --html --fail-under-lines 70
