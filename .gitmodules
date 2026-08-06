@@ -1,3 +1,0 @@
-[submodule "deps/bullet"]
-	path = deps/bullet
-	url = https://github.com/jw1912/bullet
