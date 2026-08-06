@@ -85,7 +85,7 @@ Ratings and rankings from [CCRL 40/15](https://computerchess.org.uk/4040/), [CCR
 
 - Build Binary : `cargo build --release`
 - Run engine : `cargo run --release`
-- Run benchmark: `cargo bench`
+- Run engine benchmark: `cargo run --release -- bench`
 - Misc : `cargo run --release -- --generate-magics`, `cargo run --release --features cuda -- --train <binpack_path>`
 - Use unoptimized versions (non `--release`) only if debugging
 
@@ -107,6 +107,6 @@ Ratings and rankings from [CCRL 40/15](https://computerchess.org.uk/4040/), [CCR
 
 PRs are welcome.
 
-Before opening a PR, please run all the quality checks, perft and benchmark.
+Before opening a PR, please run all the quality checks and perft.
 
 If your change affects search strength, run a 1000 match 10+0.1 tournament as well.
