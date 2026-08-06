@@ -81,9 +81,16 @@ Ratings and rankings from [CCRL 40/15](https://computerchess.org.uk/4040/), [CCR
 *Ranks are shown in brackets when available in the official rating lists.*
 </details>
 
+## Prerequisites
+
+- [Rust](https://www.rust-lang.org/) (stable toolchain)
+- `make` (for ease of development)
+
 ## Usage
 
+
 - Build Binary : `cargo build --release`
+
 - Run engine : `cargo run --release`
 - Run engine benchmark: `cargo run --release -- bench`
 - Misc : `cargo run --release -- --generate-magics`, `cargo run --release --features cuda -- --train <binpack_path>`
@@ -91,9 +98,10 @@ Ratings and rankings from [CCRL 40/15](https://computerchess.org.uk/4040/), [CCR
 
 ## Quality Checks
 
-- `cargo test`
-- `cargo clippy --all-targets`
-- `cargo fmt --all`
+Install required dependencies and tools: `make install-deps`
+
+Run all quality checks: `make quality`
+
 
 ## Acknowledgements
 

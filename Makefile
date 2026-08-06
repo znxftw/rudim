@@ -1,4 +1,4 @@
-.PHONY: all clean coverage coverage-open coverage-release coverage-release-open mutants
+.PHONY: all clean coverage coverage-open coverage-release coverage-release-open mutants quality install-deps
 
 # Detect operating system to handle executable suffixes correctly (.exe on Windows)
 ifeq ($(OS),Windows_NT)
@@ -24,6 +24,12 @@ all:
 
 clean:
 	cargo clean
+
+install-deps:
+	rustup component add clippy rustfmt llvm-tools-preview
+	cargo install cargo-llvm-cov
+	cargo install cargo-mutants
+
 # Non OpenBench
 coverage:
 	cargo llvm-cov --lib --html
@@ -39,3 +45,11 @@ coverage-release-open:
 
 mutants:
 	cargo mutants -- --lib
+
+quality:
+	cargo fmt --check
+	cargo clippy --all-targets -- -D warnings
+	cargo test --lib
+	cargo test --tests --release
+	# TODO: improve coverage, cases
+	cargo llvm-cov --lib --html --fail-under-lines 80
