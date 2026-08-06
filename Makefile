@@ -3,8 +3,12 @@
 # Detect operating system to handle executable suffixes correctly (.exe on Windows)
 ifeq ($(OS),Windows_NT)
     EXE_SUFFIX := .exe
+    COPY := copy /Y
+    FIX_PATH = $(subst /,\, $1)
 else
     EXE_SUFFIX :=
+    COPY := cp
+    FIX_PATH = $1
 endif
 
 # OpenBench passes the output path via the EXE variable (e.g., EXE=rudim-master)
@@ -13,7 +17,7 @@ EXE ?= rudim$(EXE_SUFFIX)
 
 all:
 	cargo build --release
-	cp target/release/rudim$(EXE_SUFFIX) $(EXE)
+	$(COPY) $(call FIX_PATH,target/release/rudim$(EXE_SUFFIX)) $(call FIX_PATH,$(EXE))
 
 clean:
 	cargo clean
@@ -25,7 +29,9 @@ install-deps: setup-hooks
 
 setup-hooks:
 	git config --local core.hooksPath .githooks
+ifneq ($(OS),Windows_NT)
 	chmod +x .githooks/pre-push
+endif
 
 
 # Non OpenBench
