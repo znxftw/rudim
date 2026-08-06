@@ -1,13 +1,12 @@
 use crate::board::state::BoardState;
-use crate::uci::{UciClient, reset_global, set_ready};
+use crate::uci::UciClient;
 
 impl UciClient {
     pub(crate) fn run_ucinewgame(&mut self, _parameters: &[&str]) {
-        reset_global();
         *self.board.lock().unwrap() = BoardState::default();
         self.search_state.lock().unwrap().reset_heuristics();
         self.search_state.lock().unwrap().tt.clear();
-        set_ready();
+        self.is_ready = true;
     }
 }
 
@@ -18,11 +17,7 @@ mod tests {
     use crate::common::moves::Move;
     use crate::common::square::Square;
 
-    use crate::uci::is_ready;
-    use serial_test::serial;
-
     #[test]
-    #[serial]
     fn should_reset_program() {
         let mut uci_client = UciClient::new();
         uci_client.board = std::sync::Arc::new(std::sync::Mutex::new(BoardState::parse_fen(
@@ -73,25 +68,23 @@ mod tests {
     }
 
     #[test]
-    #[serial]
     fn should_be_ready_after_reset() {
         let mut uci_client = UciClient::new();
 
         uci_client.run_ucinewgame(&[]);
 
-        assert!(is_ready());
+        assert!(uci_client.is_ready);
     }
 
     #[test]
-    #[serial]
     fn should_restore_ready_state_after_reset() {
         let mut uci_client = UciClient::new();
-        set_ready();
+        uci_client.is_ready = true;
 
-        assert!(is_ready());
+        assert!(uci_client.is_ready);
 
         uci_client.run_ucinewgame(&[]);
 
-        assert!(is_ready());
+        assert!(uci_client.is_ready);
     }
 }

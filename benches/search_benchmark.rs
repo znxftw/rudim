@@ -1,7 +1,6 @@
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use rudim::board::state::BoardState;
 use rudim::common::helpers::{ADVANCED_MOVE_FEN, ENDGAME_FEN, KIWI_PETE_FEN, STARTING_FEN};
-use rudim::engine;
 use rudim::search::search_state::SearchState;
 use std::sync::Once;
 use std::sync::atomic::AtomicBool;
@@ -38,7 +37,6 @@ fn benchmark_find_best_move(c: &mut Criterion) {
             &(fen, depth),
             |b, &(fen, depth)| {
                 b.iter(|| {
-                    engine::reset();
                     let mut board_state = BoardState::parse_fen(fen);
                     let cancellation_token = AtomicBool::new(false);
                     let mut debug_mode = false;

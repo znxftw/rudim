@@ -5,7 +5,6 @@ pub mod time_management;
 use crate::board::state::BoardState;
 use crate::common::helpers::STARTING_FEN;
 use crate::common::moves::Move;
-use crate::engine;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock, Mutex};
 
@@ -30,15 +29,17 @@ pub(crate) struct UciClient {
     pub debug_mode: Arc<AtomicBool>,
     pub current_search: Option<Arc<AtomicBool>>,
     pub search_state: Arc<Mutex<crate::search::search_state::SearchState>>,
+    pub is_ready: bool,
 }
 
 impl UciClient {
-    fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             board: Arc::new(Mutex::new(BoardState::parse_fen(STARTING_FEN))),
             debug_mode: Arc::new(AtomicBool::new(true)),
             current_search: None,
             search_state: Arc::new(Mutex::new(crate::search::search_state::SearchState::new())),
+            is_ready: false,
         }
     }
 
@@ -111,16 +112,4 @@ pub(crate) fn get_parameter(name: &str, parameters: &[&str], fallback: i32) -> i
 
 pub(crate) fn has_flag(name: &str, parameters: &[&str]) -> bool {
     parameters.contains(&name)
-}
-
-pub(crate) fn reset_global() {
-    engine::reset();
-}
-
-pub(crate) fn set_ready() {
-    engine::set_ready();
-}
-
-pub(crate) fn is_ready() -> bool {
-    engine::is_ready()
 }

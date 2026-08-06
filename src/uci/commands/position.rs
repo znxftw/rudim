@@ -1,7 +1,7 @@
 use crate::common::move_list::MoveList;
 use crate::common::move_type::MoveType;
 use crate::common::moves::Move;
-use crate::uci::{UciClient, cli, reset_global, set_ready};
+use crate::uci::{UciClient, cli};
 
 impl UciClient {
     pub(crate) fn run_position(&mut self, parameters: &[&str]) {
@@ -35,17 +35,15 @@ impl UciClient {
     }
 
     fn parse_fen(&mut self, fen: &str, moves: &[&str]) {
-        reset_global();
         *self.board.lock().unwrap() = crate::board::state::BoardState::parse_fen(fen);
         self.parse_moves(moves);
-        set_ready();
+        self.is_ready = true;
     }
 
     fn parse_startpos(&mut self, moves: &[&str]) {
-        reset_global();
         *self.board.lock().unwrap() = crate::board::state::BoardState::default();
         self.parse_moves(moves);
-        set_ready();
+        self.is_ready = true;
     }
 
     fn parse_moves(&mut self, moves: &[&str]) {
@@ -91,7 +89,6 @@ impl UciClient {
 mod tests {
     use super::*;
     use crate::board::state::BoardState;
-    use serial_test::serial;
 
     fn find_move_from_move_list(board: &mut BoardState, move_obj: Move) -> Move {
         let mut move_list = MoveList::new();
@@ -109,7 +106,6 @@ mod tests {
     }
 
     #[test]
-    #[serial]
     fn should_set_position_from_fen() {
         let mut uci_client = UciClient::new();
         let fen = "rnbqkb1r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -131,7 +127,6 @@ mod tests {
     }
 
     #[test]
-    #[serial]
     fn should_set_position_to_start_pos() {
         let mut uci_client = UciClient::new();
 
@@ -141,7 +136,6 @@ mod tests {
     }
 
     #[test]
-    #[serial]
     fn should_set_position_to_start_pos_and_apply_moves() {
         let mut uci_client = UciClient::new();
 

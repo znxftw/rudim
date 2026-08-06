@@ -39,10 +39,8 @@ impl UciClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serial_test::serial;
 
     #[test]
-    #[serial]
     fn should_resize_transposition_table() {
         let mut uci_client = UciClient::new();
 

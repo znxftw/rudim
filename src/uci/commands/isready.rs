@@ -1,10 +1,9 @@
-use crate::uci::{UciClient, cli, is_ready, reset_global, set_ready};
+use crate::uci::{UciClient, cli};
 
 impl UciClient {
     pub(crate) fn run_isready(&mut self, _parameters: &[&str]) {
-        if !is_ready() {
-            reset_global();
-            set_ready();
+        if !self.is_ready {
+            self.is_ready = true;
         }
         cli::write_line("readyok");
     }
@@ -13,28 +12,24 @@ impl UciClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serial_test::serial;
 
     #[test]
-    #[serial]
     fn should_initialize_engine_when_not_ready() {
         let mut uci_client = UciClient::new();
-        reset_global();
+        uci_client.is_ready = false;
 
         uci_client.run_isready(&[]);
 
-        assert!(is_ready());
+        assert!(uci_client.is_ready);
     }
 
     #[test]
-    #[serial]
     fn should_still_respond_when_already_ready() {
         let mut uci_client = UciClient::new();
-        reset_global();
-        set_ready();
+        uci_client.is_ready = true;
 
         uci_client.run_isready(&[]);
 
-        assert!(is_ready());
+        assert!(uci_client.is_ready);
     }
 }

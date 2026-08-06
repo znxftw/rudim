@@ -3,7 +3,6 @@ use rudim::common::helpers::{ADVANCED_MOVE_FEN, ENDGAME_FEN, KIWI_PETE_FEN, STAR
 use rudim::common::move_type::MoveType;
 use rudim::common::moves::Move;
 use rudim::search::search_state::SearchState;
-use serial_test::serial;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
@@ -74,7 +73,6 @@ fn assert_tactic_best_move(fen: &str, move_lan: &str) {
 macro_rules! traversal_test_case {
     ($name:ident, $fen:expr, $nodes:expr, $score:expr, $depth:expr) => {
         #[test]
-        #[serial]
         fn $name() {
             assert_traversal($fen, $nodes, $score, $depth);
         }
@@ -82,7 +80,6 @@ macro_rules! traversal_test_case {
     ($name:ident, skip = $reason:literal, $fen:expr, $nodes:expr, $score:expr, $depth:expr) => {
         #[test]
         #[ignore = $reason]
-        #[serial]
         fn $name() {
             assert_traversal($fen, $nodes, $score, $depth);
         }
@@ -92,7 +89,6 @@ macro_rules! traversal_test_case {
 macro_rules! tactic_test_case {
     ($name:ident, $fen:expr, $best_move:expr) => {
         #[test]
-        #[serial]
         fn $name() {
             assert_tactic_best_move($fen, $best_move);
         }
@@ -100,7 +96,6 @@ macro_rules! tactic_test_case {
     ($name:ident, skip = $reason:literal, $fen:expr, $best_move:expr) => {
         #[test]
         #[ignore = $reason]
-        #[serial]
         fn $name() {
             assert_tactic_best_move($fen, $best_move);
         }
