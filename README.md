@@ -98,9 +98,10 @@ Ratings and rankings from [CCRL 40/15](https://computerchess.org.uk/4040/), [CCR
 
 ## Quality Checks
 
-Install required dependencies and tools: `make install-deps`
+Install required dependencies, tools, and Git pre-push hooks: `make install-deps`
 
 Run all quality checks: `make quality`
+
 
 
 ## Acknowledgements

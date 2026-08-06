@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Git pre-push hook for rudim
+# Runs quality checks before allowing git push
+
+set -e
+
+echo "==> Running quality checks before pushing..."
+make quality
+
+echo "==> Quality checks passed! Proceeding with push."
+exit 0

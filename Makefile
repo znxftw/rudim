@@ -1,4 +1,4 @@
-.PHONY: all clean coverage coverage-open coverage-release coverage-release-open mutants quality install-deps
+.PHONY: all clean coverage coverage-open coverage-release coverage-release-open mutants quality install-deps setup-hooks
 
 # Detect operating system to handle executable suffixes correctly (.exe on Windows)
 ifeq ($(OS),Windows_NT)
@@ -25,10 +25,15 @@ all:
 clean:
 	cargo clean
 
-install-deps:
+install-deps: setup-hooks
 	rustup component add clippy rustfmt llvm-tools-preview
 	cargo install cargo-llvm-cov
 	cargo install cargo-mutants
+
+setup-hooks:
+	git config --local core.hooksPath .githooks
+	chmod +x .githooks/pre-push
+
 
 # Non OpenBench
 coverage:
