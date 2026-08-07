@@ -1,0 +1,50 @@
+name: Mutation Tests
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  mutants:
+    name: Run mutation tests
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-C target-cpu=generic"
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Rust toolchain (rustup)
+        run: |
+          rustup toolchain install stable --profile minimal --component clippy --component rustfmt --component llvm-tools-preview
+          rustup default stable
+          rustc --version
+          cargo --version
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Install cargo-mutants
+        uses: taiki-e/install-action@faf6515f98a6da02430741fd0af1094fde82286d # cargo-mutants
+        with:
+          tool: cargo-mutants
+
+      - name: Run mutation tests
+        run: make mutants
+
+      - name: Upload mutation test artifact
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: mutants-out
+          path: mutants.out
