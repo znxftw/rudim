@@ -228,6 +228,26 @@ mod tests {
     }
 
     #[test]
+    fn should_get_attacks_for_edge_knights() {
+        let knight_attacks_h1 = get_knight_attacks(Square::H1);
+        assert_eq!(1, knight_attacks_h1.get_bit(Square::G3 as usize));
+        assert_eq!(1, knight_attacks_h1.get_bit(Square::F2 as usize));
+        assert_eq!(2, knight_attacks_h1.0.count_ones());
+
+        let knight_attacks_g1 = get_knight_attacks(Square::G1);
+        assert_eq!(1, knight_attacks_g1.get_bit(Square::E2 as usize));
+        assert_eq!(1, knight_attacks_g1.get_bit(Square::F3 as usize));
+        assert_eq!(1, knight_attacks_g1.get_bit(Square::H3 as usize));
+        assert_eq!(3, knight_attacks_g1.0.count_ones());
+
+        let knight_attacks_b1 = get_knight_attacks(Square::B1);
+        assert_eq!(1, knight_attacks_b1.get_bit(Square::A3 as usize));
+        assert_eq!(1, knight_attacks_b1.get_bit(Square::C3 as usize));
+        assert_eq!(1, knight_attacks_b1.get_bit(Square::D2 as usize));
+        assert_eq!(3, knight_attacks_b1.0.count_ones());
+    }
+
+    #[test]
     fn should_get_attacks_for_central_king() {
         let king_attacks_e5 = get_king_attacks(Square::E5);
 

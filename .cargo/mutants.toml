@@ -1,0 +1,6 @@
+exclude_re = [
+    # | and ^ for mutually exclusive files are equivalent
+    "src/bitboard/attacks\\.rs:9:33: replace \\| with \\^",
+    "src/bitboard/attacks\\.rs:10:33: replace \\| with \\^",
+    "src/bitboard/attacks\\.rs:164:29: replace \\| with \\^ in get_queen_attacks",
+]
