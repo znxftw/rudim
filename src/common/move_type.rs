@@ -11,11 +11,11 @@ pub enum MoveType {
     BishopPromotion = 5,
     RookPromotion = 6,
     QueenPromotion = 7,
-    KnightPromotionCapture = 12,
-    BishopPromotionCapture = 13,
-    RookPromotionCapture = 14,
-    QueenPromotionCapture = 15,
-    Castle = 16,
+    KnightPromotionCapture = 8,
+    BishopPromotionCapture = 9,
+    RookPromotionCapture = 10,
+    QueenPromotionCapture = 11,
+    Castle = 12,
 }
 
 impl MoveType {
@@ -75,11 +75,11 @@ impl From<u8> for MoveType {
             5 => Self::BishopPromotion,
             6 => Self::RookPromotion,
             7 => Self::QueenPromotion,
-            12 => Self::KnightPromotionCapture,
-            13 => Self::BishopPromotionCapture,
-            14 => Self::RookPromotionCapture,
-            15 => Self::QueenPromotionCapture,
-            16 => Self::Castle,
+            8 => Self::KnightPromotionCapture,
+            9 => Self::BishopPromotionCapture,
+            10 => Self::RookPromotionCapture,
+            11 => Self::QueenPromotionCapture,
+            12 => Self::Castle,
             _ => panic!("Invalid move type value: {}", value),
         }
     }
@@ -149,7 +149,7 @@ mod tests {
         assert_eq!(MoveType::QueenPromotion.promotion_char(), Some('q'));
         assert!(!MoveType::QueenPromotion.is_capture());
 
-        assert_eq!(MoveType::KnightPromotionCapture.value(), 12);
+        assert_eq!(MoveType::KnightPromotionCapture.value(), 8);
         assert_eq!(
             MoveType::KnightPromotionCapture.promotion_piece(),
             Piece::Knight
@@ -157,7 +157,7 @@ mod tests {
         assert_eq!(MoveType::KnightPromotionCapture.promotion_char(), Some('n'));
         assert!(MoveType::KnightPromotionCapture.is_capture());
 
-        assert_eq!(MoveType::BishopPromotionCapture.value(), 13);
+        assert_eq!(MoveType::BishopPromotionCapture.value(), 9);
         assert_eq!(
             MoveType::BishopPromotionCapture.promotion_piece(),
             Piece::Bishop
@@ -165,7 +165,7 @@ mod tests {
         assert_eq!(MoveType::BishopPromotionCapture.promotion_char(), Some('b'));
         assert!(MoveType::BishopPromotionCapture.is_capture());
 
-        assert_eq!(MoveType::RookPromotionCapture.value(), 14);
+        assert_eq!(MoveType::RookPromotionCapture.value(), 10);
         assert_eq!(
             MoveType::RookPromotionCapture.promotion_piece(),
             Piece::Rook
@@ -173,7 +173,7 @@ mod tests {
         assert_eq!(MoveType::RookPromotionCapture.promotion_char(), Some('r'));
         assert!(MoveType::RookPromotionCapture.is_capture());
 
-        assert_eq!(MoveType::QueenPromotionCapture.value(), 15);
+        assert_eq!(MoveType::QueenPromotionCapture.value(), 11);
         assert_eq!(
             MoveType::QueenPromotionCapture.promotion_piece(),
             Piece::Queen
@@ -181,7 +181,7 @@ mod tests {
         assert_eq!(MoveType::QueenPromotionCapture.promotion_char(), Some('q'));
         assert!(MoveType::QueenPromotionCapture.is_capture());
 
-        assert_eq!(MoveType::Castle.value(), 16);
+        assert_eq!(MoveType::Castle.value(), 12);
         assert_eq!(MoveType::Castle.promotion_piece(), Piece::None);
         assert_eq!(MoveType::Castle.promotion_char(), None);
         assert!(!MoveType::Castle.is_capture());
@@ -190,8 +190,8 @@ mod tests {
     #[test]
     fn test_move_type_conversions() {
         assert_eq!(MoveType::from(0_u8), MoveType::Quiet);
-        assert_eq!(MoveType::from(15_u8), MoveType::QueenPromotionCapture);
-        assert_eq!(u8::from(MoveType::Castle), 16);
+        assert_eq!(MoveType::from(11_u8), MoveType::QueenPromotionCapture);
+        assert_eq!(u8::from(MoveType::Castle), 12);
     }
 
     #[test]

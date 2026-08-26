@@ -45,7 +45,7 @@ impl MoveOrdering {
 
     pub fn update_history(&mut self, piece: usize, move_obj: Move, bonus: i32) {
         const MAX_HISTORY: i32 = 16384;
-        let target = move_obj.target as usize;
+        let target = move_obj.target() as usize;
         let clamped_bonus = bonus.clamp(-MAX_HISTORY, MAX_HISTORY);
         let current_score = self.history_moves[piece][target];
         self.history_moves[piece][target] +=
@@ -103,9 +103,9 @@ impl MoveOrdering {
     ) {
         let counter_move = if let Some(prev_mv) = previous_move {
             let prev_side = board_state.side_to_move.other();
-            let prev_piece = board_state.piece_mapping[prev_mv.target as usize];
+            let prev_piece = board_state.piece_mapping[prev_mv.target() as usize];
             if prev_piece != Piece::None {
-                self.counter_moves[prev_side as usize][prev_piece as usize][prev_mv.target as usize]
+                self.counter_moves[prev_side as usize][prev_piece as usize][prev_mv.target() as usize]
             } else {
                 Move::NO_MOVE
             }
@@ -114,7 +114,7 @@ impl MoveOrdering {
         };
 
         for move_obj in moves.iter_mut() {
-            let prom_piece = move_obj.mv.move_type.promotion_piece();
+            let prom_piece = move_obj.mv.move_type().promotion_piece();
             if prom_piece == Piece::Queen {
                 move_obj.score = 25000;
             } else if move_obj.mv == self.killer_moves[0][ply] {
@@ -126,10 +126,10 @@ impl MoveOrdering {
             } else if prom_piece != Piece::None {
                 move_obj.score = -20000;
             } else {
-                let piece = board_state.get_piece_on(move_obj.mv.source);
+                let piece = board_state.get_piece_on(move_obj.mv.source());
                 if piece != -1 {
                     let history_score =
-                        self.history_moves[piece as usize][move_obj.mv.target as usize];
+                        self.history_moves[piece as usize][move_obj.mv.target() as usize];
                     move_obj.score = history_score;
                 }
             }
@@ -157,15 +157,15 @@ impl Default for MoveOrdering {
 pub fn populate_capture_scores(moves: &mut [ScoredMove], board_state: &BoardState) {
     for move_obj in moves.iter_mut() {
         let source_piece =
-            board_state.get_piece_on_side(move_obj.mv.source, board_state.side_to_move);
-        let target_piece: usize = if move_obj.mv.move_type == MoveType::EnPassant {
+            board_state.get_piece_on_side(move_obj.mv.source(), board_state.side_to_move);
+        let target_piece: usize = if move_obj.mv.move_type() == MoveType::EnPassant {
             Piece::Pawn as usize
         } else {
-            board_state.get_piece_on_side(move_obj.mv.target, board_state.side_to_move.other())
+            board_state.get_piece_on_side(move_obj.mv.target(), board_state.side_to_move.other())
         };
 
         let mut score = MVV_LVA[target_piece][source_piece];
-        let prom_piece = move_obj.mv.move_type.promotion_piece();
+        let prom_piece = move_obj.mv.move_type().promotion_piece();
         if prom_piece == Piece::Queen {
             score += 50000;
         } else if prom_piece != Piece::None {
@@ -184,27 +184,15 @@ mod tests {
     fn should_sort_moves_by_score() {
         let mut moves = vec![
             ScoredMove {
-                mv: Move {
-                    source: Square::E2,
-                    target: Square::E4,
-                    move_type: MoveType::Quiet,
-                },
+                mv: Move::new(Square::E2, Square::E4, MoveType::Quiet),
                 score: 100,
             },
             ScoredMove {
-                mv: Move {
-                    source: Square::D2,
-                    target: Square::D4,
-                    move_type: MoveType::Quiet,
-                },
+                mv: Move::new(Square::D2, Square::D4, MoveType::Quiet),
                 score: 300,
             },
             ScoredMove {
-                mv: Move {
-                    source: Square::G1,
-                    target: Square::F3,
-                    move_type: MoveType::Quiet,
-                },
+                mv: Move::new(Square::G1, Square::F3, MoveType::Quiet),
                 score: 200,
             },
         ];
@@ -218,27 +206,15 @@ mod tests {
     fn should_not_change_order_if_already_sorted() {
         let mut moves = vec![
             ScoredMove {
-                mv: Move {
-                    source: Square::D2,
-                    target: Square::D4,
-                    move_type: MoveType::Quiet,
-                },
+                mv: Move::new(Square::D2, Square::D4, MoveType::Quiet),
                 score: 300,
             },
             ScoredMove {
-                mv: Move {
-                    source: Square::G1,
-                    target: Square::F3,
-                    move_type: MoveType::Quiet,
-                },
+                mv: Move::new(Square::G1, Square::F3, MoveType::Quiet),
                 score: 200,
             },
             ScoredMove {
-                mv: Move {
-                    source: Square::E2,
-                    target: Square::E4,
-                    move_type: MoveType::Quiet,
-                },
+                mv: Move::new(Square::E2, Square::E4, MoveType::Quiet),
                 score: 100,
             },
         ];
@@ -257,27 +233,15 @@ mod tests {
 
         let mut quiet_moves = vec![
             ScoredMove {
-                mv: Move {
-                    source: Square::A7,
-                    target: Square::A8,
-                    move_type: MoveType::QueenPromotion,
-                },
+                mv: Move::new(Square::A7, Square::A8, MoveType::QueenPromotion),
                 score: 0,
             },
             ScoredMove {
-                mv: Move {
-                    source: Square::A7,
-                    target: Square::A8,
-                    move_type: MoveType::RookPromotion,
-                },
+                mv: Move::new(Square::A7, Square::A8, MoveType::RookPromotion),
                 score: 0,
             },
             ScoredMove {
-                mv: Move {
-                    source: Square::C7,
-                    target: Square::C8,
-                    move_type: MoveType::Quiet,
-                },
+                mv: Move::new(Square::C7, Square::C8, MoveType::Quiet),
                 score: 0,
             },
         ];
@@ -288,11 +252,7 @@ mod tests {
         assert_eq!(quiet_moves[1].score, -20000);
         assert_eq!(quiet_moves[2].score, 0);
 
-        let under_prom = Move {
-            source: Square::A7,
-            target: Square::A8,
-            move_type: MoveType::RookPromotion,
-        };
+        let under_prom = Move::new(Square::A7, Square::A8, MoveType::RookPromotion);
         move_ordering.add_killer_move(under_prom, 0);
 
         let mut killer_quiet_moves = vec![ScoredMove {
@@ -304,27 +264,15 @@ mod tests {
 
         let mut capture_moves = vec![
             ScoredMove {
-                mv: Move {
-                    source: Square::A7,
-                    target: Square::B8,
-                    move_type: MoveType::QueenPromotionCapture,
-                },
+                mv: Move::new(Square::A7, Square::B8, MoveType::QueenPromotionCapture),
                 score: 0,
             },
             ScoredMove {
-                mv: Move {
-                    source: Square::A7,
-                    target: Square::B8,
-                    move_type: MoveType::RookPromotionCapture,
-                },
+                mv: Move::new(Square::A7, Square::B8, MoveType::RookPromotionCapture),
                 score: 0,
             },
             ScoredMove {
-                mv: Move {
-                    source: Square::C7,
-                    target: Square::B8,
-                    move_type: MoveType::Capture,
-                },
+                mv: Move::new(Square::C7, Square::B8, MoveType::Capture),
                 score: 0,
             },
         ];

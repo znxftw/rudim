@@ -438,14 +438,14 @@ fn update_history_stats(
     tried_quiets: &[Move],
 ) {
     let bonus = (300 * depth as i32) - 250;
-    let piece = board_state.get_piece_on(best_move.source) as usize;
+    let piece = board_state.get_piece_on(best_move.source()) as usize;
     search_state
         .move_ordering
         .update_history(piece, best_move, bonus);
 
     for &quiet_move in tried_quiets {
         if quiet_move != best_move {
-            let q_piece = board_state.get_piece_on(quiet_move.source) as usize;
+            let q_piece = board_state.get_piece_on(quiet_move.source()) as usize;
             search_state
                 .move_ordering
                 .update_history(q_piece, quiet_move, -bonus);
@@ -485,12 +485,12 @@ fn beta_cutoff(
 
         if let Some(prev_mv) = previous_move {
             let prev_side = board_state.side_to_move.other();
-            let prev_piece = board_state.piece_mapping[prev_mv.target as usize];
+            let prev_piece = board_state.piece_mapping[prev_mv.target() as usize];
             if prev_piece != Piece::None {
                 search_state.move_ordering.add_counter_move(
                     prev_side,
                     prev_piece,
-                    prev_mv.target,
+                    prev_mv.target(),
                     move_obj,
                 );
             }

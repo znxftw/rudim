@@ -87,7 +87,7 @@ pub fn search(
                     .promotion_char()
                     .map(|c| c.to_string())
                     .unwrap_or_else(String::new);
-                format!("{}{}{}", m.source, m.target, promotion)
+                format!("{}{}{}", m.source(), m.target(), promotion)
             })
             .collect::<Vec<String>>()
             .join(" ");

@@ -72,10 +72,10 @@ impl UciClient {
         board.generate_moves(&mut move_list);
 
         for m in move_list.iter() {
-            if m.mv.source == move_obj.source
-                && m.mv.target == move_obj.target
-                && (move_obj.move_type == MoveType::Quiet
-                    || ((m.mv.move_type.value() & !8) == move_obj.move_type.value()))
+            if m.mv.source() == move_obj.source()
+                && m.mv.target() == move_obj.target()
+                && (move_obj.move_type() == MoveType::Quiet
+                    || m.mv.move_type().promotion_piece() == move_obj.move_type().promotion_piece())
             {
                 return m.mv;
             }
@@ -94,10 +94,10 @@ mod tests {
         let mut move_list = MoveList::new();
         board.generate_moves(&mut move_list);
         for m in move_list.iter() {
-            if m.mv.source == move_obj.source
-                && m.mv.target == move_obj.target
-                && (move_obj.move_type == MoveType::Quiet
-                    || ((m.mv.move_type.value() & !8) == move_obj.move_type.value()))
+            if m.mv.source() == move_obj.source()
+                && m.mv.target() == move_obj.target()
+                && (move_obj.move_type() == MoveType::Quiet
+                    || m.mv.move_type().promotion_piece() == move_obj.move_type().promotion_piece())
             {
                 return m.mv;
             }

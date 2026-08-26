@@ -120,21 +120,21 @@ pub fn board_state_to_viriboard(rudim_state: &BoardState) -> ViriBoard {
 }
 
 pub fn map_rudim_move(m: &Move) -> ViriMove {
-    let from_viri = ViriSquare::new_clamped((m.source as u8) ^ 56);
-    let to_viri = if m.move_type == MoveType::Castle {
+    let from_viri = ViriSquare::new_clamped((m.source() as u8) ^ 56);
+    let to_viri = if m.move_type() == MoveType::Castle {
         // Viriboard maps castle differently
-        let rook_sq = match m.target {
+        let rook_sq = match m.target() {
             RudimSquare::G1 => RudimSquare::H1,
             RudimSquare::C1 => RudimSquare::A1,
             RudimSquare::G8 => RudimSquare::H8,
             RudimSquare::C8 => RudimSquare::A8,
-            _ => m.target,
+            _ => m.target(),
         };
         ViriSquare::new_clamped((rook_sq as u8) ^ 56)
     } else {
-        ViriSquare::new_clamped((m.target as u8) ^ 56)
+        ViriSquare::new_clamped((m.target() as u8) ^ 56)
     };
-    match m.move_type {
+    match m.move_type() {
         MoveType::EnPassant => {
             ViriMove::new_with_flags(from_viri, to_viri, ViriMoveFlags::EnPassant)
         }

@@ -436,7 +436,7 @@ mod tests {
         board.generate_moves(&mut move_list);
         let ep_count = move_list
             .iter()
-            .filter(|m| m.mv.move_type == MoveType::EnPassant)
+            .filter(|m| m.mv.move_type() == MoveType::EnPassant)
             .count();
         assert_eq!(
             ep_count, 1,

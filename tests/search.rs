@@ -13,10 +13,10 @@ fn find_move_from_move_list(board: &mut BoardState, expected_move: Move) -> Move
     board.generate_moves(&mut move_list);
 
     for m in move_list.iter() {
-        if m.mv.source == expected_move.source
-            && m.mv.target == expected_move.target
-            && (expected_move.move_type == MoveType::Quiet
-                || ((m.mv.move_type.value() & !8) == expected_move.move_type.value()))
+        if m.mv.source() == expected_move.source()
+            && m.mv.target() == expected_move.target()
+            && (expected_move.move_type() == MoveType::Quiet
+                || m.mv.move_type().promotion_piece() == expected_move.move_type().promotion_piece())
         {
             return m.mv;
         }

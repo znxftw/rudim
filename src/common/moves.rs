@@ -1,46 +1,73 @@
 use crate::common::move_type::MoveType;
 use crate::common::piece::Piece;
 use crate::common::square::Square;
-use std::hash::{Hash, Hasher};
 
-// TODO: optimize memory here, can save a lot of TT space
-// ref for ideas https://github.com/codedeliveryservice/Reckless/blob/main/src/types/moves.rs
-#[derive(Debug, Clone, Copy)]
-pub struct Move {
-    pub source: Square,
-    pub target: Square,
-    pub move_type: MoveType,
-}
+/// Compact 16-bit Move Encoding:
+/// Bits 0..5 (6 bits): Source Square (0..63)
+/// Bits 6..11 (6 bits): Target Square (0..63)
+/// Bits 12..15 (4 bits): MoveType
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub struct Move(pub u16);
 
 impl Move {
-    pub const NO_MOVE: Move = Move {
-        source: Square::NoSquare,
-        target: Square::NoSquare,
-        move_type: MoveType::Quiet,
-    };
+    pub const NO_MOVE: Move = Move(0);
 
+    #[inline(always)]
     pub fn new(source: Square, target: Square, move_type: MoveType) -> Self {
-        Self {
-            source,
-            target,
-            move_type,
+        if source == Square::NoSquare || target == Square::NoSquare {
+            return Move::NO_MOVE;
+        }
+        let src_idx = (source as u16) & 0x3F;
+        let tgt_idx = (target as u16) & 0x3F;
+        let mt_idx = (move_type as u16) & 0x0F;
+        Move(src_idx | (tgt_idx << 6) | (mt_idx << 12))
+    }
+
+    #[inline(always)]
+    pub fn source(self) -> Square {
+        if self.0 == 0 {
+            Square::NoSquare
+        } else {
+            Square::from((self.0 & 0x3F) as usize)
         }
     }
 
+    #[inline(always)]
+    pub fn target(self) -> Square {
+        if self.0 == 0 {
+            Square::NoSquare
+        } else {
+            Square::from(((self.0 >> 6) & 0x3F) as usize)
+        }
+    }
+
+    #[inline(always)]
+    pub fn move_type(self) -> MoveType {
+        if self.0 == 0 {
+            MoveType::Quiet
+        } else {
+            MoveType::from(((self.0 >> 12) & 0x0F) as u8)
+        }
+    }
+
+    #[inline(always)]
     pub fn is_capture(&self) -> bool {
-        self.move_type.is_capture()
+        self.move_type().is_capture()
     }
 
+    #[inline(always)]
     pub fn promotion_char(&self) -> Option<char> {
-        self.move_type.promotion_char()
+        self.move_type().promotion_char()
     }
 
+    #[inline(always)]
     pub fn is_promotion(&self) -> bool {
-        self.move_type.promotion_piece() != Piece::None
+        self.move_type().promotion_piece() != Piece::None
     }
 
+    #[inline(always)]
     pub fn is_castle(&self) -> bool {
-        self.move_type == MoveType::Castle
+        self.move_type() == MoveType::Castle
     }
 
     pub fn parse_long_algebraic(move_string: &str) -> Option<Self> {
@@ -83,27 +110,14 @@ impl Move {
     }
 }
 
-impl PartialEq for Move {
-    fn eq(&self, other: &Self) -> bool {
-        self.source == other.source
-            && self.target == other.target
-            && self.move_type == other.move_type
-    }
-}
-
-impl Eq for Move {}
-
-impl Hash for Move {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.source.hash(state);
-        self.target.hash(state);
-        self.move_type.hash(state);
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_move_size() {
+        assert_eq!(std::mem::size_of::<Move>(), 2);
+    }
 
     #[test]
     fn test_move_equality() {
@@ -116,14 +130,14 @@ mod tests {
     #[test]
     fn test_parse_long_algebraic() {
         let m = Move::parse_long_algebraic("e2e4").unwrap();
-        assert_eq!(m.source, Square::E2);
-        assert_eq!(m.target, Square::E4);
-        assert_eq!(m.move_type, MoveType::Quiet);
+        assert_eq!(m.source(), Square::E2);
+        assert_eq!(m.target(), Square::E4);
+        assert_eq!(m.move_type(), MoveType::Quiet);
 
         let m_prom = Move::parse_long_algebraic("e7e8q").unwrap();
-        assert_eq!(m_prom.source, Square::E7);
-        assert_eq!(m_prom.target, Square::E8);
-        assert_eq!(m_prom.move_type, MoveType::QueenPromotion);
+        assert_eq!(m_prom.source(), Square::E7);
+        assert_eq!(m_prom.target(), Square::E8);
+        assert_eq!(m_prom.move_type(), MoveType::QueenPromotion);
     }
 
     #[test]
@@ -180,5 +194,7 @@ mod tests {
         let m1 = Move::NO_MOVE;
         let m2 = Move::NO_MOVE;
         assert_eq!(m1, m2);
+        assert_eq!(m1.source(), Square::NoSquare);
+        assert_eq!(m1.target(), Square::NoSquare);
     }
 }

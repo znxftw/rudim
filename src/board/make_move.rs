@@ -20,8 +20,8 @@ impl BoardState {
         let original_half_move_clock = self.half_move_clock;
 
         self.board_hash ^=
-            zobrist::zobrist_table()[self.get_piece_on(m.source) as usize][m.source as usize];
-        let moved_piece = self.remove_piece(m.source, true);
+            zobrist::zobrist_table()[self.get_piece_on(m.source()) as usize][m.source() as usize];
+        let moved_piece = self.remove_piece(m.source(), true);
         if moved_piece == Piece::Pawn || m.is_capture() {
             self.half_move_clock = 0;
         } else {
@@ -36,16 +36,16 @@ impl BoardState {
         }
 
         if m.is_promotion() {
-            final_moved_piece = m.move_type.promotion_piece();
+            final_moved_piece = m.move_type().promotion_piece();
         }
 
         if m.is_castle() {
             self.handle_castle(m);
         }
 
-        self.add_piece(m.target, self.side_to_move, final_moved_piece, true);
+        self.add_piece(m.target(), self.side_to_move, final_moved_piece, true);
         self.board_hash ^=
-            zobrist::zobrist_table()[self.get_piece_on(m.target) as usize][m.target as usize];
+            zobrist::zobrist_table()[self.get_piece_on(m.target()) as usize][m.target() as usize];
 
         self.flush_pending_updates(next_idx);
         self.update_castling_rights(m);
@@ -63,7 +63,7 @@ impl BoardState {
     }
 
     fn handle_castle(&mut self, m: Move) {
-        match m.target {
+        match m.target() {
             Square::C1 => self.move_rook_from(Square::A1, Square::D1, self.side_to_move),
             Square::G1 => self.move_rook_from(Square::H1, Square::F1, self.side_to_move),
             Square::C8 => self.move_rook_from(Square::A8, Square::D8, self.side_to_move),
@@ -73,10 +73,10 @@ impl BoardState {
     }
 
     fn handle_capture(&mut self, m: Move) -> Piece {
-        let target_square = if m.move_type.is_en_passant() {
+        let target_square = if m.move_type().is_en_passant() {
             self.en_passant_square_for(m)
         } else {
-            m.target
+            m.target()
         };
 
         self.board_hash ^= zobrist::zobrist_table()[self.get_piece_on(target_square) as usize]
@@ -96,8 +96,8 @@ impl BoardState {
 
         // TODO: this needs to be rethought for proper impl (FEN, and legal en passsnt represent EP square differently)
         // https://www.talkchess.com/forum/viewtopic.php?t=33397
-        self.en_passant_square = if m.move_type.is_double_push() {
-            let t = m.target as usize;
+        self.en_passant_square = if m.move_type().is_double_push() {
+            let t = m.target() as usize;
             let adjacent = ((1u64 << (t - 1)) & !FILE_H) | ((1u64 << (t + 1)) & !FILE_A);
             if (self.get_pieces(self.side_to_move.other(), Piece::Pawn) & adjacent).is_not_empty() {
                 self.en_passant_square_for(m)
@@ -112,8 +112,8 @@ impl BoardState {
 
     fn update_castling_rights(&mut self, m: Move) {
         self.board_hash = zobrist::hash_castling_rights(self, self.board_hash);
-        self.castle &= Castle::from_bits_retain(CASTLING_CONSTANTS[m.source as usize]);
-        self.castle &= Castle::from_bits_retain(CASTLING_CONSTANTS[m.target as usize]);
+        self.castle &= Castle::from_bits_retain(CASTLING_CONSTANTS[m.source() as usize]);
+        self.castle &= Castle::from_bits_retain(CASTLING_CONSTANTS[m.target() as usize]);
         self.board_hash = zobrist::hash_castling_rights(self, self.board_hash);
     }
 
@@ -129,11 +129,11 @@ impl BoardState {
     pub fn unmake_move(&mut self, m: Move) {
         let history = self.history.restore();
 
-        let moved_piece = self.remove_piece(m.target, false);
+        let moved_piece = self.remove_piece(m.target(), false);
         self.side_to_move = self.side_to_move.other();
 
         if history.captured_piece != Piece::None {
-            if m.move_type.is_en_passant() {
+            if m.move_type().is_en_passant() {
                 self.add_piece(
                     self.en_passant_square_for(m),
                     self.side_to_move.other(),
@@ -142,7 +142,7 @@ impl BoardState {
                 );
             } else {
                 self.add_piece(
-                    m.target,
+                    m.target(),
                     self.side_to_move.other(),
                     history.captured_piece,
                     false,
@@ -151,7 +151,7 @@ impl BoardState {
         }
 
         if m.is_castle() {
-            match m.target {
+            match m.target() {
                 Square::C1 => {
                     self.remove_piece(Square::D1, false);
                     self.add_piece(Square::A1, self.side_to_move, Piece::Rook, false);
@@ -173,7 +173,7 @@ impl BoardState {
         }
 
         self.add_piece(
-            m.source,
+            m.source(),
             self.side_to_move,
             if m.is_promotion() {
                 Piece::Pawn
@@ -195,7 +195,7 @@ impl BoardState {
         } else {
             8
         };
-        Square::from((m.target as i32 + offset) as usize)
+        Square::from((m.target() as i32 + offset) as usize)
     }
 
     pub fn is_draw(&self) -> bool {
@@ -369,10 +369,10 @@ mod tests {
             let parsed_move = Move::parse_long_algebraic(move_str).unwrap();
             let mut found_move = Move::NO_MOVE;
             for m in move_list.iter() {
-                if m.mv.source == parsed_move.source
-                    && m.mv.target == parsed_move.target
-                    && (parsed_move.move_type == MoveType::Quiet
-                        || ((m.mv.move_type.value() & !8) == parsed_move.move_type.value()))
+                if m.mv.source() == parsed_move.source()
+                    && m.mv.target() == parsed_move.target()
+                    && (parsed_move.move_type() == MoveType::Quiet
+                        || m.mv.move_type().promotion_piece() == parsed_move.move_type().promotion_piece())
                 {
                     found_move = m.mv;
                     break;
@@ -437,7 +437,7 @@ mod tests {
                 .unwrap_or_else(|| panic!("Failed to parse move: '{}'", move_str));
             let mut found_move = Move::NO_MOVE;
             for m in move_list.iter() {
-                if m.mv.source == parsed_move.source && m.mv.target == parsed_move.target {
+                if m.mv.source() == parsed_move.source() && m.mv.target() == parsed_move.target() {
                     found_move = m.mv;
                     break;
                 }
@@ -461,7 +461,7 @@ mod tests {
             let parsed = Move::parse_long_algebraic(move_str).unwrap();
             let mut found = Move::NO_MOVE;
             for m in move_list.iter() {
-                if m.mv.source == parsed.source && m.mv.target == parsed.target {
+                if m.mv.source() == parsed.source() && m.mv.target() == parsed.target() {
                     found = m.mv;
                     break;
                 }
@@ -640,22 +640,14 @@ mod tests {
             BoardState::parse_fen("rnbqkbnr/pppp1ppp/8/4P3/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2");
 
         // Quiet Moves which won't update draw killer
-        board.make_move(Move {
-            source: Square::B7,
-            target: Square::C6,
-            move_type: MoveType::Quiet,
-        });
-        board.make_move(Move {
-            source: Square::B1,
-            target: Square::C3,
-            move_type: MoveType::Quiet,
-        });
+        board.make_move(Move::new(Square::B7, Square::C6, MoveType::Quiet));
+        board.make_move(Move::new(Square::B1, Square::C3, MoveType::Quiet));
         let mut move_list = MoveList::new();
         board.generate_moves(&mut move_list);
         let double_push = move_list
             .iter()
             .copied()
-            .find(|m| m.mv.source == Square::F7 && m.mv.target == Square::F5)
+            .find(|m| m.mv.source() == Square::F7 && m.mv.target() == Square::F5)
             .expect("f7f5 double push must exist");
         board.make_move(double_push.mv);
         assert_eq!(board.en_passant_square, Square::F6);

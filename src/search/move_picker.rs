@@ -203,11 +203,11 @@ mod tests {
 
         let has_good_capture = good_captures
             .iter()
-            .any(|m| m.source == Square::C3 && m.target == Square::B4);
+            .any(|m| m.source() == Square::C3 && m.target() == Square::B4);
         let has_bad_capture = good_captures
             .iter()
-            .any(|m| m.source == Square::D2 && m.target == Square::D4);
-        let has_quiets = good_captures.iter().any(|m| m.move_type == MoveType::Quiet);
+            .any(|m| m.source() == Square::D2 && m.target() == Square::D4);
+        let has_quiets = good_captures.iter().any(|m| m.move_type() == MoveType::Quiet);
 
         assert!(has_good_capture);
         assert!(!has_bad_capture);
@@ -229,11 +229,11 @@ mod tests {
 
         let good_capture_idx = returned_moves
             .iter()
-            .position(|m| m.source == Square::C3 && m.target == Square::B4)
+            .position(|m| m.source() == Square::C3 && m.target() == Square::B4)
             .unwrap();
         let bad_capture_idx = returned_moves
             .iter()
-            .position(|m| m.source == Square::D2 && m.target == Square::D4)
+            .position(|m| m.source() == Square::D2 && m.target() == Square::D4)
             .unwrap();
 
         assert!(good_capture_idx < bad_capture_idx);
@@ -241,7 +241,7 @@ mod tests {
         let quiet_indices: Vec<usize> = returned_moves
             .iter()
             .enumerate()
-            .filter(|(_, m)| m.move_type == MoveType::Quiet)
+            .filter(|(_, m)| m.move_type() == MoveType::Quiet)
             .map(|(i, _)| i)
             .collect();
 

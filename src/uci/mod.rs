@@ -94,7 +94,7 @@ pub(crate) fn output_best_move(move_obj: Move) {
         .unwrap_or_default();
     cli::write_line(&format!(
         "bestmove {}{}{}",
-        move_obj.source, move_obj.target, promotion
+        move_obj.source(), move_obj.target(), promotion
     ));
 }
 

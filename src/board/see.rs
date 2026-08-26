@@ -30,7 +30,7 @@ impl Piece {
 impl BoardState {
     // impl - https://www.chessprogramming.org/SEE_-_The_Swap_Algorithm
     pub fn see(&self, mv: Move) -> i16 {
-        let (source, target) = (mv.source, mv.target);
+        let (source, target) = (mv.source(), mv.target());
         let mut occupancy = self.occupancy();
         let mut side = self.side_to_move;
 
@@ -48,7 +48,7 @@ impl BoardState {
 
         let mut depth = 1;
         let mut last_captured_piece = if mv.is_promotion() {
-            mv.move_type.promotion_piece()
+            mv.move_type().promotion_piece()
         } else {
             self.piece_mapping[source as usize]
         };
@@ -87,10 +87,10 @@ impl BoardState {
 
     #[inline(always)]
     fn get_initial_captured_piece(&self, mv: Move) -> Piece {
-        if mv.move_type == MoveType::EnPassant {
+        if mv.move_type() == MoveType::EnPassant {
             Piece::Pawn
         } else {
-            self.piece_mapping[mv.target as usize]
+            self.piece_mapping[mv.target() as usize]
         }
     }
 
@@ -98,18 +98,18 @@ impl BoardState {
     fn get_initial_gain(&self, mv: Move, captured: Piece) -> i16 {
         let mut gain = captured.see_value();
         if mv.is_promotion() {
-            gain += mv.move_type.promotion_piece().see_value() - Piece::Pawn.see_value();
+            gain += mv.move_type().promotion_piece().see_value() - Piece::Pawn.see_value();
         }
         gain
     }
 
     #[inline(always)]
     fn clear_en_passant_square(&self, mv: Move, occupancy: &mut Bitboard, side: Side) {
-        if mv.move_type == MoveType::EnPassant {
+        if mv.move_type() == MoveType::EnPassant {
             let ep_sq = if side == Side::White {
-                mv.target as usize + 8
+                mv.target() as usize + 8
             } else {
-                mv.target as usize - 8
+                mv.target() as usize - 8
             };
             occupancy.clear_bit(ep_sq);
         }

@@ -151,7 +151,7 @@ fn run_searches() {
             .unwrap_or_default();
         println!(
             "Best move: {}{}{}",
-            best_move.source, best_move.target, promo
+            best_move.source(), best_move.target(), promo
         );
         println!("Time taken: {:?}", duration);
     }
