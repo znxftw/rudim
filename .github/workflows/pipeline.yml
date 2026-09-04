@@ -24,7 +24,12 @@ on:
 
 jobs:
   ci:
+    name: ci (${{ matrix.toolchain }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [stable, nightly]
     env:
       RUSTFLAGS: "-C target-cpu=generic"
     environment:
@@ -40,8 +45,8 @@ jobs:
 
       - name: Setup Rust toolchain (rustup)
         run: |
-          rustup toolchain install stable --profile minimal --component clippy --component rustfmt --component llvm-tools-preview
-          rustup default stable
+          rustup toolchain install ${{ matrix.toolchain }} --profile minimal --component clippy --component rustfmt --component llvm-tools-preview
+          rustup default ${{ matrix.toolchain }}
           rustc --version
           cargo --version
 
@@ -52,8 +57,8 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          key: ${{ runner.os }}-cargo-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-${{ matrix.toolchain }}-
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@faf6515f98a6da02430741fd0af1094fde82286d # cargo-llvm-cov
@@ -62,13 +67,13 @@ jobs:
         run: make quality
 
       - name: Upload HTML coverage report artifact for GitHub Pages
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && matrix.toolchain == 'stable'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: target/llvm-cov/html
 
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && matrix.toolchain == 'stable'
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
 
