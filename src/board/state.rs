@@ -11,7 +11,6 @@ use crate::common::piece::{Piece, PieceMap};
 use crate::common::side::{Side, SideMap};
 use crate::common::square::Square;
 use crate::eval::nnue::loader::Network;
-use std::fmt;
 
 #[rustfmt::skip]
 pub const CASTLING_CONSTANTS: [u8; SQUARES] = [
@@ -206,12 +205,6 @@ impl PartialEq for BoardState {
 }
 
 impl Eq for BoardState {}
-
-impl fmt::Display for BoardState {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.board_hash)
-    }
-}
 
 #[cfg(test)]
 mod tests {
